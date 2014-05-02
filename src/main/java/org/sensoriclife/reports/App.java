@@ -10,5 +10,6 @@ import org.sensoriclife.Logger;
 public class App {
 	public static void main(String[] args) {
 		Logger.getInstance();
+		Logger.info("SensoricLife - reports");
 	}
 }
