@@ -32,7 +32,7 @@ public class Accumulo {
 	private Instance instance; 
 	private Connector connector;
 
-	private Accumulo() {
+	public Accumulo() {
 		this.instance = null;
 		this.connector = null;
 	}
@@ -58,10 +58,10 @@ public class Accumulo {
 		this.connector = null;
 	}
 
-	public synchronized Scanner scannByKey(String tabel, String key, String attribute, String authentication) throws TableNotFoundException {
+	public synchronized Scanner scanByKey(String table, String key, String attribute, String authentication) throws TableNotFoundException {
 		Authorizations auths = new Authorizations(authentication);
 
-		Scanner scan = this.connector.createScanner(tabel, auths);
+		Scanner scan = this.connector.createScanner(table, auths);
 		scan.setRange(new Range(key,key));
 		scan.fetchColumnFamily(new Text(attribute));
 
