@@ -36,7 +36,7 @@ public class MMCMain {
 		//AccumuloOutputFormat.setZooKeeperInstance(job, "myinstance",
 		  //      "zooserver-one,zooserver-two");
 		
-		Accumulo accumulo = new Accumulo();
+		Accumulo accumulo = Accumulo.getInstance();
 		//connect to accumulo
 		accumulo.connect();
 		//load data from accumulo - two tables needed (electricity_consumption and residentialUnit with resi_id and electric_id as parameters))

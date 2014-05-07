@@ -1,12 +1,12 @@
 package org.sensoriclife.reports.world;
 
-import java.util.Date;
+import org.apache.accumulo.core.data.Value;
 
 public class Consumption {
 	
 	private int consumptionId;
-	private Date timestamp;
-	private int amount;
+	private long timestamp;
+	private double amount;
 	
 	public int getConsumptionId() {
 		return consumptionId;
@@ -16,19 +16,19 @@ public class Consumption {
 		this.consumptionId = consumptionId;
 	}
 	
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 	
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 	
-	public void setAmount(int amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 	
-	public int getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 	

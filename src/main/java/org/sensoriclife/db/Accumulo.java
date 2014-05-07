@@ -32,12 +32,12 @@ public class Accumulo {
 	private Instance instance; 
 	private Connector connector;
 
-	public Accumulo() {
+	private Accumulo() {
 		this.instance = null;
 		this.connector = null;
 	}
 
-	public static synchronized Accumulo getInstance() {
+	public static Accumulo getInstance() {
 		if ( accumolo == null )
 			accumolo = new Accumulo();
 
@@ -58,7 +58,7 @@ public class Accumulo {
 		this.connector = null;
 	}
 
-	public synchronized Scanner scanByKey(String table, String key, String attribute, String authentication) throws TableNotFoundException {
+	public Scanner scanByKey(String table, String key, String attribute, String authentication) throws TableNotFoundException {
 		Authorizations auths = new Authorizations(authentication);
 
 		Scanner scan = this.connector.createScanner(table, auths);
@@ -68,11 +68,11 @@ public class Accumulo {
 		return scan;
 	}
 
-	public synchronized void write(String table, Text rowID, Text columnFamily, Text columnQualifier, long timestamp, Value values) throws TableNotFoundException, MutationsRejectedException {
+	public void write(String table, Text rowID, Text columnFamily, Text columnQualifier, long timestamp, Value values) throws TableNotFoundException, MutationsRejectedException {
 		this.write(table, rowID, columnFamily, columnQualifier, timestamp, values, "public");
 	}
 
-	public synchronized void write(String table, Text rowID, Text columnFamily, Text columnQualifier, long timestamp, Value value, String visibility) throws TableNotFoundException, MutationsRejectedException {
+	public void write(String table, Text rowID, Text columnFamily, Text columnQualifier, long timestamp, Value value, String visibility) throws TableNotFoundException, MutationsRejectedException {
 		ColumnVisibility colVis = new ColumnVisibility("public");
 
 		Mutation mutation = new Mutation(rowID);

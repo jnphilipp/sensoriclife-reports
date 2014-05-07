@@ -11,22 +11,15 @@ public class ResidentialUnit implements Cloneable {
 	private int coldWaterId;
 	private int warmWaterId;
 	private ArrayList<Integer> heatingIds;
-	private double electricityConsumption;
+	private ElecConsumption elecConsumption;
 
 	public ResidentialUnit() {
 		heatingIds = new ArrayList<Integer>();
+		elecConsumption = new ElecConsumption();
 	}
 
 	public String getAddress() {
 		return null;
-	}
-
-	public double getElectricityConsumption() {
-		return electricityConsumption;
-	}
-
-	public void setElectricityConsumption(double electricityConsumption) {
-		this.electricityConsumption = electricityConsumption;
 	}
 
 	public int getResidentialId() {
@@ -83,6 +76,14 @@ public class ResidentialUnit implements Cloneable {
 
 	public void setHeatingIds(ArrayList<Integer> heatingId) {
 		this.heatingIds = heatingId;
+	}
+	
+	public ElecConsumption getElecConsumption() {
+		return elecConsumption;
+	}
+	
+	public void setElecConsumption(ElecConsumption elecConsumption) {
+		this.elecConsumption = elecConsumption;
 	}
 
 	public ResidentialUnit clone() throws CloneNotSupportedException {
