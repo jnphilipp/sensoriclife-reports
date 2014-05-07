@@ -1,6 +1,7 @@
 package org.sensoriclife.util;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +14,11 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
+import org.sensoriclife.Logger;
 
 /**
  *
@@ -165,5 +168,26 @@ public class Helpers {
 			hashtext = "0" + hashtext;
 
 		return hashtext;
+	}
+	
+	public static Properties loadConfig(String configFile) {
+		
+		Properties properties = new Properties();
+		
+		if ( !new File(configFile).exists() ) {
+			System.err.println("The configuration file does not exists.");
+			Logger.error(Helpers.class, "The configuration file does not exists.");
+			return properties;
+		}
+
+		try {
+			
+			properties.load(new FileInputStream(configFile));
+			return properties;
+		}
+		catch ( IOException e ) {
+			Logger.error(Helpers.class, "Error while reading config file.", e.toString());
+			return properties;
+		}
 	}
 }
