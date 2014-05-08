@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -11,7 +12,7 @@ import org.sensoriclife.reports.App;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
 public class AccumuloMMCMapper extends
-		Mapper<Text, Text, NullWritable, ResidentialUnit> {
+		Mapper<Text, Text, IntWritable, ResidentialUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -26,7 +27,7 @@ public class AccumuloMMCMapper extends
 			flat.getElecConsumption().setAmount(amount);
 			flat.getElecConsumption().setTimestamp(timestamp);
 			flat.setElectricMeterId(electricMeterId);
-			c.write(NullWritable.get(), flat);
+			c.write(new IntWritable(1), flat);
 		}
 	}
 

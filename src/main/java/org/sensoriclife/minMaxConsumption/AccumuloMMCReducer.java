@@ -5,9 +5,8 @@ import java.util.Iterator;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
@@ -17,9 +16,9 @@ import org.sensoriclife.reports.world.ResidentialUnit;
  *
  */
 public class AccumuloMMCReducer extends
-		Reducer<NullWritable, ResidentialUnit, Text, Mutation> {
+		Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
 
-	public void reduce(NullWritable key, Iterable<ResidentialUnit> values,
+	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,
 			Context c) throws IOException, InterruptedException {
 
 		ResidentialUnit minFlat = null;
