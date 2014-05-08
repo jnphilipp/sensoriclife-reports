@@ -11,8 +11,13 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
+/**
+ * 
+ * @author marcel
+ *
+ */
 public class AccumuloMMCReducer extends
-		Reducer<NullWritable, Writable, Text, Mutation> {
+		Reducer<NullWritable, ResidentialUnit, Text, Mutation> {
 
 	public void reduce(NullWritable key, Iterable<ResidentialUnit> values,
 			Context c) throws IOException, InterruptedException {
@@ -33,32 +38,35 @@ public class AccumuloMMCReducer extends
 				maxFlat = flat;
 		}
 
-		Mutation m = new Mutation();
+		Mutation m1 = new Mutation();
 		// write minimum
-		m.put("consumptionId",
+		m1.put("consumptionId",
 				"min",
 				new Value(String.valueOf(
 						minFlat.getElecConsumption().getConsumptionId())
 						.getBytes()));
-		m.put("amount",
+		m1.put("amount",
 				"minAmount",
 				new Value(String.valueOf(
 						minFlat.getElecConsumption().getAmount()).getBytes()));
 		
+		Mutation m2 = new Mutation();
 		// write maximum
-		m.put("consumptionId",
-				"min",
+		
+		m2.put("consumptionId",
+				"max",
 				new Value(String.valueOf(
 						maxFlat.getElecConsumption().getConsumptionId())
 						.getBytes()));
-		m.put("amount",
-				"minAmount",
+		m2.put("amount",
+				"maxAmount",
 				new Value(String.valueOf(
 						maxFlat.getElecConsumption().getAmount()).getBytes()));
 
 		// create the mutation based on input key and value
 		// report in hdfs
-		c.write(new Text("minMaxConsumption"), m);
+		c.write(new Text("minMaxConsumption"), m1);
+		c.write(new Text("minMaxConsumption"), m2);
 
 		// report as console - output
 		System.out.println(minFlat.getAddress() + " "

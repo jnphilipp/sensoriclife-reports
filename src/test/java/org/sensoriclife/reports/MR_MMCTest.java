@@ -1,14 +1,11 @@
 package org.sensoriclife.reports;
 
-import org.sensoriclife.minMaxConsumption.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
- 
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
+
+import org.apache.accumulo.core.data.Mutation;
+import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mrunit.mapreduce.MapDriver;
@@ -16,17 +13,25 @@ import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver;
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver;
 import org.junit.Before;
 import org.junit.Test;
+import org.sensoriclife.minMaxConsumption.AccumuloMMCMapper;
+import org.sensoriclife.minMaxConsumption.AccumuloMMCReducer;
+import org.sensoriclife.reports.world.ResidentialUnit;
  
+/**
+ * 
+ * @author yves, marcel
+ *
+ */
 public class MR_MMCTest {
  
-  MapDriver<Text, Text, NullWritable, ResidentialUnit> mapDriver;
-  ReduceDriver<NullWritable, ResidentialUnit, Text, DoubleWritable> reduceDriver;
-  MapReduceDriver<Text, Text, NullWritable, ResidentialUnit, Text, DoubleWritable> mapReduceDriver;
+  private MapDriver<Text, Text, NullWritable, ResidentialUnit> mapDriver;
+  private ReduceDriver<NullWritable, ResidentialUnit, Text, Mutation> reduceDriver;
+  private MapReduceDriver<Text, Text, NullWritable, ResidentialUnit, Text, Mutation> mapReduceDriver;
  
   @Before
   public void setUp() {
-    MMCMapper mapper = new MMCMapper();
-    MMCReducer reducer = new MMCReducer();
+    AccumuloMMCMapper mapper = new AccumuloMMCMapper();
+    AccumuloMMCReducer reducer = new AccumuloMMCReducer();
     mapDriver = MapDriver.newMapDriver(mapper);
     reduceDriver = ReduceDriver.newReduceDriver(reducer);
     mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer);
@@ -34,21 +39,36 @@ public class MR_MMCTest {
  
   @Test
   public void testMapper() throws IOException {
-    mapDriver.withInput(new Text("1-1-1-1-1"), new Text(
-        "1;1;1"));
-    //mapDriver.withOutput(new Text("6"), new IntWritable(1));
-    
-	mapDriver.runTest();
-	
+    mapDriver.withInput(new Text("1-1-1-1-1"), new Text("1"));
+    ResidentialUnit flat = new ResidentialUnit();
+	flat.getElecConsumption().setAmount(1);
+	flat.getElecConsumption().setTimestamp(1);
+	flat.setElectricMeterId(1);
+    mapDriver.withOutput(NullWritable.get(), flat);
+	mapDriver.runTest();	
   }
  
   @Test
   public void testReducer() throws IOException {
-    List<IntWritable> values = new ArrayList<IntWritable>();
-    values.add(new IntWritable(1));
-    values.add(new IntWritable(1));
-    //reduceDriver.withInput(new Text("6"), values);
-    //reduceDriver.withOutput(new Text("6"), new IntWritable(2));
+    List<ResidentialUnit> values = new ArrayList<ResidentialUnit>();
+    ResidentialUnit flat = new ResidentialUnit();
+   	flat.getElecConsumption().setAmount(1);
+   	flat.getElecConsumption().setTimestamp(1);
+   	flat.setElectricMeterId(1);
+    values.add(flat);
+    reduceDriver.withInput(NullWritable.get(), values);
+   
+    Mutation m1 = new Mutation();
+	// write minimum
+	m1.put("consumptionId",
+			"min",
+			new Value("1-1-1-1-1".getBytes())); 
+	m1.put("amount",
+			"minAmount",
+			new Value(String.valueOf(1).getBytes()));
+    
+    reduceDriver.withOutput(new Text("minMaxConsumption"), m1);
+    //reduceDriver.withOutput(new Text("minMaxConsumption"), m2);
     reduceDriver.runTest();
   }
 }
