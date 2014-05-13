@@ -3,17 +3,18 @@ package org.sensoriclife.minMaxConsumption;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.util.CachedConfiguration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -22,8 +23,6 @@ import org.sensoriclife.Logger;
 import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.App;
 import org.sensoriclife.reports.world.ResidentialUnit;
-
-import com.beust.jcommander.Parameter;
 
 /**
  * 
@@ -36,15 +35,6 @@ public class MMCMain extends Configured implements Tool {
 		int res = ToolRunner.run(CachedConfiguration.getInstance(),
 				new MMCMain(), args);
 		System.exit(res);
-	}
-
-	static class Opts extends ClientOnRequiredTable {
-		@Parameter(names = "--output", description = "output directory")
-		String output;
-		@Parameter(names = "--reducers", description = "number of reducers to use", required = true)
-		int reducers;
-		@Parameter(names = "--offline", description = "run against an offline table")
-		boolean offline = false;
 	}
 
 	@Override
@@ -72,11 +62,13 @@ public class MMCMain extends Configured implements Tool {
 		}
 		
 		
-		
-		
-		Job job = Job.getInstance(getConf());
+		Job job = Job.getInstance(getConf(), MMCMain.class.getName());
 		job.setJarByClass(this.getClass());
+		
 		AccumuloInputFormat.setMockInstance(job, "mockInstance");
+		
+		//input from mockinstance
+		//TextInputFormat.setInputPaths(job, "/inputPath");
 
 		// AccumuloInputFormat.setZooKeeperInstance(job, "myinstance",
 		// "zooserver-one,zooserver-two");
@@ -105,12 +97,14 @@ public class MMCMain extends Configured implements Tool {
 		job.setMapOutputValueClass(ResidentialUnit.class);
 		job.setCombinerClass(AccumuloMMCReducer.class);
 		job.setReducerClass(AccumuloMMCReducer.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(Mutation.class);
 
-		// job.setNumReduceTasks(opts.reducers);
-		job.setOutputFormatClass(TextOutputFormat.class);
+		// job.setNumReduceTasks(App.getProperty("numberOfReducers"));
+		job.setOutputFormatClass(AccumuloOutputFormat.class);
 		TextOutputFormat.setOutputPath(job, new Path("/output"));
 		job.waitForCompletion(true);
-		
+
 		return job.isSuccessful() ? 0 : 1;
 	}
 }
