@@ -1,9 +1,11 @@
 package org.sensoriclife.reports.world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class District implements Cloneable{
+public class District implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private ArrayList<Street> streets;
 	
@@ -25,10 +27,5 @@ public class District implements Cloneable{
 	
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public District clone() throws CloneNotSupportedException{
-		District clone = (District)super.clone();
-		return clone;
 	}
 }

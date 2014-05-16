@@ -3,6 +3,7 @@ package org.sensoriclife.minMaxConsumption;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -23,7 +24,6 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -31,6 +31,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
 public class UserCountMain extends Configured implements Tool {
@@ -50,13 +51,11 @@ public class UserCountMain extends Configured implements Tool {
 		args2[3] = mockInstanceName;
 		args2[4] = outputTableName;
 
-	
 		MockInstance inputMi = new MockInstance(mockInstanceName);
 		Connector connector = inputMi.getConnector(userName, new PasswordToken(
 				password));
 		connector.tableOperations().create(inputTableName, false);
 		connector.tableOperations().create(outputTableName, false);
-	
 
 		// insert some test data
 		insertData(connector, inputTableName);
@@ -67,7 +66,7 @@ public class UserCountMain extends Configured implements Tool {
 		Connector connector = accumulo.getConnector();
 
 		accumulo.createTable(args2[0]);
-		accumulo.createTable(args2[5]);
+		accumulo.createTable(args2[4]);
 		
 		String colFam = "electricity";
 		String colQual = "amount";
@@ -99,6 +98,7 @@ public class UserCountMain extends Configured implements Tool {
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}
 		*/
+		
 		
 		// print the out the counts for each node
 		printUserCount(connector, inputTableName);
@@ -195,19 +195,19 @@ public class UserCountMain extends Configured implements Tool {
 		ColumnVisibility colVis = new ColumnVisibility();// "public");
 		// long timestamp = System.currentTimeMillis();
 
-		Value value = new Value("3".getBytes());
+		Value value = new Value("4".getBytes());
 
 		Mutation mutation = new Mutation(rowID);
 		mutation.put(colFam, colQual, colVis, 1, value);
 		wr.addMutation(mutation);
 		mutation = new Mutation("2");
 		mutation.put(colFam, new Text("5"), colVis, 2,
-				new Value("1".getBytes()));
+				new Value("8".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation("3");
 		mutation.put(colFam, new Text("5"), colVis, 3,
-				new Value("1".getBytes()));
+				new Value("111".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation("4");
@@ -217,7 +217,7 @@ public class UserCountMain extends Configured implements Tool {
 		
 		mutation = new Mutation("5");
 		mutation.put(colFam, new Text("5"), colVis, 10,
-				new Value("4".getBytes()));
+				new Value("42".getBytes()));
 		wr.addMutation(mutation);
 
 		mutation = new Mutation("6");
@@ -227,7 +227,7 @@ public class UserCountMain extends Configured implements Tool {
 		
 		mutation = new Mutation("7");
 		mutation.put("Log", "5", new ColumnVisibility(), 3,
-				new Value("3".getBytes()));
+				new Value("1".getBytes()));
 		wr.addMutation(mutation);
 		wr.close();
 	}

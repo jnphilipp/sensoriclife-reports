@@ -1,14 +1,20 @@
 package org.sensoriclife.reports.world;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.hadoop.io.Writable;
 
-public class ResidentialUnit implements Writable, Cloneable {
+public class ResidentialUnit implements Serializable, Writable{
 
+	private static final long serialVersionUID = 1L;
 	private int residentialId;
 	private int billUserId;
 	private int numberOfResidents;
@@ -89,12 +95,37 @@ public class ResidentialUnit implements Writable, Cloneable {
 	
 	public void setElecConsumption(ElecConsumption elecConsumption) {
 		this.elecConsumption = elecConsumption;
-	}
-
-	public ResidentialUnit clone() throws CloneNotSupportedException {
-		ResidentialUnit clone = (ResidentialUnit) super.clone();
-		return clone;
-	}
+	}	
+	
+	public Object deepCopy(Object oldObj) throws Exception
+	   {
+	      ObjectOutputStream oos = null;
+	      ObjectInputStream ois = null;
+	      try
+	      {
+	         ByteArrayOutputStream bos = 
+	               new ByteArrayOutputStream();
+	         oos = new ObjectOutputStream(bos);
+	         // serialize and pass the object
+	         oos.writeObject(oldObj);
+	         oos.flush();  
+	         ByteArrayInputStream bin = 
+	               new ByteArrayInputStream(bos.toByteArray());
+	         ois = new ObjectInputStream(bin);
+	         // return the new object
+	         return ois.readObject();
+	      }
+	      catch(Exception e)
+	      {
+	         System.out.println("Exception = " + e);
+	         throw(e);
+	      }
+	      finally
+	      {
+	         oos.close();
+	         ois.close();
+	      }
+	   }
 
 	@Override
 	public void write(DataOutput out) throws IOException {

@@ -1,9 +1,11 @@
 package org.sensoriclife.reports.world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Building implements Cloneable {
+public class Building implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private ArrayList<ResidentialUnit> residentialUnits;
 
@@ -25,10 +27,5 @@ public class Building implements Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Building clone() throws CloneNotSupportedException {
-		Building clone = (Building) super.clone();
-		return clone;
 	}
 }

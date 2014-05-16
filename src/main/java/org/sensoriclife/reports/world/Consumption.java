@@ -3,11 +3,13 @@ package org.sensoriclife.reports.world;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.hadoop.io.Writable;
 
-public class Consumption implements Writable, Cloneable{
+public class Consumption implements Serializable, Writable{
 
+	private static final long serialVersionUID = 1L;
 	private int consumptionId;
 	private long timestamp;
 	private double amount;
@@ -34,11 +36,6 @@ public class Consumption implements Writable, Cloneable{
 	
 	public double getAmount() {
 		return amount;
-	}
-	
-	public Consumption clone() throws CloneNotSupportedException {
-		Consumption clone = (Consumption) super.clone();
-		return clone;
 	}
 
 	@Override
