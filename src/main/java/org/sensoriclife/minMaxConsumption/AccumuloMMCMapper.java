@@ -5,14 +5,11 @@ import java.io.IOException;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.sensoriclife.reports.App;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
 public class AccumuloMMCMapper extends
-		Mapper<Text, Text, IntWritable, ResidentialUnit> {
+		Mapper<Key, Value, IntWritable, ResidentialUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -20,8 +17,8 @@ public class AccumuloMMCMapper extends
 		double amount = Double.parseDouble(v.toString());
 		long timestamp = k.getTimestamp();
 		// filter period for minMaxConsumption of electricity
-		if (timestamp >= Long.parseLong(App.getProperty("minTimeStamp"))
-				&& timestamp <= Long.parseLong(App.getProperty("maxTimeStamp"))) {
+		if (timestamp >= Long.parseLong(/*App.getProperty("minTimeStamp")*/"1")
+				&& timestamp <= Long.parseLong(/*App.getProperty("maxTimeStamp")*/"40")) {
 			int electricMeterId = Integer.parseInt(k.getRow().toString());
 			ResidentialUnit flat = new ResidentialUnit();
 			flat.getElecConsumption().setAmount(amount);

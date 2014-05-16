@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
@@ -24,9 +25,9 @@ import org.sensoriclife.reports.world.ResidentialUnit;
  */
 public class MR_MMCTest {
  
-  private MapDriver<Text, Text, IntWritable, ResidentialUnit> mapDriver;
+  private MapDriver<Key, Value, IntWritable, ResidentialUnit> mapDriver;
   private ReduceDriver<IntWritable, ResidentialUnit, Text, Mutation> reduceDriver;
-  private MapReduceDriver<Text, Text, IntWritable, ResidentialUnit, Text, Mutation> mapReduceDriver;
+  private MapReduceDriver<Key, Value, IntWritable, ResidentialUnit, Text, Mutation> mapReduceDriver;
  
   @Before
   public void setUp() {
@@ -39,7 +40,7 @@ public class MR_MMCTest {
  
   @Test
   public void testMapper() throws IOException {
-    mapDriver.withInput(new Text("1-1-1-1-1"), new Text("1"));
+    mapDriver.withInput(new Key("1-1-1-1-1"), new Value("1".getBytes()));
     ResidentialUnit flat = new ResidentialUnit();
 	flat.getElecConsumption().setAmount(1);
 	flat.getElecConsumption().setTimestamp(1);

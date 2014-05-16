@@ -1,8 +1,13 @@
 package org.sensoriclife.reports.world;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class ResidentialUnit implements Cloneable {
+import org.apache.hadoop.io.Writable;
+
+public class ResidentialUnit implements Writable, Cloneable {
 
 	private int residentialId;
 	private int billUserId;
@@ -89,5 +94,38 @@ public class ResidentialUnit implements Cloneable {
 	public ResidentialUnit clone() throws CloneNotSupportedException {
 		ResidentialUnit clone = (ResidentialUnit) super.clone();
 		return clone;
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeInt(residentialId);
+		out.writeInt(billUserId);
+		out.writeInt(numberOfResidents);
+		out.writeInt(electricMeterId);
+		out.writeInt(coldWaterId);
+		out.writeInt(warmWaterId);
+		elecConsumption.write(out);
+		out.writeInt(heatingIds.size());
+		for(int i: heatingIds){
+			out.writeInt(i);
+		}
+		
+		
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		residentialId = in.readInt();
+		billUserId = in.readInt();
+		numberOfResidents = in.readInt();
+		electricMeterId = in.readInt();
+		coldWaterId = in.readInt();
+		warmWaterId = in.readInt();
+		elecConsumption.readFields(in);
+		heatingIds.clear();
+		int cnt = in.readInt();
+		for (int x = 0; x < cnt; x++) {
+	        heatingIds.add(in.readInt());
+	    }
 	}
 }

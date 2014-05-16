@@ -20,43 +20,51 @@ public class AccumuloMMCReducer extends
 
 	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,
 			Context c) throws IOException, InterruptedException {
-
+		
+		//TO DO: list of minFlats / maxFlats!!!
+		
 		ResidentialUnit minFlat = null;
 		ResidentialUnit maxFlat = null;
-
+		
 		Iterator<ResidentialUnit> valuesIt = values.iterator();
 		while (valuesIt.hasNext()) {
-			ResidentialUnit flat = null;
-			flat = (ResidentialUnit) valuesIt.next();
+			
+			ResidentialUnit flat = valuesIt.next();
+			if(flat == null) continue;
+			
 			double consumption = flat.getElecConsumption().getAmount();
-			if ((minFlat != null && consumption < minFlat.getElecConsumption()
-					.getAmount()) || minFlat == null)
-				minFlat = flat;
-			if ((maxFlat != null && consumption > maxFlat.getElecConsumption()
-					.getAmount()) || maxFlat == null)
-				maxFlat = flat;
-		}
 
-		Mutation m1 = new Mutation();
+			if ((minFlat != null && consumption < minFlat.getElecConsumption()
+					.getAmount()) || minFlat == null){
+				minFlat = flat;
+			}
+					
+			if ((maxFlat != null && consumption > maxFlat.getElecConsumption()
+					.getAmount()) || maxFlat == null){
+				maxFlat = flat;
+			}
+		}		
+		
+		if(minFlat == null || maxFlat == null) return;
+		
+		Mutation m1 = new Mutation(String.valueOf(minFlat.getElectricMeterId()));
 		// write minimum
 		m1.put("consumptionId",
 				"min",
 				new Value(String.valueOf(
-						minFlat.getElecConsumption().getConsumptionId())
-						.getBytes()));
+						minFlat.getElectricMeterId())
+						.getBytes()));			
 		m1.put("amount",
 				"minAmount",
 				new Value(String.valueOf(
 						minFlat.getElecConsumption().getAmount()).getBytes()));
 		
-		Mutation m2 = new Mutation();
-		// write maximum
-		
+		Mutation m2 = new Mutation(String.valueOf(maxFlat.getElectricMeterId()));
+		// write maximum		
 		m2.put("consumptionId",
 				"max",
 				new Value(String.valueOf(
-						maxFlat.getElecConsumption().getConsumptionId())
-						.getBytes()));
+						maxFlat.getElectricMeterId()).getBytes()));			
 		m2.put("amount",
 				"maxAmount",
 				new Value(String.valueOf(
@@ -64,13 +72,7 @@ public class AccumuloMMCReducer extends
 
 		// create the mutation based on input key and value
 		// report in hdfs
-		c.write(new Text("minMaxConsumption"), m1);
-		c.write(new Text("minMaxConsumption"), m2);
-
-		// report as console - output
-		System.out.println(minFlat.getAddress() + " "
-				+ minFlat.getElecConsumption().getAmount());
-		System.out.println(maxFlat.getAddress() + " "
-				+ maxFlat.getElecConsumption().getAmount());
+		c.write(new Text("MinMax"), m1);
+		c.write(new Text("MinMax"), m2);
 	}
 }

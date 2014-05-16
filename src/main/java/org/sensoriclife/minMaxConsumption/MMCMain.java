@@ -53,7 +53,9 @@ public class MMCMain extends Configured implements Tool {
 		
 		accumulo.write(mockTablename, "row1", colFam, colQual, timestamp, new Value("5".getBytes()));
 		accumulo.write(mockTablename, "row2", colFam, colQual, timestamp, new Value("3".getBytes()));
-
+		accumulo.write(mockTablename, "row3", colFam, colQual, timestamp, new Value("2".getBytes()));
+		accumulo.write(mockTablename, "row4", colFam, colQual, timestamp, new Value("8".getBytes()));
+		
 		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(mockTablename);
 		
 		while(scanner.hasNext()){
