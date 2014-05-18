@@ -19,7 +19,7 @@ public class AccumuloMMCMapper extends
 		// filter period for minMaxConsumption of electricity
 		if (timestamp >= Long.parseLong(/*App.getProperty("minTimeStamp")*/"1")
 				&& timestamp <= Long.parseLong(/*App.getProperty("maxTimeStamp")*/"40")) {
-			int electricMeterId = Integer.parseInt(k.getRow().toString());
+			String electricMeterId = k.getRow().toString();
 			ResidentialUnit flat = new ResidentialUnit();
 			flat.getElecConsumption().setAmount(amount);
 			flat.getElecConsumption().setTimestamp(timestamp);

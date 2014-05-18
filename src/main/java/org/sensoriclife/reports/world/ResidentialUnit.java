@@ -18,7 +18,7 @@ public class ResidentialUnit implements Serializable, Writable{
 	private int residentialId;
 	private int billUserId;
 	private int numberOfResidents;
-	private int electricMeterId;
+	private String electricMeterId;
 	private int coldWaterId;
 	private int warmWaterId;
 	private ArrayList<Integer> heatingIds;
@@ -57,11 +57,11 @@ public class ResidentialUnit implements Serializable, Writable{
 		this.numberOfResidents = numberOfResidents;
 	}
 
-	public int getElectricMeterId() {
+	public String getElectricMeterId() {
 		return electricMeterId;
 	}
 
-	public void setElectricMeterId(int electricMeterId) {
+	public void setElectricMeterId(String electricMeterId) {
 		this.electricMeterId = electricMeterId;
 	}
 
@@ -132,7 +132,7 @@ public class ResidentialUnit implements Serializable, Writable{
 		out.writeInt(residentialId);
 		out.writeInt(billUserId);
 		out.writeInt(numberOfResidents);
-		out.writeInt(electricMeterId);
+		out.writeUTF(electricMeterId);
 		out.writeInt(coldWaterId);
 		out.writeInt(warmWaterId);
 		elecConsumption.write(out);
@@ -149,7 +149,7 @@ public class ResidentialUnit implements Serializable, Writable{
 		residentialId = in.readInt();
 		billUserId = in.readInt();
 		numberOfResidents = in.readInt();
-		electricMeterId = in.readInt();
+		electricMeterId = in.readUTF();
 		coldWaterId = in.readInt();
 		warmWaterId = in.readInt();
 		elecConsumption.readFields(in);
