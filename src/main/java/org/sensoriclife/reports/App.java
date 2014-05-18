@@ -8,7 +8,7 @@ import java.util.Properties;
 import org.apache.accumulo.core.util.CachedConfiguration;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.Logger;
-import org.sensoriclife.minMaxConsumption.MMCMain;
+import org.sensoriclife.reports.minMaxConsumption.MinMaxReport;
 import org.sensoriclife.util.Helpers;
 
 /**
@@ -37,7 +37,7 @@ public class App {
 		int res = 0;
 		try {
 			res = ToolRunner.run(CachedConfiguration.getInstance(),
-					new MMCMain(), args);
+					new MinMaxReport(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

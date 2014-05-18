@@ -1,4 +1,4 @@
-package org.sensoriclife.minMaxConsumption;
+package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
 

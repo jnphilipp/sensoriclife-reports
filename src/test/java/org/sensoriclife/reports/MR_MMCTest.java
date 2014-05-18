@@ -44,19 +44,19 @@ public class MR_MMCTest {
     ResidentialUnit flat = new ResidentialUnit();
 	flat.getElecConsumption().setAmount(1);
 	flat.getElecConsumption().setTimestamp(1);
-	flat.setElectricMeterId(1);
+	flat.setElectricMeterId("1_el");
     mapDriver.withOutput(new IntWritable(1), flat);
 	mapDriver.runTest();	
   }
  
 
-  //@Test
+  @Test
   public void testReducer() throws IOException {
     List<ResidentialUnit> values = new ArrayList<ResidentialUnit>();
     ResidentialUnit flat = new ResidentialUnit();
    	flat.getElecConsumption().setAmount(1);
    	flat.getElecConsumption().setTimestamp(1);
-   	flat.setElectricMeterId(1);
+   	flat.setElectricMeterId("1_el");
     values.add(flat);
     reduceDriver.withInput(new IntWritable(1), values);
    

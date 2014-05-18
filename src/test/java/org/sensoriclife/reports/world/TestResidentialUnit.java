@@ -13,7 +13,7 @@ public class TestResidentialUnit {
 	public void testName() throws Exception {
 		
 		ResidentialUnit ru = new ResidentialUnit();
-		ru.setElectricMeterId(1);
+		ru.setElectricMeterId("1_el");
 		ru.getElecConsumption().setTimestamp(2);
 		ru.getElecConsumption().setAmount(3);
 		
@@ -27,7 +27,7 @@ public class TestResidentialUnit {
 		ObjectInputStream ois = new ObjectInputStream(bis);
 		ru1.readFields(ois);
 		
-		assertEquals(1, ru1.getElectricMeterId());
+		assertEquals("1_el", ru1.getElectricMeterId());
 		assertEquals(2, ru1.getElecConsumption().getTimestamp());
 		assertEquals(3d, ru1.getElecConsumption().getAmount(), 0d);
 	}

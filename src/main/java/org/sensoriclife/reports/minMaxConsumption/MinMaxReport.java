@@ -1,9 +1,8 @@
-package org.sensoriclife.minMaxConsumption;
+package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -15,6 +14,7 @@ import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
+import org.apache.accumulo.core.client.mock.MockInstance;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
@@ -28,10 +28,9 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.world.ResidentialUnit;
 
-public class UserCountMain extends Configured implements Tool {
+public class MinMaxReport extends Configured implements Tool {
 	
 	public static void main(String[] args) throws Exception {
 
@@ -48,18 +47,16 @@ public class UserCountMain extends Configured implements Tool {
 		args2[3] = mockInstanceName;
 		args2[4] = outputTableName;
 
-		/*
 		MockInstance inputMi = new MockInstance(mockInstanceName);
 		Connector connector = inputMi.getConnector(userName, new PasswordToken(
 				password));
 		connector.tableOperations().create(inputTableName, false);
 		connector.tableOperations().create(outputTableName, false);
-		 */
 
 		// insert some test data
-		//insertData(connector, inputTableName);
+		insertData(connector, inputTableName);
 
-		
+		/*
 		Accumulo accumulo = Accumulo.getInstance();
 		accumulo.connect();
 		Connector connector = accumulo.getConnector();
@@ -82,21 +79,21 @@ public class UserCountMain extends Configured implements Tool {
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}
-		
+		*/
 		
 		// run the map reduce job to read the edge table and populate the node
 		// table
-		int res = ToolRunner.run(new Configuration(), new UserCountMain(),
+		int res = ToolRunner.run(new Configuration(), new MinMaxReport(),
 				args2);
 
-		
+		/*
 		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(args2[4]);
 		
 		while(scanner2.hasNext()){
 			Entry<Key, Value> entry = scanner2.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}
-		
+		*/
 		
 		
 		// print the inputtable
@@ -113,7 +110,7 @@ public class UserCountMain extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 
 		Job job = Job.getInstance(getConf());
-		job.setJobName(UserCountMain.class.getName());
+		job.setJobName(MinMaxReport.class.getName());
 
 		job.setJarByClass(this.getClass());
 
