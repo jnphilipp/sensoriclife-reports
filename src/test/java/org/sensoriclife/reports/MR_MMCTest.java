@@ -3,7 +3,6 @@ package org.sensoriclife.reports;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
@@ -16,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxMapper;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxReducer;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.ResidentialUnit; 
  
 /**
  * 
@@ -60,7 +59,7 @@ public class MR_MMCTest {
     values.add(flat);
     reduceDriver.withInput(new IntWritable(1), values);
    
-    Mutation m1 = new Mutation();
+    Mutation m1 = new Mutation("1_el");
 	// write minimum
 	m1.put("consumptionId",
 			"min",

@@ -3,7 +3,6 @@ package org.sensoriclife.reports.minMaxConsumption;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
