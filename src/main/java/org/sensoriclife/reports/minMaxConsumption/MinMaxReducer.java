@@ -9,14 +9,14 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.sensoriclife.reports.world.ResidentialUnit;
+import org.sensoriclife.world.ResidentialUnit;
 
 /**
  * 
  * @author marcel
  * 
  */
-public class AccumuloMMCReducer extends
+public class MinMaxReducer extends
 		Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
 
 	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,

@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.sensoriclife.world.ResidentialUnit;
+
 public class TestResidentialUnit {
 	
 	@org.junit.Test

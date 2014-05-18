@@ -14,9 +14,9 @@ import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver;
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver;
 import org.junit.Before;
 import org.junit.Test;
-import org.sensoriclife.minMaxConsumption.AccumuloMMCMapper;
-import org.sensoriclife.minMaxConsumption.AccumuloMMCReducer;
-import org.sensoriclife.reports.world.ResidentialUnit;
+import org.sensoriclife.reports.minMaxConsumption.MinMaxMapper;
+import org.sensoriclife.reports.minMaxConsumption.MinMaxReducer;
+import org.sensoriclife.world.ResidentialUnit;
  
 /**
  * 
@@ -31,8 +31,8 @@ public class MR_MMCTest {
  
   @Before
   public void setUp() {
-    AccumuloMMCMapper mapper = new AccumuloMMCMapper();
-    AccumuloMMCReducer reducer = new AccumuloMMCReducer();
+    MinMaxMapper mapper = new MinMaxMapper();
+    MinMaxReducer reducer = new MinMaxReducer();
     mapDriver = MapDriver.newMapDriver(mapper);
     reduceDriver = ReduceDriver.newReduceDriver(reducer);
     mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer);

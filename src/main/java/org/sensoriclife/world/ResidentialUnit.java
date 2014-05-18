@@ -1,4 +1,4 @@
-package org.sensoriclife.reports.world;
+package org.sensoriclife.world;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,15 +1,15 @@
-package org.sensoriclife.reports.minMaxConsumption;
+package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
 import java.io.IOException;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.sensoriclife.reports.world.ResidentialUnit;
+import org.sensoriclife.world.ResidentialUnit;
 
-public class AccumuloMMCMapper extends
-		Mapper<Key, Value, IntWritable, ResidentialUnit> {
+public class DaysWithConsumptionMapper extends
+		Mapper<Key, Value, LongWritable, ResidentialUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -24,7 +24,17 @@ public class AccumuloMMCMapper extends
 			flat.getElecConsumption().setAmount(amount);
 			flat.getElecConsumption().setTimestamp(timestamp);
 			flat.setElectricMeterId(electricMeterId);
-			c.write(new IntWritable(1), flat);
+			
+			/*
+			Timestamp ts = new Timestamp(timestamp);
+			GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
+			cal.setTime(ts);
+			//emit day of year
+			c.write(new LongWritable(cal.get(Calendar.DAY_OF_YEAR)), flat);
+			*/
+			
+			c.write(new LongWritable(timestamp), flat);
+			
 		}
 	}
 

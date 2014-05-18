@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org</groupId>
 	<artifactId>sensoriclife-reports</artifactId>
-	<version>0.1.2</version>
+	<version>0.2.2</version>
 	<packaging>jar</packaging>
 
 	<name>reports</name>

@@ -1,4 +1,4 @@
-package org.sensoriclife.reports.world;
+package org.sensoriclife.world;
 
 public class ElecConsumption extends Consumption{
 
