@@ -23,7 +23,6 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
@@ -33,7 +32,14 @@ import org.sensoriclife.world.ResidentialUnit;
 
 public class MinMaxReport extends Configured implements Tool {
 	
-	public static void main(String[] args) throws Exception {
+	public static void runMinMax(String[] args) throws Exception {
+		
+		/*
+		 * args[0] = reportName
+		 * args[1] = (boolean) allTime 
+		 * args[2] = (long) minTimestamp
+		 * args[3] = (long) maxTimestamp
+		 */
 		
 		MockInstanceConfiguration mockConfig = MockInstanceConfiguration.getInstance();
 		mockConfig.setMockInstanceName("mockInstance");
@@ -103,8 +109,12 @@ public class MinMaxReport extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
-
-		Job job = Job.getInstance(getConf());
+		
+		Configuration conf = new Configuration();
+		/*conf.setLong("maxTimestamp", 2);
+		conf.setLong("minTimestamp", 2);*/
+		
+		Job job = Job.getInstance(conf);
 		job.setJobName(MinMaxReport.class.getName());
 
 		job.setJarByClass(this.getClass());
@@ -124,7 +134,7 @@ public class MinMaxReport extends Configured implements Tool {
 		AccumuloOutputFormat.setCreateTables(job, true);
 		AccumuloOutputFormat.setMockInstance(job, args[3]);
 
-		job.setMapOutputKeyClass(IntWritable.class);
+		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Mutation.class);
@@ -146,41 +156,50 @@ public class MinMaxReport extends Configured implements Tool {
 		int consumptionId = 1;
 		Text colFam = new Text("device");
 		Text colQual = new Text("amount");
+		Text colFam2 = new Text("residential");
+		Text colQual2 = new Text("id");
 		ColumnVisibility colVis = new ColumnVisibility();// "public");
 		// long timestamp = System.currentTimeMillis();
 
 		Value value = new Value("4".getBytes());
 
 		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
 		mutation.put(colFam, colQual, colVis, 1, value);
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-10".getBytes()));
 		wr.addMutation(mutation);
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_el"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wu"));
 		mutation.put(colFam, colQual, colVis, 2,
 				new Value("8".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-3".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-1".getBytes()));
 		mutation.put(colFam, colQual, colVis, 3,
 				new Value("111".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-0".getBytes()));
 		mutation.put(colFam, colQual, colVis, 4,
 				new Value("7".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 4) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-3".getBytes()));
 		mutation.put(colFam, colQual, colVis, 10,
 				new Value("42".getBytes()));
 		wr.addMutation(mutation);
 
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 5) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("2-2-3".getBytes()));
 		mutation.put(colFam, colQual, new ColumnVisibility(), 2,
 				new Value("2".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 6) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("3-2-3".getBytes()));
 		mutation.put(colFam, colQual, new ColumnVisibility(), 3,
 				new Value("1".getBytes()));
 		wr.addMutation(mutation);

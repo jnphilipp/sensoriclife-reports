@@ -24,7 +24,7 @@ import org.sensoriclife.world.ResidentialUnit;
  */
 public class MR_MMCTest {
  
-  private MapDriver<Key, Value, IntWritable, ResidentialUnit> mapDriver;
+ /* private MapDriver<Key, Value, IntWritable, ResidentialUnit> mapDriver;
   private ReduceDriver<IntWritable, ResidentialUnit, Text, Mutation> reduceDriver;
   private MapReduceDriver<Key, Value, IntWritable, ResidentialUnit, Text, Mutation> mapReduceDriver;
  
@@ -71,5 +71,5 @@ public class MR_MMCTest {
     reduceDriver.withOutput(new Text("minMaxConsumption"), m1);
     //reduceDriver.withOutput(new Text("minMaxConsumption"), m2);
     reduceDriver.runTest();
-  }
+  }*/
 }

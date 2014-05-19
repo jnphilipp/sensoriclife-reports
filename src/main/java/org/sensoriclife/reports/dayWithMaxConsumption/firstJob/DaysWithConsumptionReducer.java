@@ -29,7 +29,7 @@ public class DaysWithConsumptionReducer extends
 			ResidentialUnit flat = valuesIt.next();
 			if (flat == null)
 				continue;
-			overallConsumption += flat.getElecConsumption().getAmount();
+			//overallConsumption += flat.getElecConsumption().getAmount();
 		}
 
 		Mutation m = new Mutation(String.valueOf(key));

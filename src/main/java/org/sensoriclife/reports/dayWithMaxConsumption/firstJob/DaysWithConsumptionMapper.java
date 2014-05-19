@@ -21,9 +21,9 @@ public class DaysWithConsumptionMapper extends
 				&& timestamp <= Long.parseLong(/*App.getProperty("maxTimeStamp")*/"40")) {
 			String electricMeterId = k.getRow().toString();
 			ResidentialUnit flat = new ResidentialUnit();
-			flat.getElecConsumption().setAmount(amount);
-			flat.getElecConsumption().setTimestamp(timestamp);
-			flat.setElectricMeterId(electricMeterId);
+			//flat.getElecConsumption().setAmount(amount);
+			//flat.getElecConsumption().setTimestamp(timestamp);
+			//flat.setElectricMeterId(electricMeterId);
 			
 			/*
 			Timestamp ts = new Timestamp(timestamp);

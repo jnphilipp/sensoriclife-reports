@@ -8,94 +8,96 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 import org.apache.hadoop.io.Writable;
 
 public class ResidentialUnit implements Serializable, Writable{
 
 	private static final long serialVersionUID = 1L;
-	private int residentialId;
-	private int billUserId;
-	private int numberOfResidents;
-	private String electricMeterId;
-	private int coldWaterId;
-	private int warmWaterId;
-	private ArrayList<Integer> heatingIds;
-	private ElecConsumption elecConsumption;
-
+	
+	private String consumptionID = "";
+	private float deviceAmount = 0;
+	private String residentialID = "";
+	private int userID = 0;
+	private String userResidential= "";
+	private long timeStamp = 0;
+	
+	
+	private boolean isSetConsumptionID = false;
+	private boolean isSetDeviceAmount = false;
+	private boolean isSetResidentialID = false;
+	private boolean isSetUserID = false;
+	private boolean isSetUserResidential = false;
+	private boolean isSetTimeStamp = false;
+	
 	public ResidentialUnit() {
-		heatingIds = new ArrayList<Integer>();
-		elecConsumption = new ElecConsumption();
-	}
-
-	public String getAddress() {
-		return null;
-	}
-
-	public int getResidentialId() {
-		return residentialId;
-	}
-
-	public void setResidentialId(int residentialId) {
-		this.residentialId = residentialId;
-	}
-
-	public int getBillUserId() {
-		return billUserId;
-	}
-
-	public void setBillUserId(int billUserId) {
-		this.billUserId = billUserId;
-	}
-
-	public int getNumberOfResidents() {
-		return numberOfResidents;
-	}
-
-	public void setNumberOfResidents(int numberOfResidents) {
-		this.numberOfResidents = numberOfResidents;
-	}
-
-	public String getElectricMeterId() {
-		return electricMeterId;
-	}
-
-	public void setElectricMeterId(String electricMeterId) {
-		this.electricMeterId = electricMeterId;
-	}
-
-	public int getColdWaterId() {
-		return coldWaterId;
-	}
-
-	public void setColdWaterId(int coldWaterId) {
-		this.coldWaterId = coldWaterId;
-	}
-
-	public int getWarmWaterId() {
-		return warmWaterId;
-	}
-
-	public void setWarmWaterId(int warmWaterId) {
-		this.warmWaterId = warmWaterId;
-	}
-
-	public ArrayList<Integer> getHeatingIds() {
-		return heatingIds;
-	}
-
-	public void setHeatingIds(ArrayList<Integer> heatingId) {
-		this.heatingIds = heatingId;
 	}
 	
-	public ElecConsumption getElecConsumption() {
-		return elecConsumption;
+	
+	public String getConsumptionID() {
+		return consumptionID;
+	}
+	public void setConsumptionID(String consumptionID) {
+		this.isSetConsumptionID = true;
+		this.consumptionID = consumptionID;
+	}
+	public float getDeviceAmount() {
+		return deviceAmount;
+	}
+	public void setDeviceAmount(float deviceAmount) {
+		this.isSetDeviceAmount = true;
+		this.deviceAmount = deviceAmount;
+	}
+	public String getResidentialID() {
+		return residentialID;
+	}
+	public void setResidentialID(String residentialID) {
+		this.isSetResidentialID = true;
+		this.residentialID = residentialID;
+	}
+	public int getUserID() {
+		return userID;
+	}
+	public void setUserID(int userID) {
+		this.isSetUserID = true;
+		this.userID = userID;
+	}
+	public String getUserResidential() {
+		return userResidential;
+	}
+	public void setUserResidential(String userResidential) {
+		
+		this.isSetUserResidential = true;
+		this.userResidential = userResidential;
 	}
 	
-	public void setElecConsumption(ElecConsumption elecConsumption) {
-		this.elecConsumption = elecConsumption;
-	}	
+	public void setTimeStamp(long timeStamp){
+		this.isSetTimeStamp = true;
+		this.timeStamp = timeStamp;
+	}
+	public long getTimeStamp(){
+		return timeStamp;
+	}
+	
+	public boolean isSetConsumptionID() {
+		return isSetConsumptionID;
+	}
+	public boolean isSetDeviceAmount() {
+		return isSetDeviceAmount;
+	}
+	public boolean isSetResidentialID() {
+		return isSetResidentialID;
+	}
+	public boolean isSetUserID() {
+		return isSetUserID;
+	}
+	public boolean isSetUserResidential() {
+		return isSetUserResidential;
+	}
+	public boolean isSetTimeStamp(){
+		return isSetTimeStamp();
+	}
 	
 	public Object deepCopy(Object oldObj) throws Exception
 	   {
@@ -129,34 +131,36 @@ public class ResidentialUnit implements Serializable, Writable{
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-		out.writeInt(residentialId);
-		out.writeInt(billUserId);
-		out.writeInt(numberOfResidents);
-		out.writeUTF(electricMeterId);
-		out.writeInt(coldWaterId);
-		out.writeInt(warmWaterId);
-		elecConsumption.write(out);
-		out.writeInt(heatingIds.size());
-		for(int i: heatingIds){
-			out.writeInt(i);
-		}
+		out.writeInt(this.userID);
+		out.writeFloat(this.deviceAmount);
+		out.writeUTF(this.consumptionID);
+		out.writeUTF(this.userResidential);
+		out.writeUTF(this.residentialID);
+		out.writeLong(this.timeStamp);
 		
-		
+		out.writeBoolean(this.isSetConsumptionID);
+		out.writeBoolean(this.isSetDeviceAmount);
+		out.writeBoolean(this.isSetUserID);
+		out.writeBoolean(this.isSetResidentialID);
+		out.writeBoolean(this.isSetUserResidential);
+		out.writeBoolean(this.isSetTimeStamp);
 	}
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		residentialId = in.readInt();
-		billUserId = in.readInt();
-		numberOfResidents = in.readInt();
-		electricMeterId = in.readUTF();
-		coldWaterId = in.readInt();
-		warmWaterId = in.readInt();
-		elecConsumption.readFields(in);
-		heatingIds.clear();
-		int cnt = in.readInt();
-		for (int x = 0; x < cnt; x++) {
-	        heatingIds.add(in.readInt());
-	    }
+		this.userID = in.readInt();
+		this.deviceAmount = in.readFloat();
+		this.consumptionID = in.readUTF();
+		this.userResidential = in.readUTF();
+		this.residentialID = in.readUTF();
+		this.timeStamp = in.readLong();
+		
+		this.isSetConsumptionID = in.readBoolean();
+		this.isSetDeviceAmount = in.readBoolean();
+		this.isSetUserID = in.readBoolean();
+		this.isSetResidentialID = in.readBoolean();
+		this.isSetUserResidential = in.readBoolean();
+		this.isSetTimeStamp = in.readBoolean();
+		
 	}
 }
