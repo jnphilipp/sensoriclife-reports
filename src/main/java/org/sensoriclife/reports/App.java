@@ -1,9 +1,7 @@
 package org.sensoriclife.reports;
 
-import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxReport;
-
 
 /**
  *
