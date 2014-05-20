@@ -1,8 +1,11 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.world.ResidentialUnit;
@@ -17,6 +20,8 @@ public class MinMaxReducer extends
 
 	public void reduce(Text key, Iterable<ResidentialUnit> values,
 			Context c) throws IOException, InterruptedException {
+		
+		ArrayList<ResidentialUnit> residentials = new ArrayList<ResidentialUnit>();
 		
 		float min = Float.MAX_VALUE;
 		String minConID = "";
@@ -44,17 +49,21 @@ public class MinMaxReducer extends
 					maxTimeStamp = value.getTimeStamp();
 				}
 			}
+			if(value.isSetResidentialID()){
+				ResidentialUnit res = new ResidentialUnit();
+				res.setConsumptionID(value.getConsumptionID());
+				res.setResidentialID(value.getResidentialID());
+				residentials.add(res);
+			}
 		}
 		
-		for(ResidentialUnit value: values)
+		for(ResidentialUnit value: residentials)
 		{
-			if(value.isSetResidentialID()){
-				if(value.getConsumptionID().equals(minConID))
-					minResID = value.getResidentialID();
+			if(value.getConsumptionID().equals(minConID))
+				minResID = value.getResidentialID();
 				
-				if(value.getConsumptionID().equals(maxConID))
-					maxResID = value.getResidentialID();
-			}
+			if(value.getConsumptionID().equals(maxConID))
+				maxResID = value.getResidentialID();
 		}
 		
 		Mutation m1 = new Mutation(key);
@@ -64,8 +73,12 @@ public class MinMaxReducer extends
 		m1.put("min", "amount",minTimeStamp,new Value(new Float(min).toString().getBytes()));
 		m1.put("max", "residentialID",maxTimeStamp,new Value(maxResID.getBytes()));
 		m1.put("max", "amount",maxTimeStamp,new Value(new Float(max).toString().getBytes()));
+	
+		Configuration conf = new Configuration();
+		conf = c.getConfiguration();
+		String outputTableName = conf.getStrings("outputTableName","MinMaxTable")[0];
 		
-		c.write(new Text("MinMax"), m1);
+		c.write(new Text(outputTableName), m1);
 		
 	}
 }

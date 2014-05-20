@@ -34,7 +34,7 @@ public class MinMaxMapper extends
 				flat.setConsumptionID(consumptionID);
 				flat.setTimeStamp(k.getTimestamp());
 				flat.setDeviceAmount(Float.parseFloat(v.toString()));
-				System.out.println("Mapper: "+flat.getConsumptionID()+" Verbrauch: "+flat.getDeviceAmount());
+				
 				c.write(new Text(counterType),flat);
 			}
 		}
@@ -44,7 +44,6 @@ public class MinMaxMapper extends
 			ResidentialUnit flat = new ResidentialUnit();
 			flat.setConsumptionID(consumptionID);
 			flat.setResidentialID(v.toString());
-			System.out.println("Mapp: "+flat.getConsumptionID()+" Residential: "+flat.getResidentialID());
 			c.write(new Text(counterType),flat);
 		}	
 		
