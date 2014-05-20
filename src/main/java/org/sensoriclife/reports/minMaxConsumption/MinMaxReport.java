@@ -1,6 +1,10 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -27,81 +31,77 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.sensoriclife.util.MockInstanceConfiguration;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class MinMaxReport extends Configured implements Tool {
+	
+	public static boolean test = true;
+	
 	
 	public static void runMinMax(String[] args) throws Exception {
 		
 		/*
 		 * args[0] = reportName
-		 * args[1] = (boolean) allTime 
-		 * args[2] = (long) minTimestamp
-		 * args[3] = (long) maxTimestamp
+		 * 
+		 * args[1] = inputInstanceName
+		 * args[2] = inputTableName
+		 * args[3] = inputUserName
+		 * args[4] = inputPassword
+		 * 
+		 * args[5] = outputInstanceName
+		 * args[6] = outputTableName
+		 * args[7] = outputUserName
+		 * args[8] = outputPassword
+		 * 
+		 * args[9] = (boolean) allTime 
+		 * args[10] = (long) minTimestamp
+		 * args[11] = (long) maxTimestamp
 		 */
 		
-		MockInstanceConfiguration mockConfig = MockInstanceConfiguration.getInstance();
-		mockConfig.setMockInstanceName("mockInstance");
-		mockConfig.setInputTableName("Consumption");
-		mockConfig.setOutputTableName("MinMax");
-		mockConfig.setUserName("");
-		mockConfig.setPassword("");
-
-		MockInstance mockInstance = new MockInstance(mockConfig.getMockInstanceName());
-		Connector connector = mockInstance.getConnector(mockConfig.getUserName(), new PasswordToken(
-				mockConfig.getPassword()));
-		connector.tableOperations().create(mockConfig.getInputTableName(), false);
-		connector.tableOperations().create(mockConfig.getOutputTableName(), false);
-
-		// insert some test data
-		insertData(connector, mockConfig.getInputTableName());
-
-		/*
-		Accumulo accumulo = Accumulo.getInstance();
-		accumulo.connect();
-		Connector connector = accumulo.getConnector();
-
-		accumulo.createTable(args2[0]);
-		accumulo.createTable(args2[4]);
 		
-		String colFam = "device";
-		String colQual = "amount";
-		long timestamp = System.currentTimeMillis();
-		
-		accumulo.write(args2[0], "1_el", colFam, colQual, timestamp, new Value("5".getBytes()));
-		accumulo.write(args2[0], "2_el", colFam, colQual, timestamp, new Value("3".getBytes()));
-		accumulo.write(args2[0], "3_el", colFam, colQual, timestamp, new Value("2".getBytes()));
-		accumulo.write(args2[0], "4_el", colFam, colQual, timestamp, new Value("8".getBytes()));
-		
-		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(args2[0]);
-		
-		while(scanner.hasNext()){
-			Entry<Key, Value> entry = scanner.next();
-			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
+		/*TEST*/
+		if(test)
+		{
+			MockInstance inputMockInstance = new MockInstance(args[1]);
+			MockInstance outputMockInstance = new MockInstance(args[5]);
+			
+			Connector inputConnector = inputMockInstance.getConnector(args[3], new PasswordToken(args[4]));
+			Connector outputConnector = outputMockInstance.getConnector(args[7], new PasswordToken(args[8]));
+			
+			inputConnector.tableOperations().create(args[2], false);
+			outputConnector.tableOperations().create(args[6], false);
+
+			// insert some test data
+			insertData(inputConnector, args[2]);
 		}
-		*/
+		
+
+		
 		
 		// run the map reduce job to read the edge table and populate the node
 		// table
 		int res = ToolRunner.run(new Configuration(), new MinMaxReport(),
-				mockConfig.getConfigAsStringArray());
+				args);
 
+		
 		/*
-		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(args2[4]);
-		
-		while(scanner2.hasNext()){
-			Entry<Key, Value> entry = scanner2.next();
-			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
+		 * Test
+		 */
+		if(test)
+		{
+			MockInstance inputMockInstance = new MockInstance(args[1]);
+			MockInstance outputMockInstance = new MockInstance(args[5]);
+			
+			Connector inputConnector = inputMockInstance.getConnector(args[3], new PasswordToken(args[4]));
+			Connector outputConnector = outputMockInstance.getConnector(args[7], new PasswordToken(args[8]));
+			
+			// print the inputtable
+			printTable(inputConnector, args[2]);
+			System.out.println("############################################");
+			// print the results of mapreduce
+			printTable(outputConnector, args[6]);
 		}
-		*/
 		
-		
-		// print the inputtable
-		printTable(connector, mockConfig.getInputTableName());
-		System.out.println("############################################");
-		// print the results of mapreduce
-		printTable(connector, mockConfig.getOutputTableName());
 
 		System.exit(res);
 
@@ -110,9 +110,68 @@ public class MinMaxReport extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		
+		/*
+		 * args[0] = reportName
+		 * 
+		 * args[1] = inputInstanceName
+		 * args[2] = inputTableName
+		 * args[3] = inputUserName
+		 * args[4] = inputPassword
+		 * 
+		 * args[5] = outputInstanceName
+		 * args[6] = outputTableName
+		 * args[7] = outputUserName
+		 * args[8] = outputPassword
+		 * 
+		 * args[9] = (boolean) allTime 
+		 * args[10] = (long) minTimestamp
+		 * args[11] = (long) maxTimestamp
+		 */
+		
 		Configuration conf = new Configuration();
-		/*conf.setLong("maxTimestamp", 2);
-		conf.setLong("minTimestamp", 2);*/
+		conf.setStrings("outputTableName", args[6]);
+		if(!args[9].equals("true"))
+		{
+			try
+			{
+			  DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
+			  Date d  = formatter.parse( args[10]);// day.month.year"
+			  System.out.println( d.getTime() ); 
+			  conf.setLong("minTimestamp", d.getTime());
+			}
+			catch ( ParseException e )
+			{
+				try
+				{
+				  DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
+				  Date d  = formatter.parse( args[10]);// day.month.year hour:minut:second
+				  System.out.println( d.getTime() ); 
+				  conf.setLong("minTimestamp", d.getTime());
+				}
+				catch ( ParseException ee ) {}
+			}
+			
+			try
+			{
+			  DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
+			  Date d  = formatter.parse( args[11]);// day.month.year"
+			  System.out.println( d.getTime() ); 
+			  conf.setLong("maxTimestamp", d.getTime());
+			}
+			catch ( ParseException e )
+			{
+				try
+				{
+				  DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
+				  Date d  = formatter.parse( args[11]);// day.month.year hour:minut:second
+				  System.out.println( d.getTime() ); 
+				  conf.setLong("maxTimestamp", d.getTime());
+				}
+				catch ( ParseException ee ) {}
+			}
+			
+		}
+		
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(MinMaxReport.class.getName());
@@ -122,17 +181,20 @@ public class MinMaxReport extends Configured implements Tool {
 		job.setMapperClass(MinMaxMapper.class);
 		job.setReducerClass(MinMaxReducer.class);
 
-		AccumuloInputFormat.setMockInstance(job, args[3]);
-		AccumuloInputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloInputFormat.setInputTableName(job, args[0]);
-		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
+		if(test)
+		{
+			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
+			AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
+			AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+			AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[4]);
-		AccumuloOutputFormat.setCreateTables(job, true);
-		AccumuloOutputFormat.setMockInstance(job, args[3]);
+			AccumuloOutputFormat.setMockInstance(job, args[5]);
+			AccumuloOutputFormat.setConnectorInfo(job, args[7], new PasswordToken(args[8]));
+			AccumuloOutputFormat.setDefaultTableName(job, args[6]);
+			AccumuloOutputFormat.setCreateTables(job, true);
+		}
+		
+		
 
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);
