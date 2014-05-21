@@ -84,6 +84,9 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 		System.out.println("############################################");
 		// print the results of mapreduce
 		printTable(connector, mockConfig.getOutputTableName());
+		
+		//this is for production mode - save storage
+		connector.tableOperations().delete(mockConfig.getInputTableName());	
 	}
 
 	@Override
