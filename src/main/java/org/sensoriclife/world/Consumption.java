@@ -15,6 +15,7 @@ public class Consumption implements Serializable, Writable {
 
 	private static final long serialVersionUID = 1L;
 	private int consumptionId;
+	private String counterType;
 	private long timestamp;
 	private int dayOfYear;
 	private double amount;
@@ -50,6 +51,14 @@ public class Consumption implements Serializable, Writable {
 	public void setDayOfYear(int dayOfYear) {
 		this.dayOfYear = dayOfYear;
 	}
+	
+	public String getCounterType() {
+		return counterType;
+	}
+	
+	public void setCounterType(String counterType) {
+		this.counterType = counterType;
+	}
 
 	public Object deepCopy(Object oldObj) throws Exception {
 		ObjectOutputStream oos = null;
@@ -77,6 +86,7 @@ public class Consumption implements Serializable, Writable {
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(consumptionId);
+		out.writeUTF(counterType);
 		out.writeLong(timestamp);
 		out.writeInt(dayOfYear);
 		out.writeDouble(amount);
@@ -85,6 +95,7 @@ public class Consumption implements Serializable, Writable {
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		consumptionId = in.readInt();
+		counterType = in.readUTF();
 		timestamp = in.readLong();
 		dayOfYear = in.readInt();
 		amount = in.readDouble();

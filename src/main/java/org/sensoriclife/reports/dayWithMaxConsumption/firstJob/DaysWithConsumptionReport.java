@@ -98,20 +98,6 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		// print the results of mapreduce
 		printTable(connector, mockConfig.getOutputTableName());
 		
-		
-		//####################
-		/*
-		System.out.println("Start second job");
-		
-		mockConfig.setInputTableName("DaysWithConsumption");
-		mockConfig.setOutputTableName("DaysWithMaxConsumption");
-		
-		connector.tableOperations().create(mockConfig.getOutputTableName(), false);
-		
-		int res = ToolRunner.run(new Configuration(), new DayWithMaxConsumptionReport(),
-				mockConfig.getConfigAsStringArray());
-		*/
-		
 		return mockInstance;
 
 	}
@@ -161,44 +147,79 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		int consumptionId = 1;
 		Text colFam = new Text("device");
 		Text colQual = new Text("amount");
+		Text colFam2 = new Text("residential");
+		Text colQual2 = new Text("id");
 		ColumnVisibility colVis = new ColumnVisibility();// "public");
 		// long timestamp = System.currentTimeMillis();
 
 		Value value = new Value("4".getBytes());
 
 		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wc"));
 		mutation.put(colFam, colQual, colVis, 1, value);
-		wr.addMutation(mutation);
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_el"));
-		mutation.put(colFam, colQual, colVis, 2,
-				new Value("110".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 1,new Value("1-2-10".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wc"));
+		mutation.put(colFam, colQual, colVis, 2,
+				new Value("125".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-3".getBytes()));
+		wr.addMutation(mutation);
+		
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wh"));
+		mutation.put(colFam, colQual, colVis, 1, new Value("12".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 1,new Value("1-2-10".getBytes()));
+		wr.addMutation(mutation);
+		
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wh"));
+		mutation.put(colFam, colQual, colVis, 2,
+				new Value("13".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-3".getBytes()));
+		wr.addMutation(mutation);
+		
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 3,new Value("1-2-1".getBytes()));
 		mutation.put(colFam, colQual, colVis, 3,
 				new Value("111".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
-		mutation.put(colFam, colQual, colVis, 3,
-				new Value("70".getBytes()));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-0".getBytes()));
+		mutation.put(colFam, colQual, colVis, 2,
+				new Value("7".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 4) + "_el"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 10,new Value("1-1-3".getBytes()));
 		mutation.put(colFam, colQual, colVis, 10,
 				new Value("42".getBytes()));
 		wr.addMutation(mutation);
 
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 5) + "_el"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("2-2-3".getBytes()));
 		mutation.put(colFam, colQual, new ColumnVisibility(), 2,
-				new Value("10".getBytes()));
+				new Value("2".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 6) + "_el"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 4) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 3,new Value("3-2-3".getBytes()));
 		mutation.put(colFam, colQual, new ColumnVisibility(), 3,
 				new Value("1".getBytes()));
 		wr.addMutation(mutation);
+
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_he"));
+		mutation.put(colFam2, colQual2, colVis, 3,new Value("1-2-1".getBytes()));
+		mutation.put(colFam, colQual, colVis, 3,
+				new Value("18".getBytes()));
+		wr.addMutation(mutation);
+		
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_he"));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-0".getBytes()));
+		mutation.put(colFam, colQual, colVis, 2,
+				new Value("20".getBytes()));
+		wr.addMutation(mutation);
+		
+		
 		wr.close();
 	}
 

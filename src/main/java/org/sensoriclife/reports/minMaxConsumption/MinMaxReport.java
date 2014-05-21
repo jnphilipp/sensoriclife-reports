@@ -33,6 +33,11 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.world.ResidentialUnit;
 
+/**
+ * 
+ * @author marcel, yves
+ *
+ */
 public class MinMaxReport extends Configured implements Tool {
 	
 	public static boolean test = true;
@@ -226,30 +231,30 @@ public class MinMaxReport extends Configured implements Tool {
 		Value value = new Value("4".getBytes());
 
 		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wc"));
 		mutation.put(colFam, colQual, colVis, 1, value);
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-10".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 1,new Value("1-2-10".getBytes()));
 		wr.addMutation(mutation);
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wu"));
+		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wc"));
 		mutation.put(colFam, colQual, colVis, 2,
-				new Value("8".getBytes()));
+				new Value("125".getBytes()));
 		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-3".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-1".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 3,new Value("1-2-1".getBytes()));
 		mutation.put(colFam, colQual, colVis, 3,
 				new Value("111".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
 		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-2-0".getBytes()));
-		mutation.put(colFam, colQual, colVis, 4,
+		mutation.put(colFam, colQual, colVis, 2,
 				new Value("7".getBytes()));
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 4) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-3".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 10,new Value("1-1-3".getBytes()));
 		mutation.put(colFam, colQual, colVis, 10,
 				new Value("42".getBytes()));
 		wr.addMutation(mutation);
@@ -261,7 +266,7 @@ public class MinMaxReport extends Configured implements Tool {
 		wr.addMutation(mutation);
 		
 		mutation = new Mutation(new Text(String.valueOf(consumptionId + 6) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("3-2-3".getBytes()));
+		mutation.put(colFam2, colQual2, colVis, 3,new Value("3-2-3".getBytes()));
 		mutation.put(colFam, colQual, new ColumnVisibility(), 3,
 				new Value("1".getBytes()));
 		wr.addMutation(mutation);

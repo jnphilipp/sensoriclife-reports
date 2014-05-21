@@ -14,10 +14,24 @@ public class DaysWithMaxConsumptionMapper extends
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 
+		String family = k.getColumnFamily().toString();
+
+		Consumption cons = new Consumption();
+		if (family.equals("el")) {
+			cons.setCounterType("el");
+		} else if (family.equals("wc")) {
+			cons.setCounterType("wc");
+		} else if (family.equals("wh")) {
+			cons.setCounterType("wh");
+		} else if (family.equals("he")) {
+			cons.setCounterType("he");
+		}
+
 		double amount = Double.parseDouble(v.toString());
 		int dayOfYear = Integer.parseInt(String.valueOf(k.getTimestamp()));
-		Consumption cons = new Consumption();
 		cons.setDayOfYear(dayOfYear);
+		Long timestamp = k.getTimestamp();
+		cons.setTimestamp(timestamp);
 		cons.setAmount(amount);
 		c.write(new IntWritable(1), cons);
 	}
