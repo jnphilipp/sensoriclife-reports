@@ -1,14 +1,11 @@
 package org.sensoriclife.reports.unusualRiseOfConsumption.secondob;
 
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
-import org.apache.accumulo.core.client.mock.MockInstance;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
@@ -20,12 +17,19 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.util.MockInstanceConfiguration;
 import org.sensoriclife.world.ResidentialUnit;
 
-public class UnusualRiseOfHeatingConsumptionReport extends Configured implements Tool {
+public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
+		Tool {
 
-	public static MockInstance runSecondJob(MockInstance mockInstance) throws Exception {
+	/**
+	 * runs the whole process of the second map reduce job, including configuration, inserting of test data and execution of the job.
+	 * @return Accumulo
+	 * @throws Exception
+	 */
+	public static Accumulo runSecondJob(Accumulo accumulo) throws Exception {
 
 		MockInstanceConfiguration mockConfig = MockInstanceConfiguration
 				.getInstance();
@@ -35,68 +39,48 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 		mockConfig.setUserName("");
 		mockConfig.setPassword("");
 
-		Connector connector = mockInstance.getConnector(
-				mockConfig.getUserName(),
-				new PasswordToken(mockConfig.getPassword()));
+		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(mockConfig
+				.getInputTableName());
 
-		/*
-		 * Accumulo accumulo = Accumulo.getInstance(); accumulo.connect();
-		 * Connector connector = accumulo.getConnector();
-		 * 
-		 * accumulo.createTable(args2[0]); accumulo.createTable(args2[4]);
-		 * 
-		 * String colFam = "device"; String colQual = "amount"; long timestamp =
-		 * System.currentTimeMillis();
-		 * 
-		 * accumulo.write(args2[0], "1_el", colFam, colQual, timestamp, new
-		 * Value("5".getBytes())); accumulo.write(args2[0], "2_el", colFam,
-		 * colQual, timestamp, new Value("3".getBytes()));
-		 * accumulo.write(args2[0], "3_el", colFam, colQual, timestamp, new
-		 * Value("2".getBytes())); accumulo.write(args2[0], "4_el", colFam,
-		 * colQual, timestamp, new Value("8".getBytes()));
-		 * 
-		 * Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(args2[0]);
-		 * 
-		 * while(scanner.hasNext()){ Entry<Key, Value> entry = scanner.next();
-		 * System.out.println("Key: " + entry.getKey().toString() + " Value: " +
-		 * entry.getValue().toString()); }
-		 */
+		while (scanner.hasNext()) {
+			Entry<Key, Value> entry = scanner.next();
+			System.out.println("Key: " + entry.getKey().toString() + " Value: "
+					+ entry.getValue().toString());
+		}
 
-		// run the map reduce job to read the edge table and populate the node
-		// table
-		int res = ToolRunner.run(new Configuration(),
+		ToolRunner.run(new Configuration(),
 				new UnusualRiseOfHeatingConsumptionReport(),
 				mockConfig.getConfigAsStringArray());
 
-		/*
-		 * Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(args2[4]);
-		 * 
-		 * while(scanner2.hasNext()){ Entry<Key, Value> entry = scanner2.next();
-		 * System.out.println("Key: " + entry.getKey().toString() + " Value: " +
-		 * entry.getValue().toString()); }
-		 */
+		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(mockConfig
+				.getOutputTableName());
 
-		// print the inputtable
-		printTable(connector, mockConfig.getInputTableName());
-		System.out.println("############################################");
-		// print the results of mapreduce
-		printTable(connector, mockConfig.getOutputTableName());
-		
+		while (scanner2.hasNext()) {
+			Entry<Key, Value> entry = scanner2.next();
+			System.out.println("Key: " + entry.getKey().toString() + " Value: "
+					+ entry.getValue().toString());
+		}
+
+		Connector connector = accumulo.getConnector();
 		connector.tableOperations().delete(mockConfig.getInputTableName());
 
-		return mockInstance;
+		return accumulo;
 
 	}
 
+	/**
+	 * executes the accumulo map reduce job.
+	 */
 	@Override
 	public int run(String[] args) throws Exception {
 
 		Configuration conf = new Configuration();
+		//time interval: weekly
 		conf.setLong("minTimestamp", 1);
 		conf.setLong("maxTimestamp", 2);
 
 		Job job = Job.getInstance(conf);
-		
+
 		job.setJobName(UnusualRiseOfHeatingConsumptionReport.class.getName());
 
 		job.setJarByClass(this.getClass());
@@ -125,22 +109,5 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 		job.setOutputFormatClass(AccumuloOutputFormat.class);
 
 		return job.waitForCompletion(true) ? 0 : -1;
-	}
-
-	public static void printTable(Connector conn, String tableName)
-			throws TableNotFoundException {
-
-		System.out.println("\n Tabelle:" + tableName);
-		Scanner scanner = conn.createScanner(tableName, new Authorizations());
-		Iterator<Map.Entry<Key, Value>> iterator = scanner.iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<Key, Value> entry = iterator.next();
-			Key key = entry.getKey();
-			Value v = entry.getValue();
-			System.out.println("Row: " + key.getRow() + " Fam: "
-					+ key.getColumnFamily() + " Qual: "
-					+ key.getColumnQualifier() + " Ts:" + key.getTimestamp()
-					+ " Value: " + v);
-		}
 	}
 }

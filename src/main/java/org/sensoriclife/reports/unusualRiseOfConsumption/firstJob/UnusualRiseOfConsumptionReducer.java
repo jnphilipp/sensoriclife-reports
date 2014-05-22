@@ -5,10 +5,8 @@ import java.util.Iterator;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.sensoriclife.world.Consumption;
 import org.sensoriclife.world.ResidentialUnit;
 
 /**
@@ -25,7 +23,6 @@ public class UnusualRiseOfConsumptionReducer extends
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
 		long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
-		long minTs = conf.getLong("minTimestamp", 0);
 		
 		double oldAmount = 0;
 		double currentAmount = 0;
@@ -34,7 +31,6 @@ public class UnusualRiseOfConsumptionReducer extends
 		ResidentialUnit helperFlat = null;
 
 		Iterator<ResidentialUnit> valuesIt = values.iterator();
-		// should contain four values (2*2 rows)
 		while (valuesIt.hasNext()) {
 
 			flat = valuesIt.next();

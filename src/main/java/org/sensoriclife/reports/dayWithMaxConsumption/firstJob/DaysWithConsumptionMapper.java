@@ -14,9 +14,6 @@ public class DaysWithConsumptionMapper extends
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
-
-		//new year has begun
-		//filter all records with year - 1 and emit their amount.
 		
 		String consumptionID = k.getRow().toString();
 		String family = k.getColumnFamily().toString();
