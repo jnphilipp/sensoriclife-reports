@@ -7,6 +7,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class MinMaxMapper extends
@@ -14,38 +15,30 @@ public class MinMaxMapper extends
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
-
-		String consumptionID = k.getRow().toString();
-		String family = k.getColumnFamily().toString();
-		String qualifier = k.getColumnQualifier().toString();
-			
-		if(family.equals("device") && qualifier.equals("amount"))
+		
+		Configuration conf = new Configuration();
+		conf = c.getConfiguration();
+		int selector = conf.getInt("selectModus", 0);
+		
+		int rowIDindicator = k.getRow().toString().split("_").length;
+		
+		if(rowIDindicator == 2)
 		{
-			Configuration conf = new Configuration();
-			conf = c.getConfiguration();
-			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
-			long minTs = conf.getLong("minTimestamp", 0);
+			int resIDindicator = k.getRow().toString().split("_")[0].split("-").length;
 			
-			Long timestamp = k.getTimestamp();
-			
-			if (timestamp >= minTs && timestamp <= maxTs) {
-				String counterType = consumptionID.split("_")[1];
-				ResidentialUnit flat = new ResidentialUnit();
-				flat.setConsumptionID(consumptionID);
-				flat.setTimeStamp(k.getTimestamp());
-				flat.setDeviceAmount(Float.parseFloat(v.toString()));
+			if(resIDindicator == selector)
+			{
+				String counterType = k.getRow().toString().split("_")[1];
+				String resID = k.getRow().toString().split("_")[0];
 				
-				c.write(new Text(counterType),flat);
+				ResidentialUnit rU = new ResidentialUnit();
+				try {
+					rU.setDeviceAmount((float) Helpers.toObject(v.get()));
+					rU.setResidentialID(resID);
+					c.write(new Text(counterType),rU);
+				} catch (ClassNotFoundException e) {}
 			}
 		}
-		else if(family.equals("residential") && qualifier.equals("id"))
-		{
-			String counterType = consumptionID.split("_")[1];
-			ResidentialUnit flat = new ResidentialUnit();
-			flat.setConsumptionID(consumptionID);
-			flat.setResidentialID(v.toString());
-			c.write(new Text(counterType),flat);
-		}	
 		
 	}
 
