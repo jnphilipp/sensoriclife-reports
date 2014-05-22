@@ -10,6 +10,11 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.ResidentialUnit;
 
+/**
+ * 
+ * @author marcel, yves
+ *
+ */
 public class MinMaxMapper extends
 		Mapper<Key, Value, Text, ResidentialUnit> {
 

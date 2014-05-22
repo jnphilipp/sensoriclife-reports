@@ -1,17 +1,10 @@
 package org.sensoriclife.reports;
 
-/*import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import org.sensoriclife.Config;*/
 import org.sensoriclife.Logger;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxConsumptionReport;
 import org.sensoriclife.reports.yearConsumption.YearConsumptionReport;
 import org.sensoriclife.reports.yearInvoiceResidentialUnit.YearInvoiceReport;
-
-
 
 /**
  *

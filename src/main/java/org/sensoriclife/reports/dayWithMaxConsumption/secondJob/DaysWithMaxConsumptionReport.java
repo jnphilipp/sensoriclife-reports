@@ -1,16 +1,10 @@
 package org.sensoriclife.reports.dayWithMaxConsumption.secondJob;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
@@ -20,7 +14,6 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
@@ -92,20 +85,8 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 		// print the results of mapreduce
 		printTable(connector, mockConfig.getOutputTableName());
 		
-		
-		//####################
-		/*
-		System.out.println("Start second job");
-		
-		mockConfig.setInputTableName("DaysWithConsumption");
-		mockConfig.setOutputTableName("DaysWithMaxConsumption");
-		
-		connector.tableOperations().create(mockConfig.getOutputTableName(), false);
-		
-		int res = ToolRunner.run(new Configuration(), new DayWithMaxConsumptionReport(),
-				mockConfig.getConfigAsStringArray());
-		*/
-
+		//this is for production mode - save storage
+		connector.tableOperations().delete(mockConfig.getInputTableName());	
 	}
 
 	@Override
@@ -140,58 +121,6 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 		job.setOutputFormatClass(AccumuloOutputFormat.class);
 
 		return job.waitForCompletion(true) ? 0 : -1;
-	}
-
-	public static void insertData(Connector conn, String tableName)
-			throws IOException, AccumuloException, AccumuloSecurityException,
-			TableExistsException, TableNotFoundException {
-		BatchWriterConfig config = new BatchWriterConfig();
-		config.setMaxMemory(10000000L);
-		BatchWriter wr = conn.createBatchWriter(tableName, config);
-
-		// ######################################################################
-		int consumptionId = 1;
-		Text colFam = new Text("device");
-		Text colQual = new Text("amount");
-		ColumnVisibility colVis = new ColumnVisibility();// "public");
-		// long timestamp = System.currentTimeMillis();
-
-		Value value = new Value("4".getBytes());
-
-		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		mutation.put(colFam, colQual, colVis, 1, value);
-		wr.addMutation(mutation);
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_el"));
-		mutation.put(colFam, colQual, colVis, 2,
-				new Value("110".getBytes()));
-		wr.addMutation(mutation);
-		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
-		mutation.put(colFam, colQual, colVis, 3,
-				new Value("111".getBytes()));
-		wr.addMutation(mutation);
-		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
-		mutation.put(colFam, colQual, colVis, 4,
-				new Value("7".getBytes()));
-		wr.addMutation(mutation);
-		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 4) + "_el"));
-		mutation.put(colFam, colQual, colVis, 10,
-				new Value("42".getBytes()));
-		wr.addMutation(mutation);
-
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 5) + "_el"));
-		mutation.put(colFam, colQual, new ColumnVisibility(), 2,
-				new Value("10".getBytes()));
-		wr.addMutation(mutation);
-		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 6) + "_el"));
-		mutation.put(colFam, colQual, new ColumnVisibility(), 3,
-				new Value("1".getBytes()));
-		wr.addMutation(mutation);
-		wr.close();
 	}
 
 	public static void printTable(Connector conn, String tableName)

@@ -22,7 +22,10 @@ public class DaysWithMaxConsumptionReducer extends
 
 		// TO DO: list of days with maximum consumption
 
-		Consumption maxConsumption = null;
+		Consumption maxElecConsumption = null;
+		Consumption maxWaterColdConsumption = null;
+		Consumption maxWaterHotConsumption = null;
+		Consumption maxHeatingConsumption = null;
 
 		Iterator<Consumption> valuesIt = values.iterator();
 		while (valuesIt.hasNext()) {
@@ -32,23 +35,61 @@ public class DaysWithMaxConsumptionReducer extends
 				continue;
 
 			double overallAmount = consumption.getAmount();
-
-			if ((maxConsumption != null && overallAmount >= maxConsumption
-					.getAmount()) || maxConsumption == null) {
-				try {
-					maxConsumption = (Consumption) consumption
-							.deepCopy(consumption);
-				} catch (Exception e) {
-					e.printStackTrace();
+			try {
+				String counterType = consumption.getCounterType();
+				if (counterType.equals("el")) {
+					if (maxElecConsumption == null
+							|| (overallAmount >= maxElecConsumption.getAmount())) {
+						maxElecConsumption = (Consumption) consumption
+								.deepCopy(consumption);
+					}
+				} else if (counterType.equals("wc")) {
+					if (maxWaterColdConsumption == null
+							|| (overallAmount >= maxWaterColdConsumption
+									.getAmount())) {
+						maxWaterColdConsumption = (Consumption) consumption
+								.deepCopy(consumption);
+					}
+				} else if (counterType.equals("wh")) {
+					if (maxWaterHotConsumption == null
+							|| (overallAmount >= maxWaterHotConsumption
+									.getAmount())) {
+						maxWaterHotConsumption = (Consumption) consumption
+								.deepCopy(consumption);
+					}
+				} else if (counterType.equals("he")) {
+					if (maxHeatingConsumption == null
+							|| (overallAmount >= maxHeatingConsumption
+									.getAmount())) {
+						maxHeatingConsumption = (Consumption) consumption
+								.deepCopy(consumption);
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
 		Mutation m = new Mutation("1");
-		m.put("DaysWithMaxConsumption", "DayOfYearWithMaxAmount",
-				String.valueOf(maxConsumption.getDayOfYear()));
-		m.put("DaysWithMaxConsumption", "OverallAmount",
-				String.valueOf(maxConsumption.getAmount()));
+		m.put("el", "DayOfYear", maxElecConsumption.getTimestamp(),
+				String.valueOf(maxElecConsumption.getDayOfYear()));
+		m.put("el", "MaxAmount", maxElecConsumption.getTimestamp(), String.valueOf(maxElecConsumption.getAmount()));
+
+		m.put("wc", "DayOfYear", maxWaterColdConsumption.getTimestamp(),
+				String.valueOf(maxWaterColdConsumption.getDayOfYear()));
+		m.put("wc", "MaxAmount", maxWaterColdConsumption.getTimestamp(),
+				String.valueOf(maxWaterColdConsumption.getAmount()));
+
+		m.put("wh", "DayOfYear", maxWaterHotConsumption.getTimestamp(),
+				String.valueOf(maxWaterHotConsumption.getDayOfYear()));
+		m.put("wh", "MaxAmount", maxWaterHotConsumption.getTimestamp(),
+				String.valueOf(maxWaterHotConsumption.getAmount()));
+
+		m.put("he", "DayOfYear", maxHeatingConsumption.getTimestamp(),
+				String.valueOf(maxHeatingConsumption.getDayOfYear()));
+		m.put("he", "MaxAmount", maxHeatingConsumption.getTimestamp(),
+				String.valueOf(maxHeatingConsumption.getAmount()));
+
 		c.write(new Text("DaysWithMaxConsumption"), m);
 	}
 }

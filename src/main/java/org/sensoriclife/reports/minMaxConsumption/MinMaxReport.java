@@ -13,6 +13,11 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.world.ResidentialUnit;
 
+/**
+ * 
+ * @author marcel, yves
+ *
+ */
 public class MinMaxReport extends Configured implements Tool {
 	
 	public static boolean test = true;
@@ -95,5 +100,4 @@ public class MinMaxReport extends Configured implements Tool {
 
 		return job.waitForCompletion(true) ? 0 : -1;
 	}
-	
 }

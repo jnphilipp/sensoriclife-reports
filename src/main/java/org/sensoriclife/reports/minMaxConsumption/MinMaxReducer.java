@@ -12,7 +12,7 @@ import org.sensoriclife.world.ResidentialUnit;
 
 /**
  * 
- * @author marcel
+ * @author marcel, yves
  * 
  */
 public class MinMaxReducer extends
@@ -32,7 +32,8 @@ public class MinMaxReducer extends
 		String minResID = "";
 		float max = Float.MIN_VALUE;
 		String maxResID = "";
-		
+
+
 		for(ResidentialUnit value:values)
 		{
 			if(min > value.getDeviceAmount())
@@ -64,6 +65,5 @@ public class MinMaxReducer extends
 		
 			c.write(new Text(outputTableName), m1);
 		}
-		
 	}
 }
