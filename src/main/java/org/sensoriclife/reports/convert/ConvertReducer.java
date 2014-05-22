@@ -20,23 +20,24 @@ public class ConvertReducer extends Reducer<Text, ResidentialUnit, Text, Mutatio
 		String counterType = key.toString();//.split("_")[1];
 		
 		String address = "";
+		float minAmountOutOfYear = Float.MAX_VALUE;
 		float minAmount = Float.MAX_VALUE;
 		float maxAmount = Float.MIN_VALUE;
 		float amount = 0;
 		boolean existAmount = false;
+		boolean existOutOfYearAmount = false;
+		
 		for(ResidentialUnit rU : values)
 		{
 			if(rU.isSetDeviceAmount())
 			{
 				amount = rU.getDeviceAmount();
-				if(amount < minAmount)
-				{
+				if(amount < minAmount)				
 					minAmount = amount;
-					//System.out.println();
-				}
 					
 				if(amount > maxAmount)
 					maxAmount = amount;
+					
 				existAmount = true;
 			}
 			if(rU.isSetResidentialID())
@@ -44,12 +45,27 @@ public class ConvertReducer extends Reducer<Text, ResidentialUnit, Text, Mutatio
 				address = rU.getResidentialID();
 			}
 			
+			if(rU.isSetDeviceSecontAmount())
+			{
+				amount = rU.getDeviceSecontAmount();
+				if(amount < minAmountOutOfYear)
+					minAmountOutOfYear = amount;
+				
+				existOutOfYearAmount = true;
+			}
+			
 		}
 		
-		if(minAmount == maxAmount)
-			amount = maxAmount;
+		if(!existOutOfYearAmount)
+		{
+			if(minAmount == maxAmount)
+				amount = maxAmount;
+			else
+				amount = maxAmount - minAmount;
+		}
 		else
-			amount = maxAmount - minAmount;
+			amount = maxAmount - minAmountOutOfYear;
+		
 		if(!address.equals("") && existAmount)
 		{
 

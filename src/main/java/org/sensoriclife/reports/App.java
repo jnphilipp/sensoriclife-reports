@@ -49,7 +49,7 @@ public class App {
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
-		String[] testArgs = new String[13];
+		/*String[] testArgs = new String[13];
 		testArgs[0] = "minMaxConsumption";
 		testArgs[1] = "mockInstance";
 		testArgs[2] = "InputTable";
@@ -62,18 +62,20 @@ public class App {
 		testArgs[9] = "";//"24.12.2007";
 		testArgs[10] = "";//"24.12.2007 12:15:12";
 		testArgs[11] = "true"; //residentialUnit
-		testArgs[12] = "true";  //buildings
+		testArgs[12] = "true";  //buildings*/
 		
 		/*
 		 * Testdata yearConsumption
 		 *  
 		 * args[9] = (Times) timestamp
+		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[11] = (day;month;year) pastLimitation 
 		 * 
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
-		/*String[] testArgs = new String[10];
+		/*String[] testArgs = new String[12];
 		testArgs[0] = "yearConsumption";
 		testArgs[1] = "mockInstance";
 		testArgs[2] = "InputTable";
@@ -83,20 +85,24 @@ public class App {
 		testArgs[6] = "OutputTable";
 		testArgs[7] = "";
 		testArgs[8] = "";
-		testArgs[9] = "";//"24.12.2007";
-		*/
+		testArgs[9] = "13.03.2013";
+		testArgs[10] = "true";
+		testArgs[11] = "1;0;0";*/
+		
 		
 		/*
 		 * Testdata yearInvoice
 		 *  
 		 * args[9] = (Times) timestamp
-		 * args[10] = price
+		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[11] = (day;month;year) pastLimitation 
+		 * args[12] = price
 		 * 
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
-		/*String[] testArgs = new String[11];
+		String[] testArgs = new String[13];
 		testArgs[0] = "yearInvoice";
 		testArgs[1] = "mockInstance";
 		testArgs[2] = "InputTable";
@@ -106,8 +112,10 @@ public class App {
 		testArgs[6] = "OutputTable";
 		testArgs[7] = "";
 		testArgs[8] = "";
-		testArgs[9] = "";//"24.12.2007";
-		testArgs[10] = "wu;12.5;el;2"; 	*/	
+		testArgs[9] = "13.03.2013";
+		testArgs[10] = "true";
+		testArgs[11] = "0;0;1";
+		testArgs[12] = "wu;12.5;el;2"; 
 		
 		Logger.getInstance();
 		Logger.info("SensoricLife - reports");

@@ -38,7 +38,11 @@ public class ConvertForAYearReport extends Configured implements Tool{
 		 * args[7] = outputUserName
 		 * args[8] = outputPassword
 		 * 
-		 * args[9] = (date) timeStamp -> last date
+		 * args[9] = (Times) timestamp (max)
+		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[11] = (day;month;year) pastLimitation 
+		 * Times: dd.MM.yyyy or
+		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
 		// run the map reduce job to read the edge table and populate the node
@@ -63,17 +67,20 @@ public class ConvertForAYearReport extends Configured implements Tool{
 		 * args[7] = outputUserName
 		 * args[8] = outputPassword
 		 * 
-		 * args[9] = (date) timeStamp -> last date
+		 * args[9] = (Times) timestamp (max)
+		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[11] = (day;month;year) pastLimitation 
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[6]);
+		conf.setBoolean("onlyYear", args[10].equals("true"));
 		
 		try
 		{
 			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
 			Date d  = formatter.parse( args[9]);// day.month.year"
-			conf.setLong("minTimestamp", d.getTime());
+			conf.setLong("maxTimestamp", d.getTime());
 		}
 		catch ( ParseException e )
 		{
@@ -81,7 +88,7 @@ public class ConvertForAYearReport extends Configured implements Tool{
 			{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
 				Date d  = formatter.parse( args[9]);// day.month.year hour:minut:second
-				conf.setLong("minTimestamp", d.getTime());
+				conf.setLong("maxTimestamp", d.getTime());
 			}
 			catch ( ParseException ee ) {}
 		}
@@ -100,7 +107,18 @@ public class ConvertForAYearReport extends Configured implements Tool{
 			int second = caIn.get(Calendar.SECOND);
 			year -= 1;
 			Calendar caOut = new GregorianCalendar(year,month,day,hour,minute,second);
-			conf.setLong("maxTimestamp", caOut.getTimeInMillis());
+			conf.setLong("minTimestamp", caOut.getTimeInMillis());
+			
+			String[] pastLimitation = args[11].split(";");
+			int pastLimitationDay = Integer.parseInt(pastLimitation[0]);
+			int pastLimitationMonth = Integer.parseInt(pastLimitation[1]);
+			int pastLimitationYear = Integer.parseInt(pastLimitation[2]);
+			
+			day -= pastLimitationDay;
+			month -= pastLimitationMonth;
+			year -= pastLimitationYear;
+			caOut = new GregorianCalendar(year,month,day,hour,minute,second);
+			conf.setLong("pastLimitation", caOut.getTimeInMillis());
 		}
 		catch ( ParseException e )
 		{
@@ -116,7 +134,19 @@ public class ConvertForAYearReport extends Configured implements Tool{
 				year -= 1;
 				
 				Calendar caOut = new GregorianCalendar(year,month,day);
-				conf.setLong("maxTimestamp", caOut.getTimeInMillis());
+				conf.setLong("minTimestamp", caOut.getTimeInMillis());
+				
+				String[] pastLimitation = args[11].split(";");
+				int pastLimitationDay = Integer.parseInt(pastLimitation[0]);
+				int pastLimitationMonth = Integer.parseInt(pastLimitation[1]);
+				int pastLimitationYear = Integer.parseInt(pastLimitation[2]);
+				
+				day -= pastLimitationDay;
+				month -= pastLimitationMonth;
+				year -= pastLimitationYear;
+				caOut = new GregorianCalendar(year,month,day);
+				conf.setLong("pastLimitation", caOut.getTimeInMillis());
+				
 			}
 			catch ( ParseException ee ) {}
 		}
@@ -139,8 +169,8 @@ public class ConvertForAYearReport extends Configured implements Tool{
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[5], "zooserver-one,zooserver-two");
+			//AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
+			//AccumuloOutputFormat.setZooKeeperInstance(job, args[5], "zooserver-one,zooserver-two");
 		}
 		
 		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password

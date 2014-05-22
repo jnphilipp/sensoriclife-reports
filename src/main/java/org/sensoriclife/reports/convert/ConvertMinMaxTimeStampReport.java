@@ -120,17 +120,21 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		if(test)
 		{
 			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
-			AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
-			AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
-			AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
-
 			AccumuloOutputFormat.setMockInstance(job, args[5]);
-			AccumuloOutputFormat.setConnectorInfo(job, args[7], new PasswordToken(args[8]));
-			AccumuloOutputFormat.setDefaultTableName(job, args[6]);
-			AccumuloOutputFormat.setCreateTables(job, true);
+		}
+		else
+		{
+			//AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
+			//AccumuloOutputFormat.setZooKeeperInstance(job, args[5], "zooserver-one,zooserver-two");
 		}
 		
+		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
+		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		
+		AccumuloOutputFormat.setConnectorInfo(job, args[7], new PasswordToken(args[8]));
+		AccumuloOutputFormat.setDefaultTableName(job, args[6]);
+		AccumuloOutputFormat.setCreateTables(job, true);
 
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);

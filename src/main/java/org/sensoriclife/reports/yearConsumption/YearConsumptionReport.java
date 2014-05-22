@@ -1,6 +1,10 @@
 package org.sensoriclife.reports.yearConsumption;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -99,13 +103,15 @@ public class YearConsumptionReport {
 	
 	public static void insertData(Connector conn, String tableName)
 			throws IOException, AccumuloException, AccumuloSecurityException,
-			TableExistsException, TableNotFoundException {
+			TableExistsException, TableNotFoundException, ParseException {
 		BatchWriterConfig config = new BatchWriterConfig();
 		config.setMaxMemory(10000000L);
 		BatchWriter wr = conn.createBatchWriter(tableName, config);
 
 		// ######################################################################
 		int consumptionId = 1;
+		DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
+		
 		Text colFam = new Text("device");
 		Text colQual = new Text("amount");
 		Text colFam2 = new Text("residential");
@@ -113,43 +119,140 @@ public class YearConsumptionReport {
 		ColumnVisibility colVis = new ColumnVisibility();// "public");
 		// long timestamp = System.currentTimeMillis();
 		
-		Float floatValue = new Float(4.0);
+		Float floatValue = new Float(1);
+		Date d = formatter.parse( "12.03.2012");
 		Value value = new Value(Helpers.toByteArray(floatValue));
 		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
-		mutation.put(colFam, colQual, colVis, 1, value);
+		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(), value);
 		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 1) + "_wu"));
-		mutation.put(colFam, colQual, colVis, 2,new Value(Helpers.toByteArray(new Float(8))));
+		d = formatter.parse( "13.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "14.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.04.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.10.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(5))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "12.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(6))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(7))));
+		wr.addMutation(mutation);
+		
+		
+		
+		d = formatter.parse( "12.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
 		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-2".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(1))));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 2) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
-		mutation.put(colFam, colQual, colVis, 3,new Value(Helpers.toByteArray(new Float(111))));
+		d = formatter.parse( "13.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 3) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
-		mutation.put(colFam, colQual, colVis, 4,new Value(Helpers.toByteArray(new Float(7))));
+		d = formatter.parse( "14.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 5) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, colVis, 10,new Value(Helpers.toByteArray(new Float(42))));
-		wr.addMutation(mutation);
-
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 5) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), 2,new Value(Helpers.toByteArray(new Float(2))));
+		d = formatter.parse( "13.04.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
 		wr.addMutation(mutation);
 		
-		mutation = new Mutation(new Text(String.valueOf(consumptionId + 6) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), 3,new Value(Helpers.toByteArray(new Float(2))));
+		d = formatter.parse( "13.10.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(10))));
 		wr.addMutation(mutation);
+		
+		d = formatter.parse( "12.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(13))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(15))));
+		wr.addMutation(mutation);
+		
+		
+		
+		d = formatter.parse( "12.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(1))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
+		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "14.03.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.04.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.10.2012");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(5))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "12.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(6))));
+		wr.addMutation(mutation);
+		
+		d = formatter.parse( "13.03.2013");
+		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(7))));
+		wr.addMutation(mutation);
+		
 		wr.close();
 	}
 

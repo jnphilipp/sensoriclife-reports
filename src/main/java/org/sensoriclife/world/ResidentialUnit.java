@@ -18,14 +18,16 @@ public class ResidentialUnit implements Serializable, Writable {
 
 	private String consumptionID = "";
 	private float deviceAmount = 0;
+	private float deviceSecontAmount = 0;
 	private String counterType = "";
 	private String residentialID = "";
-	private int userID = 0;
+	private long userID = 0;
 	private String userResidential = "";
 	private long timeStamp = 0;
 
 	private boolean isSetConsumptionID = false;
 	private boolean isSetDeviceAmount = false;
+	private boolean isSetDeviceSecontAmount = false;
 	private boolean isSetCounterType = false;
 	private boolean isSetResidentialID = false;
 	private boolean isSetUserID = false;
@@ -62,7 +64,7 @@ public class ResidentialUnit implements Serializable, Writable {
 		this.residentialID = residentialID;
 	}
 
-	public int getUserID() {
+	public long getUserID() {
 		return userID;
 	}
 
@@ -122,6 +124,19 @@ public class ResidentialUnit implements Serializable, Writable {
 		this.counterType = counterType;
 	}
 
+	public float getDeviceSecontAmount() {
+		return deviceSecontAmount;
+	}
+
+	public void setDeviceSecontAmount(float deviceSecontAmount) {
+		this.isSetDeviceSecontAmount = true;
+		this.deviceSecontAmount = deviceSecontAmount;
+	}
+
+	public boolean isSetDeviceSecontAmount() {
+		return isSetDeviceSecontAmount;
+	}
+	
 	public Object deepCopy(Object oldObj) throws Exception {
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
@@ -147,8 +162,9 @@ public class ResidentialUnit implements Serializable, Writable {
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-		out.writeInt(this.userID);
+		out.writeLong(this.userID);
 		out.writeFloat(this.deviceAmount);
+		out.writeFloat(this.deviceSecontAmount);
 		out.writeUTF(this.counterType);
 		out.writeUTF(this.consumptionID);
 		out.writeUTF(this.userResidential);
@@ -157,6 +173,7 @@ public class ResidentialUnit implements Serializable, Writable {
 
 		out.writeBoolean(this.isSetConsumptionID);
 		out.writeBoolean(this.isSetDeviceAmount);
+		out.writeBoolean(this.isSetDeviceSecontAmount);
 		out.writeBoolean(this.isSetCounterType);
 		out.writeBoolean(this.isSetUserID);
 		out.writeBoolean(this.isSetResidentialID);
@@ -166,8 +183,9 @@ public class ResidentialUnit implements Serializable, Writable {
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		this.userID = in.readInt();
+		this.userID = in.readLong();
 		this.deviceAmount = in.readFloat();
+		this.deviceSecontAmount = in.readFloat();
 		this.counterType = in.readUTF();
 		this.consumptionID = in.readUTF();
 		this.userResidential = in.readUTF();
@@ -176,10 +194,13 @@ public class ResidentialUnit implements Serializable, Writable {
 
 		this.isSetConsumptionID = in.readBoolean();
 		this.isSetDeviceAmount = in.readBoolean();
+		this.isSetDeviceSecontAmount = in.readBoolean();
 		this.isSetCounterType = in.readBoolean();
 		this.isSetUserID = in.readBoolean();
 		this.isSetResidentialID = in.readBoolean();
 		this.isSetUserResidential = in.readBoolean();
 		this.isSetTimeStamp = in.readBoolean();
 	}
+
+	
 }

@@ -25,19 +25,37 @@ public class ConvertMapper extends Mapper<Key, Value, Text, ResidentialUnit> {
 			conf = c.getConfiguration();
 			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
 			long minTs = conf.getLong("minTimestamp", 0);
+			boolean onlyYear = conf.getBoolean("onlyYear", false);
+			long pastLimitation = conf.getLong("pastLimitation",Long.MIN_VALUE);
 			
 			Long timestamp = k.getTimestamp();
 			
-			if (timestamp >= minTs && timestamp <= maxTs) {
+			if (timestamp >= minTs && timestamp < maxTs) {
 				ResidentialUnit flat = new ResidentialUnit();
 				flat.setConsumptionID(consumptionID);
-				flat.setTimeStamp(k.getTimestamp());
+				//flat.setTimeStamp(k.getTimestamp());
+				
+				
 				try {
 					flat.setDeviceAmount((Float)Helpers.toObject(v.get()));
 					c.write(new Text(consumptionID),flat);
 				} catch (ClassNotFoundException e) {}
 				
 				
+			}
+			else if(onlyYear)
+			{
+				if(timestamp < minTs && timestamp >= pastLimitation)
+				{
+					ResidentialUnit flat = new ResidentialUnit();
+					flat.setConsumptionID(consumptionID);
+					//flat.setTimeStamp(k.getTimestamp());
+					
+					try {
+						flat.setDeviceSecontAmount((Float)Helpers.toObject(v.get()));
+						c.write(new Text(consumptionID),flat);
+					} catch (ClassNotFoundException e) {}
+				}
 			}
 		}
 		
