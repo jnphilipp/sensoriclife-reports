@@ -5,6 +5,7 @@ import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.security.Authorizations;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -19,7 +20,7 @@ import org.sensoriclife.Config;
 public class EmptyUnitConsumptionReport extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
-		Job job = Job.getInstance(getConf());
+		Job job = Job.getInstance(new Configuration());
 		job.setJobName(EmptyUnitConsumptionReport.class.getName());
 		job.setJarByClass(this.getClass());
 		job.setMapperClass(EmptyUnitConsumptionMapper1.class);
@@ -27,13 +28,13 @@ public class EmptyUnitConsumptionReport extends Configured implements Tool {
 
 		AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
-		AccumuloInputFormat.setInputTableName(job, Config.getProperty("accumulo.table_name"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("accumulo.table_name"));
 
+		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("reports.empty_consumption_report.table_name"));
 		AccumuloOutputFormat.setCreateTables(job, true);
-		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Mutation.class);

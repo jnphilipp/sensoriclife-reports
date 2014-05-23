@@ -13,7 +13,7 @@ import org.sensoriclife.Logger;
  * @author paul
  * @version 0.0.1
  */
-public class EmptyUnitConsumptionMapper1 extends Mapper <Key,Value,Text,Mutation>
+public class EmptyUnitConsumptionMapper1 extends Mapper <Key, Value, Text, Mutation>
 {
 	@Override
 	public void map(Key k, Value v, Context c) throws IOException,InterruptedException 
@@ -25,7 +25,7 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key,Value,Text,Mutation
 		Mutation m = new Mutation(k.toString());
 		Logger.info(EmptyUnitConsumptionReducer1.class, k.toString());
 		//get all amounts 
-		/*if(family.equals("device") && qualifier.equals("amount"))
+		if(family.equals("device") && qualifier.equals("amount"))
 		{
 			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
@@ -41,8 +41,8 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key,Value,Text,Mutation
 		{
 			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
-		}*/
-		m.put(family, qualifier, v);
-		c.write(k.getRow(), m);
+		}
+		//m.put(family, qualifier, v);
+		//c.write(k.getRow(), m);
 	}
 }

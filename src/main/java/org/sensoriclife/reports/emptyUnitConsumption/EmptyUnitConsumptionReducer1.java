@@ -1,6 +1,7 @@
 package org.sensoriclife.reports.emptyUnitConsumption;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import org.apache.accumulo.core.data.ColumnUpdate;
@@ -17,21 +18,36 @@ import org.sensoriclife.Logger;
  */
 public class EmptyUnitConsumptionReducer1 extends Reducer<Text, Mutation, Text, Mutation>
 {
-	private static LinkedHashSet<String> list = new LinkedHashSet<String>();
+	private static LinkedHashSet<String> list = new LinkedHashSet<>();
 	
-	public void reduce(Text key, Mutation values, Context c) throws IOException, InterruptedException 
+	@Override
+	public void reduce(Text key, Iterable<Mutation> values, Context c) throws IOException, InterruptedException 
 	{
-			Text rowId = new Text(values.getRow().toString());
-			List<ColumnUpdate> data = values.getUpdates();
-			String all ="";
-			for ( ColumnUpdate data1 : data )
-				all += data1.toString();
+		Logger.info(EmptyUnitConsumptionReducer1.class, key.toString());
+		Iterator<Mutation> mutations = values.iterator();
+		while ( mutations.hasNext() ) {
+			Mutation m = mutations.next();
+			Logger.info(EmptyUnitConsumptionReducer1.class, m.toString());
 
-			Logger.info(EmptyUnitConsumptionReducer1.class, values.toString());
+			Text rowId = key;//new Text(Arrays.toString(m.getRow()));
+			List<ColumnUpdate> data = m.getUpdates();
+			String all ="";
+			for ( ColumnUpdate data1 : data ) {
+				//try {
+					all += new String(data1.getColumnFamily());//Helpers.toObject(data1.getColumnFamily()).toString();
+					all += new String(data1.getColumnQualifier());//Helpers.toObject(data1.getColumnQualifier()).toString();
+				/*}
+				catch ( IOException | ClassNotFoundException e ) {
+					Logger.error(EmptyUnitConsumptionReducer1.class, e.toString());
+				}*/
+		}
+
+			Logger.info(EmptyUnitConsumptionReducer1.class, all);
+
 			//amounts
-			/*if( all.contains("device") && all.contains("amount") )
+			if( all.contains("device") && all.contains("amount") )
 			{
-				c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), values);
+				c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), m);
 			}
 			else if( all.contains("residential") && all.contains("id") )//all residential units with user
 			{
@@ -41,9 +57,9 @@ public class EmptyUnitConsumptionReducer1 extends Reducer<Text, Mutation, Text, 
 			{
 				if( !list.contains(rowId.toString()) )
 				{
-					c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), values);
+					c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), m);
 				}
-			}*/
-			c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), values);
+			}
+		}
 	}
 }
