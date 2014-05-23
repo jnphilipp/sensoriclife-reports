@@ -37,6 +37,19 @@ public class EmptyUnitConsumtionMapper1 extends Mapper <Key,Value,Text,Text>
 				Logger.error(EmptyUnitConsumtionMapper1.class, ex.toString());
 			}
 		}
+		//get all residential units
+		if(family.equals("user") && qualifier.equals("residential"))
+		{
+			try 
+			{
+				String addresses = (String)Helpers.toObject(v.get());
+				c.write(new Text(consumptionID), new Text(addresses));
+			} 
+			catch (ClassNotFoundException ex) 
+			{
+				Logger.error(EmptyUnitConsumtionMapper1.class, ex.toString());
+			}
+		}
 		//get all amounts 
 		if(family.equals("device") && qualifier.equals("amount"))
 		{
