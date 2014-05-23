@@ -41,6 +41,7 @@ public class ConvertForAYearReport extends Configured implements Tool{
 		 * args[9] = (Times) timestamp (max)
 		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
 		 * args[11] = (day;month;year) pastLimitation 
+		 * args[12] = (long) reportTimestamp
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
@@ -70,11 +71,13 @@ public class ConvertForAYearReport extends Configured implements Tool{
 		 * args[9] = (Times) timestamp (max)
 		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
 		 * args[11] = (day;month;year) pastLimitation 
+		 * args[12] = (long) reportTimestamp
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[6]);
 		conf.setBoolean("onlyYear", args[10].equals("true"));
+		conf.setLong("reportTimestamp", Long.parseLong(args[12]));
 		
 		try
 		{
@@ -108,17 +111,6 @@ public class ConvertForAYearReport extends Configured implements Tool{
 			year -= 1;
 			Calendar caOut = new GregorianCalendar(year,month,day,hour,minute,second);
 			conf.setLong("minTimestamp", caOut.getTimeInMillis());
-			
-			String[] pastLimitation = args[11].split(";");
-			int pastLimitationDay = Integer.parseInt(pastLimitation[0]);
-			int pastLimitationMonth = Integer.parseInt(pastLimitation[1]);
-			int pastLimitationYear = Integer.parseInt(pastLimitation[2]);
-			
-			day -= pastLimitationDay;
-			month -= pastLimitationMonth;
-			year -= pastLimitationYear;
-			caOut = new GregorianCalendar(year,month,day,hour,minute,second);
-			conf.setLong("pastLimitation", caOut.getTimeInMillis());
 		}
 		catch ( ParseException e )
 		{
@@ -135,23 +127,17 @@ public class ConvertForAYearReport extends Configured implements Tool{
 				
 				Calendar caOut = new GregorianCalendar(year,month,day);
 				conf.setLong("minTimestamp", caOut.getTimeInMillis());
-				
-				String[] pastLimitation = args[11].split(";");
-				int pastLimitationDay = Integer.parseInt(pastLimitation[0]);
-				int pastLimitationMonth = Integer.parseInt(pastLimitation[1]);
-				int pastLimitationYear = Integer.parseInt(pastLimitation[2]);
-				
-				day -= pastLimitationDay;
-				month -= pastLimitationMonth;
-				year -= pastLimitationYear;
-				caOut = new GregorianCalendar(year,month,day);
-				conf.setLong("pastLimitation", caOut.getTimeInMillis());
-				
 			}
 			catch ( ParseException ee ) {}
 		}
 			
-		
+		try
+		{
+			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
+			Date d  = formatter.parse( args[11]);// day.month.year"
+			conf.setLong("pastLimitation", d.getTime());
+		}
+		catch ( ParseException e ){}
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConvertForAYearReport.class.getName());

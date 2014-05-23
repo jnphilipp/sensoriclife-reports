@@ -48,12 +48,13 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 		 * args[4] = Password
 		 * 
 		 * args[5] = indikator to select the rowID position
-		 * 		  
+		 * args[6] = reportTimestamp
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
 		conf.setInt("indikator", Integer.parseInt(args[5]));
+		conf.setLong("reportTimestamp", new Long(args[6]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConsumptionGeneralizeReport.class.getName());

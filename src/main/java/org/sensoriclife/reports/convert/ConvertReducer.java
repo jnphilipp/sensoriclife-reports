@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -58,23 +59,26 @@ public class ConvertReducer extends Reducer<Text, ResidentialUnit, Text, Mutatio
 		
 		if(!existOutOfYearAmount)
 		{
-			if(minAmount == maxAmount)
+			/*if(minAmount == maxAmount)
 				amount = maxAmount;
-			else
-				amount = maxAmount - minAmount;
+			else*/
+			amount = maxAmount - minAmount;
 		}
 		else
 			amount = maxAmount - minAmountOutOfYear;
 		
 		if(!address.equals("") && existAmount)
 		{
-
-			Mutation m1 = new Mutation(address+"_"+counterType);
-			m1.put("device", "amount",new Value( Helpers.toByteArray(amount)));
-			
 			Configuration conf = new Configuration();
 			conf = c.getConfiguration();
 			String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
+			long reportTimestamp = conf.getLong("reportTimestamp", 0);
+			
+			Mutation m1 = new Mutation(address+"_"+counterType);
+			if(reportTimestamp != 0)
+				m1.put("device", "amount",new ColumnVisibility(),reportTimestamp,new Value( Helpers.toByteArray(amount)));	
+			else
+				m1.put("device", "amount",new Value( Helpers.toByteArray(amount)));	
 			
 			c.write(new Text(outputTableName), m1);
 		}

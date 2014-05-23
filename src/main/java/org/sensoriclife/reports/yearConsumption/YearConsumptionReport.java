@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
+import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.convert.ConvertForAYearReport;
 import org.sensoriclife.util.Helpers;
 
@@ -36,6 +38,29 @@ public class YearConsumptionReport {
 		/*
 		 * Todo: Versionierung muss noch rein 
 		 */
+		
+		/*
+		 * 
+		 * args[0] = reportName
+		 * 
+		 * args[1] = inputInstanceName
+		 * args[2] = inputTableName
+		 * args[3] = inputUserName
+		 * args[4] = inputPassword
+		 * 
+		 * args[5] = outputInstanceName
+		 * args[6] = outputTableName
+		 * args[7] = outputUserName
+		 * args[8] = outputPassword
+		 *  
+		 * args[9] = (Times) timestamp
+		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[11] = (times dd.MM.yyyy) pastLimitation 
+		 * 
+		 * Times: dd.MM.yyyy or
+		 * 		  dd.MM.yyyy kk:mm:ss
+		 */
+		
 		if(test)
 		{
 			MockInstance inputMockInstance = new MockInstance(args[1]);
@@ -51,18 +76,27 @@ public class YearConsumptionReport {
 			insertData(inputConnector, args[2]);
 		}
 		
+		GregorianCalendar now = new GregorianCalendar(); 
+		long reportTimestamp = now.getTimeInMillis();
+		
+		String[] filterArgs = new String[13];
+		for(int i = 0; (i < args.length);i++)
+			filterArgs[i] = args[i];
+		filterArgs[12] = new Long(reportTimestamp).toString();
+		
 		
 		//first report: merge residentialID,consumptionID and Consumption -> filter timestamp
-		ConvertForAYearReport.runConvert(args);
+		ConvertForAYearReport.runConvert(filterArgs);
 		
 		//second report: consumption for a residentialUnits
-		String[] summeryArgs = new String[6];
+		String[] summeryArgs = new String[7];
 		summeryArgs[0] = args[0];
 		summeryArgs[1] = args[5];
 		summeryArgs[2] = args[6];
 		summeryArgs[3] = args[7];
 		summeryArgs[4] = args[8];
 		summeryArgs[5] = "6";
+		summeryArgs[6] = new Long(reportTimestamp).toString();
 		
 		ConsumptionGeneralizeReport.runYearConsumptionGeneralize(summeryArgs);
 		
@@ -81,7 +115,11 @@ public class YearConsumptionReport {
 		//cities
 		summeryArgs[5] = "2";
 		ConsumptionGeneralizeReport.runYearConsumptionGeneralize(summeryArgs);
-				
+		
+		Accumulo.getInstance().connect(args[5]);
+		Accumulo.getInstance().addMutation(args[6], "YearConsumption", "report", "version", Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().flushBashWriter(args[6]);
+		Accumulo.getInstance().disconnect();
 		/*
 		 * Test
 		 */

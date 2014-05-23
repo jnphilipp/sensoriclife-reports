@@ -25,6 +25,8 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 		 * args[2] = TableName
 		 * args[3] = UserName
 		 * args[4] = Password
+		 * args[5] = -
+		 * args[6] = reportTimestamp
 		 * 
 		 */
 		
@@ -44,11 +46,13 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 		 * args[2] = TableName
 		 * args[3] = UserName
 		 * args[4] = Password
-		  		  
+		 * args[5] = -
+		 * args[6] = reportTimestamp	  
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
+		conf.setLong("reportTimestamp", new Long(args[6]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConsumptionGeneralizeToBuildingReport.class.getName());

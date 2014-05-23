@@ -34,7 +34,7 @@ public class MinMaxReport extends Configured implements Tool {
 		 * args[4] = Password
 		 * 
 		 * args[5] = (4|5) select to get Max Min for residentialUnit(5) or building(4)
-		 * 
+		 * args[6] = reportTimestamp
 		 */
 		
 		// run the map reduce job to read the edge table and populate the node
@@ -56,12 +56,13 @@ public class MinMaxReport extends Configured implements Tool {
 		 * args[4] = Password
 		 * 
 		 * args[5] = (4|5) select to get Max Min for residentialUnit(5) or building(4)
-		 * 
+		 * args[6] = reportTimestamp
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
 		conf.setInt("selectModus", Integer.parseInt(args[5]));
+		conf.setLong("reportTimestamp", new Long(args[6]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(MinMaxReport.class.getName());

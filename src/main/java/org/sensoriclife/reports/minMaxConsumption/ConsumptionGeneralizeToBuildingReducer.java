@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.Text;
@@ -24,11 +25,16 @@ public class ConsumptionGeneralizeToBuildingReducer extends Reducer<Text, FloatW
 		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
 		
 		Mutation m1 = new Mutation(key);
-		m1.put("building", "amount",new Value( Helpers.toByteArray(amount)));
+		if(reportTimestamp != 0)
+			m1.put("building", "amount",new ColumnVisibility(),reportTimestamp,new Value( Helpers.toByteArray(amount)));
+		else
+			m1.put("building", "amount",new Value( Helpers.toByteArray(amount)));
 		
+			
 		c.write(new Text(outputTableName), m1);
 		
 	}

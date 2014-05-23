@@ -19,6 +19,7 @@ public class YearInvoiceComputeReducer extends Reducer<Text, FloatWritable, Text
 		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		
 		float price = conf.getFloat(counterType, -1);
 		
@@ -36,7 +37,10 @@ public class YearInvoiceComputeReducer extends Reducer<Text, FloatWritable, Text
 			String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
 			
 			Mutation m1 = new Mutation(key);
-			m1.put("residentialUnit", "invoice",new Value( Helpers.toByteArray(price)));
+			if(reportTimestamp != 0)
+				m1.put("residentialUnit", "invoice",reportTimestamp,new Value( Helpers.toByteArray(price)));
+			else
+				m1.put("residentialUnit", "invoice",new Value( Helpers.toByteArray(price)));
 			
 			c.write(new Text(outputTableName), m1);
 		}

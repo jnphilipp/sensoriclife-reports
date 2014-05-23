@@ -25,6 +25,8 @@ public class YearInvoiceComputeReport extends Configured implements Tool{
 		 * args[2] = TableName
 		 * args[3] = UserName
 		 * args[4] = Password
+		 * args[5] = price
+		 * args[6] = reportTimestamp
 		 */
 		
 		// run the map reduce job to read the edge table and populate the node
@@ -44,10 +46,12 @@ public class YearInvoiceComputeReport extends Configured implements Tool{
 		 * args[3] = UserName
 		 * args[4] = Password
 		 * args[5] = price
+		 * args[6] = reportTimestamp
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
+		conf.setLong("reportTimestamp", new Long(args[6]));
 		
 		String[] prices = args[5].split(";");
 		for(int i = 0; i < prices.length;i +=2)

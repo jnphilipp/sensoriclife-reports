@@ -24,27 +24,30 @@ public class MinMaxMapper extends
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
 		int selector = conf.getInt("selectModus", 0);
+		long timestamp = k.getTimestamp();
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		
-		int rowIDindicator = k.getRow().toString().split("_").length;
-		
-		if(rowIDindicator == 2)
+		if((timestamp == reportTimestamp)|| (reportTimestamp == 0))
 		{
-			int resIDindicator = k.getRow().toString().split("_")[0].split("-").length;
+			int rowIDindicator = k.getRow().toString().split("_").length;
 			
-			if(resIDindicator == selector)
+			if(rowIDindicator == 2)
 			{
-				String counterType = k.getRow().toString().split("_")[1];
-				String resID = k.getRow().toString().split("_")[0];
+				int resIDindicator = k.getRow().toString().split("_")[0].split("-").length;
 				
-				ResidentialUnit rU = new ResidentialUnit();
-				try {
-					rU.setDeviceAmount((float) Helpers.toObject(v.get()));
-					rU.setResidentialID(resID);
-					c.write(new Text(counterType),rU);
-				} catch (ClassNotFoundException e) {}
+				if(resIDindicator == selector)
+				{
+					String counterType = k.getRow().toString().split("_")[1];
+					String resID = k.getRow().toString().split("_")[0];
+					
+					ResidentialUnit rU = new ResidentialUnit();
+					try {
+						rU.setDeviceAmount((float) Helpers.toObject(v.get()));
+						rU.setResidentialID(resID);
+						c.write(new Text(counterType),rU);
+					} catch (ClassNotFoundException e) {}
+				}
 			}
 		}
-		
 	}
-
 }

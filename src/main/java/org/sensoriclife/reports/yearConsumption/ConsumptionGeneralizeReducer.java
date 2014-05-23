@@ -25,6 +25,7 @@ public class ConsumptionGeneralizeReducer extends Reducer<Text, FloatWritable, T
 		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
 		
 		String summaryObjectName = "";
@@ -51,7 +52,10 @@ public class ConsumptionGeneralizeReducer extends Reducer<Text, FloatWritable, T
 		}
 		
 		Mutation m1 = new Mutation(key);
-		m1.put(summaryObjectName, "amount",new Value( Helpers.toByteArray(amount)));
+		if(reportTimestamp != 0)
+			m1.put(summaryObjectName, "amount",reportTimestamp,new Value( Helpers.toByteArray(amount)));
+		else
+			m1.put(summaryObjectName, "amount",new Value( Helpers.toByteArray(amount)));
 		
 		c.write(new Text(outputTableName), m1);
 		

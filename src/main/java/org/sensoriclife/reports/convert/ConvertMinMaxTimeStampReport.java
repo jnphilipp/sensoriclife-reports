@@ -38,6 +38,9 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		 * 
 		 * args[9] = (date) timeStamp -> min
 		 * args[10] = (date) timeStamp -> max
+		 * args[11] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[12] = (day;month;year) pastLimitation
+		 * args[13] = (long) reportTimestamp
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
@@ -66,12 +69,18 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		 * 
 		 * args[9] = (date) timeStamp -> min
 		 * args[10] = (date) timeStamp -> max
+		 * args[11] = (boolean) onlyYear -> is true, when the compute inside the year
+		 * args[12] = (day;month;year) pastLimitation
+		 * args[13] = (long) reportTimestamp
+		 * 
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[6]);
+		conf.setBoolean("onlyYear", args[11].equals("true"));
+		conf.setLong("reportTimestamp", Long.parseLong(args[13]));
 		
 		try
 		{
@@ -86,6 +95,7 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
 				Date d  = formatter.parse( args[9]);// day.month.year hour:minut:second
 				conf.setLong("minTimestamp", d.getTime());
+				System.out.println("minTimestamp: "+args[9]);
 			}
 			catch ( ParseException ee ) {}
 		}
@@ -100,12 +110,19 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		{
 			try
 			{
-				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
+				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
 				Date d  = formatter.parse( args[10]);// day.month.year"
 				conf.setLong("maxTimestamp", d.getTime());
 			}
 			catch ( ParseException ee ) {}
 		}
+		try
+		{
+			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
+			Date d  = formatter.parse( args[12]);// day.month.year"
+			conf.setLong("pastLimitation", d.getTime());
+		}
+		catch ( ParseException e ){}
 			
 		
 		
