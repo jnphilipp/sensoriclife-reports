@@ -6,6 +6,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.Logger;
 
 /**
  *
@@ -22,8 +23,9 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key,Value,Text,Mutation
 		String qualifier = k.getColumnQualifier().toString();
 		Long timestamp = k.getTimestamp();
 		Mutation m = new Mutation(k.toString());
+		Logger.info(EmptyUnitConsumptionReducer1.class, k.toString());
 		//get all amounts 
-		if(family.equals("device") && qualifier.equals("amount"))
+		/*if(family.equals("device") && qualifier.equals("amount"))
 		{
 			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
@@ -39,6 +41,8 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key,Value,Text,Mutation
 		{
 			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
-		}
+		}*/
+		m.put(family, qualifier, v);
+		c.write(k.getRow(), m);
 	}
 }
