@@ -1,4 +1,4 @@
-package org.sensoriclife.reports.dayWithMaxConsumption.secondJob;
+package org.sensoriclife.reports.unusualRiseOfConsumption.secondob;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -13,54 +13,59 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.util.MockInstanceConfiguration;
-import org.sensoriclife.world.Consumption;
+import org.sensoriclife.world.ResidentialUnit;
 
-public class DaysWithMaxConsumptionReport extends Configured implements Tool {
-	
+public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
+		Tool {
+
 	/**
 	 * runs the whole process of the second map reduce job, including configuration, inserting of test data and execution of the job.
 	 * @return Accumulo
 	 * @throws Exception
 	 */
-	public static void runSecondJob(Accumulo accumulo) throws Exception {
+	public static Accumulo runSecondJob(Accumulo accumulo) throws Exception {
 
-		MockInstanceConfiguration mockConfig = MockInstanceConfiguration.getInstance();
+		MockInstanceConfiguration mockConfig = MockInstanceConfiguration
+				.getInstance();
 		mockConfig.setMockInstanceName("mockInstance");
-		mockConfig.setInputTableName("DaysWithConsumption");
-		mockConfig.setOutputTableName("DaysWithMaxConsumption");
+		mockConfig.setInputTableName("HeatingConsumption");
+		mockConfig.setOutputTableName("UnusualRiseOfConsumption");
 		mockConfig.setUserName("");
 		mockConfig.setPassword("");
-		
-		Connector connector = accumulo.getConnector();
 
-		accumulo.createTable(mockConfig.getOutputTableName(), false);
-		
-		//print inputtable
-		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(mockConfig.getInputTableName());
-		while(scanner.hasNext()){
+		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(mockConfig
+				.getInputTableName());
+
+		while (scanner.hasNext()) {
 			Entry<Key, Value> entry = scanner.next();
-			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
-		}	
-
-		ToolRunner.run(new Configuration(), new DaysWithMaxConsumptionReport(),
-				mockConfig.getConfigAsStringArray());
-		
-		//print outputtable
-		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(mockConfig.getOutputTableName());
-		while(scanner2.hasNext()){
-			Entry<Key, Value> entry = scanner2.next();	
-			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
+			System.out.println("Key: " + entry.getKey().toString() + " Value: "
+					+ entry.getValue().toString());
 		}
-		
-		//this is for production mode - save storage
-		connector.tableOperations().delete(mockConfig.getInputTableName());	
+
+		ToolRunner.run(new Configuration(),
+				new UnusualRiseOfHeatingConsumptionReport(),
+				mockConfig.getConfigAsStringArray());
+
+		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(mockConfig
+				.getOutputTableName());
+
+		while (scanner2.hasNext()) {
+			Entry<Key, Value> entry = scanner2.next();
+			System.out.println("Key: " + entry.getKey().toString() + " Value: "
+					+ entry.getValue().toString());
+		}
+
+		Connector connector = accumulo.getConnector();
+		connector.tableOperations().delete(mockConfig.getInputTableName());
+
+		return accumulo;
+
 	}
 
 	/**
@@ -68,14 +73,20 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 	 */
 	@Override
 	public int run(String[] args) throws Exception {
-		
-		Job job = Job.getInstance(getConf());
-		job.setJobName(DaysWithMaxConsumptionReport.class.getName());
+
+		Configuration conf = new Configuration();
+		//time interval: weekly
+		conf.setLong("minTimestamp", 1);
+		conf.setLong("maxTimestamp", 2);
+
+		Job job = Job.getInstance(conf);
+
+		job.setJobName(UnusualRiseOfHeatingConsumptionReport.class.getName());
 
 		job.setJarByClass(this.getClass());
 
-		job.setMapperClass(DaysWithMaxConsumptionMapper.class);
-		job.setReducerClass(DaysWithMaxConsumptionReducer.class);
+		job.setMapperClass(UnusualRiseOfHeatingConsumptionMapper.class);
+		job.setReducerClass(UnusualRiseOfHeatingConsumptionReducer.class);
 
 		AccumuloInputFormat.setMockInstance(job, args[3]);
 		AccumuloInputFormat.setConnectorInfo(job, args[2], new PasswordToken(
@@ -89,8 +100,8 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 		AccumuloOutputFormat.setCreateTables(job, true);
 		AccumuloOutputFormat.setMockInstance(job, args[3]);
 
-		job.setMapOutputKeyClass(IntWritable.class);
-		job.setMapOutputValueClass(Consumption.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(ResidentialUnit.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Mutation.class);
 
@@ -98,5 +109,5 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 		job.setOutputFormatClass(AccumuloOutputFormat.class);
 
 		return job.waitForCompletion(true) ? 0 : -1;
-	}	
+	}
 }

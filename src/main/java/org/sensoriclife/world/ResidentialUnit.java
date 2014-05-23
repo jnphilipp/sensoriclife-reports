@@ -17,7 +17,7 @@ public class ResidentialUnit implements Serializable, Writable {
 	private static final long serialVersionUID = 1L;
 
 	private String consumptionID = "";
-	private float deviceAmount = 0;
+	private float deviceAmount = -1;
 	private String counterType = "";
 	private String residentialID = "";
 	private int userID = 0;
