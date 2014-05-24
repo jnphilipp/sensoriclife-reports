@@ -25,7 +25,7 @@ public class EmptyUnitConsumptionReducer2 extends Reducer<Text, Mutation, Text, 
 			Mutation m = mutations.next();
 			Logger.info(EmptyUnitConsumptionReducer2.class, m.toString());
 
-			c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), m);
+			c.write(new Text(Config.getProperty("reports.empty_consumption_report2.table_name")), m);
 		}
 	}
 }

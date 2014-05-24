@@ -47,7 +47,7 @@ public class EmptyUnitConsumptionReducer1 extends Reducer<Text, Mutation, Text, 
 			}
 			else//residential units
 			{*/
-				c.write(new Text(Config.getProperty("reports.empty_consumption_report.table_name")), m);
+				c.write(new Text(Config.getProperty("reports.empty_consumption_report1.table_name")), m);
 			//}
 		}
 	}

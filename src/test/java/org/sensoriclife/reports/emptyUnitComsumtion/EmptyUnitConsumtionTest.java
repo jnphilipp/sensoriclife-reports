@@ -39,11 +39,13 @@ public class EmptyUnitConsumtionTest
 		//create mock accumulo 
 		Config.getInstance().getProperties().setProperty("accumulo.name", "mockInstance");
 		Config.getInstance().getProperties().setProperty("accumulo.table_name", "table");
-		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report.table_name", "report_empty_report");
-		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report.time", "1");;
+		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report1.table_name", "report_empty_report1");
+		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report2.table_name", "report_empty_report2");
+		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report.time", "1");
 		Accumulo.getInstance().connect(Config.getProperty("accumulo.name"));
 		Accumulo.getInstance().createTable(Config.getProperty("accumulo.table_name"), false);
-		Accumulo.getInstance().createTable(Config.getProperty("reports.empty_consumption_report.table_name"), false);
+		Accumulo.getInstance().createTable(Config.getProperty("reports.empty_consumption_report1.table_name"), false);
+		Accumulo.getInstance().createTable(Config.getProperty("reports.empty_consumption_report2.table_name"), false);
 
 		//unit with user
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "device", "amount", 1, Helpers.toByteArray(0.0f));
@@ -73,7 +75,7 @@ public class EmptyUnitConsumtionTest
 		assertEquals(0, res);
 
 		//read first output table
-		Iterator<Entry<Key, Value>> entriesOut = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report.table_name"));
+		Iterator<Entry<Key, Value>> entriesOut = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report1.table_name"));
 		int k = 0;
 		for ( ; entriesOut.hasNext(); ++k ) {
 			Entry<Key, Value> entry = entriesOut.next();
@@ -88,7 +90,7 @@ public class EmptyUnitConsumtionTest
 		assertEquals(0, res2);
 
 		//read second output table
-		Iterator<Entry<Key, Value>> entriesOut2 = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report.table_name"));
+		Iterator<Entry<Key, Value>> entriesOut2 = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report2.table_name"));
 		int l = 0;
 		for ( ; entriesOut2.hasNext(); ++l ) {
 			Entry<Key, Value> entry = entriesOut2.next();
@@ -99,7 +101,8 @@ public class EmptyUnitConsumtionTest
 		
 		//delete table
 		Accumulo.getInstance().deleteTable(Config.getProperty("accumulo.table_name"));
-		Accumulo.getInstance().deleteTable(Config.getProperty("reports.empty_consumption_report.table_name"));
+		Accumulo.getInstance().deleteTable(Config.getProperty("reports.empty_consumption_report1.table_name"));
+		Accumulo.getInstance().deleteTable(Config.getProperty("reports.empty_consumption_report2.table_name"));
 		Accumulo.getInstance().disconnect();
 	}
 }

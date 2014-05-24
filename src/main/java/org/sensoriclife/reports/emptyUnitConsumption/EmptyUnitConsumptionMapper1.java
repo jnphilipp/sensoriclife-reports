@@ -19,28 +19,27 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key, Value, Text, Mutat
 	@Override
 	public void map(Key k, Value v, Context c) throws IOException,InterruptedException 
 	{
-		String consumptionID = k.getRow().toString();
 		String family = k.getColumnFamily().toString();
 		String qualifier = k.getColumnQualifier().toString();
 		Long timestamp = k.getTimestamp();
 		Mutation m = new Mutation(k.toString());
 		Logger.info(EmptyUnitConsumptionMapper1.class, k.toString());
 		//get all amounts 
-		if(family.equals("device") && qualifier.equals("amount") && timestamp.toString().equals(Config.getProperty("reports.empty_consumption_report.time")) )//later timestamp per config file
+		if(family.equals("device") && qualifier.equals("amount") && timestamp.toString().equals(Config.getProperty("reports.empty_consumption_report.time")) )
 		{
-			m.put(consumptionID, qualifier, v);
+			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
 		}
 		//get all residential units 
 		if(family.equals("residential") && qualifier.equals("id"))
 		{
-			m.put(consumptionID, "existed", v);
+			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
 		}
 		//get all residential units with user
 		if(family.equals("user") && qualifier.equals("residential"))
 		{
-			m.put(consumptionID, "inhabited", v);
+			m.put(family, qualifier, v);
 			c.write(k.getRow(), m);
 		}
 	}

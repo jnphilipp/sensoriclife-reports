@@ -31,11 +31,11 @@ public class EmptyUnitConsumptionReport2 extends Configured implements Tool
 		AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
-		AccumuloInputFormat.setInputTableName(job, Config.getProperty("reports.empty_consumption_report.table_name"));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("reports.empty_consumption_report1.table_name"));
 
 		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
-		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("reports.empty_consumption_report.table_name"));
+		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("reports.empty_consumption_report2.table_name"));
 		AccumuloOutputFormat.setCreateTables(job, true);
 
 		job.setMapOutputKeyClass(Text.class);
