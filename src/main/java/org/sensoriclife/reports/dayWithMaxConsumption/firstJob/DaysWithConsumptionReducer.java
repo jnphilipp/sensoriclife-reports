@@ -7,6 +7,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
 /**
@@ -55,6 +56,8 @@ public class DaysWithConsumptionReducer extends
 				String.valueOf(overallWaterHotConsumption));
 		m.put("he", "amount", timestamp,
 				String.valueOf(overallHeatingConsumption));
-		c.write(new Text("DaysWithConsumption"), m);
+		
+		String outputTableName = Config.getProperty("outputTableName");
+		c.write(new Text(outputTableName), m);
 	}
 }

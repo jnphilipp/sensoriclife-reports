@@ -18,11 +18,11 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
-import org.sensoriclife.util.MockInstanceConfiguration;
 import org.sensoriclife.world.Consumption;
 
-public class DaysWithMaxConsumptionReport extends Configured implements Tool {
+public class DayWithMaxConsumptionReport extends Configured implements Tool {
 	
 	/**
 	 * runs the whole process of the second map reduce job, including configuration, inserting of test data and execution of the job.
@@ -30,37 +30,39 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 	 * @throws Exception
 	 */
 	public static void runSecondJob(Accumulo accumulo) throws Exception {
-
-		MockInstanceConfiguration mockConfig = MockInstanceConfiguration.getInstance();
-		mockConfig.setMockInstanceName("mockInstance");
-		mockConfig.setInputTableName("DaysWithConsumption");
-		mockConfig.setOutputTableName("DaysWithMaxConsumption");
-		mockConfig.setUserName("");
-		mockConfig.setPassword("");
+		
+		Config conf = Config.getInstance();
+		//config for mockinstance
+		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
+		conf.getProperties().setProperty("inputTableName", "DaysWithConsumption");
+		conf.getProperties().setProperty("outputTableName", "DaysWithMaxConsumption");
+		conf.getProperties().setProperty("username", "");
+		conf.getProperties().setProperty("password", "");
 		
 		Connector connector = accumulo.getConnector();
 
-		accumulo.createTable(mockConfig.getOutputTableName(), false);
+		accumulo.createTable(Config.getProperty("outputTableName"), false);
 		
 		//print inputtable
-		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(mockConfig.getInputTableName());
+		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(Config.getProperty("inputTableName"), new Authorizations());
 		while(scanner.hasNext()){
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}	
-
-		ToolRunner.run(new Configuration(), new DaysWithMaxConsumptionReport(),
-				mockConfig.getConfigAsStringArray());
+		
+		String[] args = new String[0];
+		ToolRunner.run(new Configuration(), new DayWithMaxConsumptionReport(),
+				args);
 		
 		//print outputtable
-		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(mockConfig.getOutputTableName());
+		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(Config.getProperty("outputTableName"), new Authorizations());
 		while(scanner2.hasNext()){
 			Entry<Key, Value> entry = scanner2.next();	
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}
 		
 		//this is for production mode - save storage
-		connector.tableOperations().delete(mockConfig.getInputTableName());	
+		connector.tableOperations().delete(Config.getProperty("inputTableName"));	
 	}
 
 	/**
@@ -70,24 +72,24 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		
 		Job job = Job.getInstance(getConf());
-		job.setJobName(DaysWithMaxConsumptionReport.class.getName());
+		job.setJobName(DayWithMaxConsumptionReport.class.getName());
 
 		job.setJarByClass(this.getClass());
 
-		job.setMapperClass(DaysWithMaxConsumptionMapper.class);
-		job.setReducerClass(DaysWithMaxConsumptionReducer.class);
+		job.setMapperClass(DayWithMaxConsumptionMapper.class);
+		job.setReducerClass(DayWithMaxConsumptionReducer.class);
 
-		AccumuloInputFormat.setMockInstance(job, args[3]);
-		AccumuloInputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloInputFormat.setInputTableName(job, args[0]);
+		AccumuloInputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
+				Config.getProperty("password")));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[4]);
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
+				Config.getProperty("password")));
+		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
-		AccumuloOutputFormat.setMockInstance(job, args[3]);
+		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
 
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(Consumption.class);

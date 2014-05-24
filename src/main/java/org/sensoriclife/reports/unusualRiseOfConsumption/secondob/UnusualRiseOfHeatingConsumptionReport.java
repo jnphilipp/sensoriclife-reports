@@ -17,8 +17,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
-import org.sensoriclife.util.MockInstanceConfiguration;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
@@ -30,17 +30,21 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 	 * @throws Exception
 	 */
 	public static Accumulo runSecondJob(Accumulo accumulo) throws Exception {
-
-		MockInstanceConfiguration mockConfig = MockInstanceConfiguration
-				.getInstance();
-		mockConfig.setMockInstanceName("mockInstance");
-		mockConfig.setInputTableName("HeatingConsumption");
-		mockConfig.setOutputTableName("UnusualRiseOfConsumption");
-		mockConfig.setUserName("");
-		mockConfig.setPassword("");
-
-		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(mockConfig
-				.getInputTableName());
+		
+		Config conf = Config.getInstance();
+		//config for mockinstance
+		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
+		conf.getProperties().setProperty("inputTableName", "HeatingConsumption");
+		conf.getProperties().setProperty("outputTableName", "UnusualRiseOfConsumption");
+		conf.getProperties().setProperty("username", "");
+		conf.getProperties().setProperty("password", "");
+		
+		//config for map reduce job
+		//time interval: weekly
+		conf.getProperties().setProperty("minTimestamp", "1");
+		conf.getProperties().setProperty("maxTimestamp", "2");
+		
+		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(Config.getProperty("inputTableName"), new Authorizations());
 
 		while (scanner.hasNext()) {
 			Entry<Key, Value> entry = scanner.next();
@@ -48,12 +52,12 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 					+ entry.getValue().toString());
 		}
 
+		String[] args = new String[0];
 		ToolRunner.run(new Configuration(),
-				new UnusualRiseOfHeatingConsumptionReport(),
-				mockConfig.getConfigAsStringArray());
+				new UnusualRiseOfHeatingConsumptionReport(), 
+				args);
 
-		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(mockConfig
-				.getOutputTableName());
+		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(Config.getProperty("outputTableName"), new Authorizations());
 
 		while (scanner2.hasNext()) {
 			Entry<Key, Value> entry = scanner2.next();
@@ -62,7 +66,7 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 		}
 
 		Connector connector = accumulo.getConnector();
-		connector.tableOperations().delete(mockConfig.getInputTableName());
+		connector.tableOperations().delete(Config.getProperty("inputTableName"));
 
 		return accumulo;
 
@@ -73,13 +77,7 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 	 */
 	@Override
 	public int run(String[] args) throws Exception {
-
-		Configuration conf = new Configuration();
-		//time interval: weekly
-		conf.setLong("minTimestamp", 1);
-		conf.setLong("maxTimestamp", 2);
-
-		Job job = Job.getInstance(conf);
+		Job job = Job.getInstance(getConf());
 
 		job.setJobName(UnusualRiseOfHeatingConsumptionReport.class.getName());
 
@@ -88,17 +86,17 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 		job.setMapperClass(UnusualRiseOfHeatingConsumptionMapper.class);
 		job.setReducerClass(UnusualRiseOfHeatingConsumptionReducer.class);
 
-		AccumuloInputFormat.setMockInstance(job, args[3]);
-		AccumuloInputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloInputFormat.setInputTableName(job, args[0]);
+		AccumuloInputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
+				Config.getProperty("password")));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job, args[2], new PasswordToken(
-				args[1]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[4]);
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
+				Config.getProperty("password")));
+		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
-		AccumuloOutputFormat.setMockInstance(job, args[3]);
+		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
 
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);

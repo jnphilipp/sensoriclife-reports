@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.accumulo.core.data.Mutation;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.sensoriclife.Config;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.ResidentialUnit;
 
 /**
@@ -20,9 +21,7 @@ public class UnusualRiseOfConsumptionReducer extends
 	public void reduce(Text key, Iterable<ResidentialUnit> values, Context c)
 			throws IOException, InterruptedException {
 
-		Configuration conf = new Configuration();
-		conf = c.getConfiguration();
-		long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
+		long maxTs = Long.parseLong(Config.getProperty("maxTimestamp"));
 		
 		double oldAmount = 0;
 		double currentAmount = 0;
@@ -49,7 +48,7 @@ public class UnusualRiseOfConsumptionReducer extends
 			}
 			if(helperFlat == null && flat.getConsumptionID() != null && !flat.getResidentialID().equals("")){
 				try {
-					helperFlat = (ResidentialUnit) flat.deepCopy(flat);
+					helperFlat = (ResidentialUnit) Helpers.deepCopy(flat);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -74,31 +73,34 @@ public class UnusualRiseOfConsumptionReducer extends
 					String.valueOf(currentConsumption));
 		}
 		
+		String outputTableName = Config.getProperty("outputTableName");
+		String helperOutputTableName = Config.getProperty("helperOutputTableName");
+		
 		if (counterType.equals("el")) {
 			// more than 200% rise when consumption of last week is at least 200
 			// kw/h or current consumption is higher than 2500 kw/h
 			if ((oldAmount > 200 && riseOfConsumption >= 2)
 					|| currentConsumption > 2500) {
-				c.write(new Text("UnusualRiseOfConsumption"), m);		
+				c.write(new Text(outputTableName), m);		
 			}
 		} else if (counterType.equals("wc")) {
 			// more than 300% rise when consumption of last week is at least 350
 			// l/week or current consumption is higher than 7000 l/week
 			if ((oldAmount > 350 && riseOfConsumption >= 3)
 					|| currentConsumption > 7000) {
-				c.write(new Text("UnusualRiseOfConsumption"), m);
+				c.write(new Text(outputTableName), m);
 			}
 		} else if (counterType.equals("wh")) {
 			if ((oldAmount > 150 && riseOfConsumption >= 3)
 					|| currentConsumption > 3000) {
-				c.write(new Text("UnusualRiseOfConsumption"), m);
+				c.write(new Text(outputTableName), m);
 			}
 		} else if (counterType.equals("he")) {
 			//second map reduce job is necessary
 			m = new Mutation(helperFlat.getResidentialID() + ";" + key);
 			m.put(helperFlat.getCounterType(), "consumptionCurrentWeek", maxTs,
 					String.valueOf(currentConsumption));
-			c.write(new Text("HeatingConsumption"), m);
+			c.write(new Text(helperOutputTableName), m);
 		}
 	}
 }

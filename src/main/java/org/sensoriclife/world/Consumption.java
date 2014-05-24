@@ -1,12 +1,8 @@
 package org.sensoriclife.world;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.apache.hadoop.io.Writable;
@@ -59,30 +55,7 @@ public class Consumption implements Serializable, Writable {
 	public void setCounterType(String counterType) {
 		this.counterType = counterType;
 	}
-
-	public Object deepCopy(Object oldObj) throws Exception {
-		ObjectOutputStream oos = null;
-		ObjectInputStream ois = null;
-		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			oos = new ObjectOutputStream(bos);
-			// serialize and pass the object
-			oos.writeObject(oldObj);
-			oos.flush();
-			ByteArrayInputStream bin = new ByteArrayInputStream(
-					bos.toByteArray());
-			ois = new ObjectInputStream(bin);
-			// return the new object
-			return ois.readObject();
-		} catch (Exception e) {
-			System.out.println("Exception = " + e);
-			throw (e);
-		} finally {
-			oos.close();
-			ois.close();
-		}
-	}
-
+	
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(consumptionId);

@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class DaysWithConsumptionMapper extends
@@ -22,10 +22,8 @@ public class DaysWithConsumptionMapper extends
 			
 		if(family.equals("device") && qualifier.equals("amount"))
 		{
-			Configuration conf = new Configuration();
-			conf = c.getConfiguration();
-			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
-			long minTs = conf.getLong("minTimestamp", 0);
+			long minTs = Long.parseLong(Config.getProperty("minTimestamp"));
+			long maxTs = Long.parseLong(Config.getProperty("maxTimestamp"));
 			
 			if (timestamp >= minTs && timestamp <= maxTs) {
 				String counterType = consumptionID.split("_")[1];

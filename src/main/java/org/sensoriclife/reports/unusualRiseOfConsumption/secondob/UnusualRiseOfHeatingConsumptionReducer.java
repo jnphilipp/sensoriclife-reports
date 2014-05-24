@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.accumulo.core.data.Mutation;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
 /**
@@ -20,9 +20,7 @@ public class UnusualRiseOfHeatingConsumptionReducer extends
 	public void reduce(Text key, Iterable<ResidentialUnit> values, Context c)
 			throws IOException, InterruptedException {
 
-		Configuration conf = new Configuration();
-		conf = c.getConfiguration();
-		long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
+		long maxTs = Long.parseLong(Config.getProperty("maxTimestamp"));
 		
 		double currentConsumption = 0;
 		double overallAmountHeatingsCurrent = 0;
@@ -50,10 +48,12 @@ public class UnusualRiseOfHeatingConsumptionReducer extends
 		m.put(flat.getCounterType(), "consumptionCurrentWeek", maxTs,
 				String.valueOf(overallAmountHeatingsCurrent));
 		
+		String outputTableName = Config.getProperty("outputTableName");
+		
 		String counterType = flat.getCounterType();
 		if (counterType.equals("he")) {
 			if(overallAmountHeatingsCurrent > 500){
-				c.write(new Text("UnusualRiseOfConsumption"), m);
+				c.write(new Text(outputTableName), m);
 			}			
 		}
 	}

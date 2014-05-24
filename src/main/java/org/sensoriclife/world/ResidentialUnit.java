@@ -1,18 +1,14 @@
 package org.sensoriclife.world;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-//import java.util.ArrayList;
 
 import org.apache.hadoop.io.Writable;
 
-public class ResidentialUnit implements Serializable, Writable {
+public class ResidentialUnit implements Serializable, Writable,
+		Comparable<ResidentialUnit> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -113,36 +109,13 @@ public class ResidentialUnit implements Serializable, Writable {
 	public boolean isSetTimeStamp() {
 		return isSetTimeStamp();
 	}
-	
+
 	public String getCounterType() {
 		return counterType;
 	}
-	
+
 	public void setCounterType(String counterType) {
 		this.counterType = counterType;
-	}
-
-	public Object deepCopy(Object oldObj) throws Exception {
-		ObjectOutputStream oos = null;
-		ObjectInputStream ois = null;
-		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			oos = new ObjectOutputStream(bos);
-			// serialize and pass the object
-			oos.writeObject(oldObj);
-			oos.flush();
-			ByteArrayInputStream bin = new ByteArrayInputStream(
-					bos.toByteArray());
-			ois = new ObjectInputStream(bin);
-			// return the new object
-			return ois.readObject();
-		} catch (Exception e) {
-			System.out.println("Exception = " + e);
-			throw (e);
-		} finally {
-			oos.close();
-			ois.close();
-		}
 	}
 
 	@Override
@@ -181,5 +154,30 @@ public class ResidentialUnit implements Serializable, Writable {
 		this.isSetResidentialID = in.readBoolean();
 		this.isSetUserResidential = in.readBoolean();
 		this.isSetTimeStamp = in.readBoolean();
+	}
+
+	@Override
+	public int compareTo(ResidentialUnit ru) {
+		if (ru.getConsumptionID().equals(getConsumptionID())
+				&& ru.getCounterType().equals(getCounterType())
+				&& ru.getDeviceAmount() == getDeviceAmount()
+				&& ru.getResidentialID().equals(getResidentialID())
+				&& ru.getTimeStamp() == getTimeStamp()
+				&& ru.getUserID() == getUserID()
+				&& ru.getUserResidential().equals(getUserResidential())) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
+	public String toString() {
+		String output = "residentialId: " + getResidentialID()
+				+ " consumptionId: " + getConsumptionID() + " counterType: "
+				+ getCounterType() + " deviceAmount: " + getDeviceAmount()
+				+ " timestamp: " + getTimeStamp() + " userId: " + getUserID()
+				+ " userResidential: " + getUserResidential();
+		return output;
 	}
 }

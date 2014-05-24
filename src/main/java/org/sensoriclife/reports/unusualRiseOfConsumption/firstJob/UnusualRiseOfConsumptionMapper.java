@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class UnusualRiseOfConsumptionMapper extends
@@ -15,12 +15,8 @@ public class UnusualRiseOfConsumptionMapper extends
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 		
-		Configuration conf = new Configuration();
-		conf = c.getConfiguration();
-		
-		//intervall should be a week
-		long minTs = conf.getLong("minTimestamp", 0);
-		long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
+		long minTs = Long.parseLong(Config.getProperty("minTimestamp"));
+		long maxTs = Long.parseLong(Config.getProperty("maxTimestamp"));
 		
 		String rowId = k.getRow().toString();
 		Long timestamp = k.getTimestamp();
