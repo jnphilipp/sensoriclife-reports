@@ -6,6 +6,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
 
 /**
@@ -23,26 +24,24 @@ public class EmptyUnitConsumptionMapper1 extends Mapper <Key, Value, Text, Mutat
 		String qualifier = k.getColumnQualifier().toString();
 		Long timestamp = k.getTimestamp();
 		Mutation m = new Mutation(k.toString());
-		Logger.info(EmptyUnitConsumptionReducer1.class, k.toString());
+		Logger.info(EmptyUnitConsumptionMapper1.class, k.toString());
 		//get all amounts 
-		if(family.equals("device") && qualifier.equals("amount"))
+		if(family.equals("device") && qualifier.equals("amount") && timestamp.toString().equals(Config.getProperty("reports.empty_consumption_report.time")) )//later timestamp per config file
 		{
-			m.put(family, qualifier, v);
+			m.put(consumptionID, qualifier, v);
+			c.write(k.getRow(), m);
+		}
+		//get all residential units 
+		if(family.equals("residential") && qualifier.equals("id"))
+		{
+			m.put(consumptionID, "existed", v);
 			c.write(k.getRow(), m);
 		}
 		//get all residential units with user
-		if(family.equals("residential") && qualifier.equals("id"))
-		{
-			m.put(family, qualifier, v);
-			c.write(k.getRow(), m);
-		}
-		//get all residential units
 		if(family.equals("user") && qualifier.equals("residential"))
 		{
-			m.put(family, qualifier, v);
+			m.put(consumptionID, "inhabited", v);
 			c.write(k.getRow(), m);
 		}
-		//m.put(family, qualifier, v);
-		//c.write(k.getRow(), m);
 	}
 }

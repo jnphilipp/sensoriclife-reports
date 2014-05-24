@@ -20,7 +20,8 @@ import org.junit.Test;
 import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
 import org.sensoriclife.db.Accumulo;
-import org.sensoriclife.reports.emptyUnitConsumption.EmptyUnitConsumptionReport;
+import org.sensoriclife.reports.emptyUnitConsumption.EmptyUnitConsumptionReport1;
+import org.sensoriclife.reports.emptyUnitConsumption.EmptyUnitConsumptionReport2;
 import org.sensoriclife.util.Helpers;
 
 /**
@@ -38,22 +39,23 @@ public class EmptyUnitConsumtionTest
 		//create mock accumulo 
 		Config.getInstance().getProperties().setProperty("accumulo.name", "mockInstance");
 		Config.getInstance().getProperties().setProperty("accumulo.table_name", "table");
-		//Config.getInstance().getProperties().setProperty("accumulo.user", "");
 		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report.table_name", "report_empty_report");
+		Config.getInstance().getProperties().setProperty("reports.empty_consumption_report.time", "1");;
 		Accumulo.getInstance().connect(Config.getProperty("accumulo.name"));
 		Accumulo.getInstance().createTable(Config.getProperty("accumulo.table_name"), false);
 		Accumulo.getInstance().createTable(Config.getProperty("reports.empty_consumption_report.table_name"), false);
 
 		//unit with user
-		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "device", "amount", Helpers.toByteArray(0.0f));
+		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "device", "amount", 1, Helpers.toByteArray(0.0f));
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "residential", "id", Helpers.toByteArray("1-1-1-1-1"));
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "user", "id", ArrayUtils.addAll(Helpers.toByteArray(5L), Helpers.toByteArray("Nati")));
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "0_el", "user", "residential", Helpers.toByteArray("1-1-1-1-1"));
 		//empty unit wit comsumtion
-		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "1_el", "device", "amount", Helpers.toByteArray(0.1f));
+		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "1_el", "device", "amount", 0, Helpers.toByteArray(0.0f));
+		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "1_el", "device", "amount", 1, Helpers.toByteArray(0.1f));
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "1_el", "residential", "id", Helpers.toByteArray("1-1-1-1-2"));
 		//empty unit without comsumtion
-		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "2_el", "device", "amount", Helpers.toByteArray(0.0f));
+		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "2_el", "device", "amount", 1, Helpers.toByteArray(0.0f));
 		Accumulo.getInstance().addMutation(Config.getProperty("accumulo.table_name"), "2_el", "residential", "id", Helpers.toByteArray("1-1-1-1-3"));
 		Accumulo.getInstance().flushBashWriter(Config.getProperty("accumulo.table_name"));
 		
@@ -66,10 +68,11 @@ public class EmptyUnitConsumtionTest
 		}
 		assertNotEquals(i, 0);	
 
-		int res = ToolRunner.run(new Configuration(), new EmptyUnitConsumptionReport(), new String[0]);
+		//first mapreduce job
+		int res = ToolRunner.run(new Configuration(), new EmptyUnitConsumptionReport1(), new String[0]);
 		assertEquals(0, res);
 
-		//read output table
+		//read first output table
 		Iterator<Entry<Key, Value>> entriesOut = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report.table_name"));
 		int k = 0;
 		for ( ; entriesOut.hasNext(); ++k ) {
@@ -79,8 +82,24 @@ public class EmptyUnitConsumtionTest
 		}
 		assertNotEquals(k, 0);	
 		
+		
+		//second mapreduce job
+		int res2 = ToolRunner.run(new Configuration(), new EmptyUnitConsumptionReport2(), new String[0]);
+		assertEquals(0, res2);
+
+		//read second output table
+		Iterator<Entry<Key, Value>> entriesOut2 = Accumulo.getInstance().scanAll(Config.getProperty("reports.empty_consumption_report.table_name"));
+		int l = 0;
+		for ( ; entriesOut2.hasNext(); ++l ) {
+			Entry<Key, Value> entry = entriesOut2.next();
+			Logger.info(entry.getKey().getRow().toString(), entry.getKey().getColumnFamily().toString(), entry.getKey().getColumnQualifier().toString(), entry.getKey().getColumnVisibility().toString(), "" + entry.getKey().getTimestamp(), entry.getValue().toString());
+			
+		}
+		assertNotEquals(l, 0);	
+		
 		//delete table
 		Accumulo.getInstance().deleteTable(Config.getProperty("accumulo.table_name"));
+		Accumulo.getInstance().deleteTable(Config.getProperty("reports.empty_consumption_report.table_name"));
 		Accumulo.getInstance().disconnect();
 	}
 }

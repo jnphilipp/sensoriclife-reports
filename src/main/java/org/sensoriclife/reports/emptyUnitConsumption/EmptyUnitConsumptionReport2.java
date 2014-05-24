@@ -17,19 +17,21 @@ import org.sensoriclife.Config;
  * @author paul
  * @version 0.0.1
  */
-public class EmptyUnitConsumptionReport extends Configured implements Tool {
+public class EmptyUnitConsumptionReport2 extends Configured implements Tool 
+{
 	@Override
-	public int run(String[] args) throws Exception {
+	public int run(String[] args) throws Exception 
+	{
 		Job job = Job.getInstance(new Configuration());
-		job.setJobName(EmptyUnitConsumptionReport.class.getName());
+		job.setJobName(EmptyUnitConsumptionReport2.class.getName());
 		job.setJarByClass(this.getClass());
-		job.setMapperClass(EmptyUnitConsumptionMapper1.class);
-		job.setReducerClass(EmptyUnitConsumptionReducer1.class);
+		job.setMapperClass(EmptyUnitConsumptionMapper2.class);
+		job.setReducerClass(EmptyUnitConsumptionReducer2.class);
 
 		AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
-		AccumuloInputFormat.setInputTableName(job, Config.getProperty("accumulo.table_name"));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("reports.empty_consumption_report.table_name"));
 
 		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
