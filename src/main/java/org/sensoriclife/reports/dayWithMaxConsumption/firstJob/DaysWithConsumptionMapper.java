@@ -7,10 +7,10 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 public class DaysWithConsumptionMapper extends
-		Mapper<Key, Value, LongWritable, ResidentialUnit> {
+		Mapper<Key, Value, LongWritable, DeviceUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -32,7 +32,7 @@ public class DaysWithConsumptionMapper extends
 			
 			if (timestamp >= minTs && timestamp <= maxTs) {
 				String counterType = consumptionID.split("_")[1];
-				ResidentialUnit flat = new ResidentialUnit();
+				DeviceUnit flat = new DeviceUnit();
 				flat.setConsumptionID(consumptionID);
 				flat.setTimeStamp(k.getTimestamp());
 				flat.setDeviceAmount(Float.parseFloat(v.toString()));

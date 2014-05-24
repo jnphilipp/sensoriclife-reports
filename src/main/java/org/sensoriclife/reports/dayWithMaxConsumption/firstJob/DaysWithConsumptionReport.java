@@ -29,7 +29,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.util.MockInstanceConfiguration;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 public class DaysWithConsumptionReport extends Configured implements Tool {
 	
@@ -126,7 +126,7 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		AccumuloOutputFormat.setMockInstance(job, args[3]);
 
 		job.setMapOutputKeyClass(LongWritable.class);
-		job.setMapOutputValueClass(ResidentialUnit.class);
+		job.setMapOutputValueClass(DeviceUnit.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Mutation.class);
 

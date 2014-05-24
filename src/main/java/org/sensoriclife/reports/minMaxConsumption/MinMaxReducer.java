@@ -8,7 +8,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.util.Helpers;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -16,9 +16,9 @@ import org.sensoriclife.world.ResidentialUnit;
  * 
  */
 public class MinMaxReducer extends
-		Reducer<Text, ResidentialUnit, Text, Mutation> {
+		Reducer<Text, DeviceUnit, Text, Mutation> {
 
-	public void reduce(Text key, Iterable<ResidentialUnit> values,
+	public void reduce(Text key, Iterable<DeviceUnit> values,
 			Context c) throws IOException, InterruptedException {
 		
 		Configuration conf = new Configuration();
@@ -35,7 +35,7 @@ public class MinMaxReducer extends
 		String maxResID = "";
 
 
-		for(ResidentialUnit value:values)
+		for(DeviceUnit value:values)
 		{
 			if(min > value.getDeviceAmount())
 			{

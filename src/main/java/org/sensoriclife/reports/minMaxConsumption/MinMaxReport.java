@@ -11,7 +11,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -92,7 +92,7 @@ public class MinMaxReport extends Configured implements Tool {
 		AccumuloOutputFormat.setCreateTables(job, false);
 		
 		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(ResidentialUnit.class);
+		job.setMapOutputValueClass(DeviceUnit.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Mutation.class);
 

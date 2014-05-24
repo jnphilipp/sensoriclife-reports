@@ -6,12 +6,12 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.sensoriclife.util.Helpers;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
-public class ConvertMapper extends Mapper<Key, Value, Text, ResidentialUnit> {
+public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
 		
@@ -31,7 +31,7 @@ public class ConvertMapper extends Mapper<Key, Value, Text, ResidentialUnit> {
 			Long timestamp = k.getTimestamp();
 			
 			if (timestamp >= minTs && timestamp < maxTs) {
-				ResidentialUnit flat = new ResidentialUnit();
+				DeviceUnit flat = new DeviceUnit();
 				flat.setConsumptionID(consumptionID);
 				//flat.setTimeStamp(k.getTimestamp());
 				
@@ -47,7 +47,7 @@ public class ConvertMapper extends Mapper<Key, Value, Text, ResidentialUnit> {
 			{
 				if(timestamp < minTs && timestamp >= pastLimitation)
 				{
-					ResidentialUnit flat = new ResidentialUnit();
+					DeviceUnit flat = new DeviceUnit();
 					flat.setConsumptionID(consumptionID);
 					//flat.setTimeStamp(k.getTimestamp());
 					
@@ -61,7 +61,7 @@ public class ConvertMapper extends Mapper<Key, Value, Text, ResidentialUnit> {
 		
 		else if(family.equals("residential") && qualifier.equals("id"))
 		{
-			ResidentialUnit flat = new ResidentialUnit();
+			DeviceUnit flat = new DeviceUnit();
 			flat.setConsumptionID(consumptionID);
 			flat.setResidentialID(v.toString());
 			c.write(new Text(consumptionID),flat);

@@ -7,7 +7,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -15,9 +15,9 @@ import org.sensoriclife.world.ResidentialUnit;
  * 
  */
 public class DaysWithConsumptionReducer extends
-		Reducer<LongWritable, ResidentialUnit, Text, Mutation> {
+		Reducer<LongWritable, DeviceUnit, Text, Mutation> {
 
-	public void reduce(LongWritable key, Iterable<ResidentialUnit> values,
+	public void reduce(LongWritable key, Iterable<DeviceUnit> values,
 			Context c) throws IOException, InterruptedException {
 
 		double overallElecConsumption = 0;
@@ -25,10 +25,10 @@ public class DaysWithConsumptionReducer extends
 		double overallWaterHotConsumption = 0;
 		double overallHeatingConsumption = 0;
 		
-		Iterator<ResidentialUnit> valuesIt = values.iterator();
+		Iterator<DeviceUnit> valuesIt = values.iterator();
 		while (valuesIt.hasNext()) {
 
-			ResidentialUnit flat = valuesIt.next();
+			DeviceUnit flat = valuesIt.next();
 			if (flat == null)
 				continue;
 			double overallConsumption = flat.getDeviceAmount();

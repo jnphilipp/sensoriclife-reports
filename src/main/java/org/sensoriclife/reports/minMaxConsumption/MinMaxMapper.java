@@ -8,7 +8,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.util.Helpers;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -16,7 +16,7 @@ import org.sensoriclife.world.ResidentialUnit;
  *
  */
 public class MinMaxMapper extends
-		Mapper<Key, Value, Text, ResidentialUnit> {
+		Mapper<Key, Value, Text, DeviceUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -40,7 +40,7 @@ public class MinMaxMapper extends
 					String counterType = k.getRow().toString().split("_")[1];
 					String resID = k.getRow().toString().split("_")[0];
 					
-					ResidentialUnit rU = new ResidentialUnit();
+					DeviceUnit rU = new DeviceUnit();
 					try {
 						rU.setDeviceAmount((float) Helpers.toObject(v.get()));
 						rU.setResidentialID(resID);

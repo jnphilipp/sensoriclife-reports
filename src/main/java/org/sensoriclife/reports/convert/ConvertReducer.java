@@ -10,12 +10,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.util.Helpers;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.world.DeviceUnit;
 
 
-public class ConvertReducer extends Reducer<Text, ResidentialUnit, Text, Mutation> {
+public class ConvertReducer extends Reducer<Text, DeviceUnit, Text, Mutation> {
 
-	public void reduce(Text key, Iterable<ResidentialUnit> values,Context c) 
+	public void reduce(Text key, Iterable<DeviceUnit> values,Context c) 
 			throws IOException, InterruptedException {
 	
 		String counterType = key.toString();//.split("_")[1];
@@ -28,7 +28,7 @@ public class ConvertReducer extends Reducer<Text, ResidentialUnit, Text, Mutatio
 		boolean existAmount = false;
 		boolean existOutOfYearAmount = false;
 		
-		for(ResidentialUnit rU : values)
+		for(DeviceUnit rU : values)
 		{
 			if(rU.isSetDeviceAmount())
 			{

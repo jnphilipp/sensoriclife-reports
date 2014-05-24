@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxMapper;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxReducer;
-import org.sensoriclife.world.ResidentialUnit; 
+import org.sensoriclife.world.DeviceUnit; 
  
 /**
  * 

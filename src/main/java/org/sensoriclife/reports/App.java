@@ -16,7 +16,7 @@ import org.sensoriclife.reports.yearInvoiceResidentialUnit.YearInvoiceReport;
 public class App {
 	public static void main(String[] args) throws Exception {
 		
-
+		
 		/*
 		 * args[0] = (String) reportName
 		 * args[1-n] = reportArgs
