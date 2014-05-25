@@ -20,5 +20,9 @@ public class datetest {
 		String outputDate = String.valueOf(cal.get(Calendar.DAY_OF_MONTH)) + "." + String.valueOf(cal.get(Calendar.MONTH) + 1 + ".");
 		
 		System.out.println(outputDate);
+		
+		int long1 = 5;
+		int long2 = 12;
+		System.out.println((int)(long2 - long1)/2);
 	}
 }
