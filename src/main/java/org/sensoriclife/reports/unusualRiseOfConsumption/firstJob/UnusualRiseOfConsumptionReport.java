@@ -41,9 +41,9 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 		conf.getProperties().setProperty("password", "");
 		
 		//config for map reduce job
-		//time interval: weekly
-		conf.getProperties().setProperty("minTimestamp", "1");
-		conf.getProperties().setProperty("maxTimestamp", "2");
+		//time interval: weekly for last week
+		conf.getProperties().setProperty("minTimestamp", String.valueOf(System.currentTimeMillis() - 86400000*7));
+		conf.getProperties().setProperty("maxTimestamp", String.valueOf(System.currentTimeMillis()));
 		
 		Accumulo accumulo = Accumulo.getInstance();
 		accumulo.connect();
@@ -130,155 +130,169 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 		String colQual = "amount";
 		String colFam2 = "residential";
 		String colQual2 = "id";
-
+		
+		//last week data : one week = 86400000*7 ms
+		long ts1 = System.currentTimeMillis() - 86400000*7;
+		
 		Mutation mutation = accumulo.newMutation(
-				String.valueOf(consumptionId) + "_wc", colFam, colQual, 1,
+				String.valueOf(consumptionId) + "_wc", colFam, colQual, ts1,
 				new Value("90".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
+		
+		//data insert after 3 days
+		long ts2 = ts1 + 86400000*3;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_wc", colFam, colQual, 2, new Value("440".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_wc", colFam, colQual, ts2, new Value("440".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_wc", colFam, colQual, 1, new Value("80".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_wc", colFam, colQual, ts1, new Value("80".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
+				new Value("1-2-3".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
+		long ts3 = ts2 + 86400000;
+
+		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
+				+ "_wc", colFam, colQual, ts3, new Value("125".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts3,
 				new Value("1-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
-		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_wc", colFam, colQual, 2, new Value("125".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
-				new Value("1-2-3".getBytes()));
+		mutation = accumulo.newMutation(String.valueOf(consumptionId)
+				+ "_wh", colFam, colQual, ts3, new Value("35".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts3,
+				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
+		
+		long ts4 = ts3 + 86400000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_wh", colFam, colQual, 1, new Value("35".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_wh", colFam, colQual, ts4, new Value("175".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts4,
 				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_wh", colFam, colQual, 2, new Value("175".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
-				new Value("1-2-10".getBytes()));
-		accumulo.addMutation(tableName, mutation);
-
-		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_el", colFam, colQual, 1, new Value("111".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts4, new Value("111".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts4,
 				new Value("1-2-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
+		
+		long ts5 = ts4 + 86400000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_el", colFam, colQual, 2, new Value("222".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts5, new Value("222".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts5,
 				new Value("1-2-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_el", colFam, colQual, 1, new Value("111".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts5, new Value("111".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts5,
 				new Value("1-2-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_el", colFam, colQual, 2, new Value("600".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts5, new Value("600".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts5,
 				new Value("1-2-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
-				+ "_el", colFam, colQual, 1, new Value("42".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts5, new Value("42".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts5,
 				new Value("1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
-				+ "_el", colFam, colQual, 2, new Value("50".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts2, new Value("50".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 3)
-				+ "_el", colFam, colQual, 1, new Value("333".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts1, new Value("333".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("2-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 3)
-				+ "_el", colFam, colQual, 2, new Value("1500".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts2, new Value("1500".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("2-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 4)
-				+ "_el", colFam, colQual, 1, new Value("1".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts1, new Value("1".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("3-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 4)
-				+ "_el", colFam, colQual, 2, new Value("14".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts2, new Value("14".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("3-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 5)
-				+ "_el", colFam, colQual, 1, new Value("2000".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_el", colFam, colQual, ts1, new Value("2000".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("3-2-8".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 5)
-				+ "_el", colFam, colQual, 2, new Value("5000".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_el", colFam, colQual, ts2, new Value("5000".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("3-2-8".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_he", colFam, colQual, 1, new Value("180".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_he", colFam, colQual, ts1, new Value("180".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId)
-				+ "_he", colFam, colQual, 2, new Value("220".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_he", colFam, colQual, ts2, new Value("220".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_he", colFam, colQual, 1, new Value("310".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_he", colFam, colQual, ts1, new Value("310".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-4".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
-				+ "_he", colFam, colQual, 2, new Value("800".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_he", colFam, colQual, ts2, new Value("800".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-4".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
-				+ "_he", colFam, colQual, 1, new Value("50".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 1,
+				+ "_he", colFam, colQual, ts1, new Value("50".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-4".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
-				+ "_he", colFam, colQual, 2, new Value("80".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 2,
+				+ "_he", colFam, colQual, ts2, new Value("80".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-4".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
+		long ts0 = ts1 - 86400000*14;
+		
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 8)
-				+ "_el", colFam, colQual, 0, new Value("14".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, 0,
+				+ "_el", colFam, colQual, ts0, new Value("14".getBytes()));
+		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts0,
 				new Value("3-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 	}

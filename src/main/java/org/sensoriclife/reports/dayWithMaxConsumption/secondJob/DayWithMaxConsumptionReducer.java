@@ -1,8 +1,13 @@
 package org.sensoriclife.reports.dayWithMaxConsumption.secondJob;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.hadoop.io.IntWritable;
@@ -77,38 +82,58 @@ public class DayWithMaxConsumptionReducer extends
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-
-		Mutation m = new Mutation("1");
+		}	
 		
+		Mutation m = new Mutation("1");
 		for(Consumption cons: maxElecConsumptions){
-			m.put("el", "DayOfYear", cons.getTimestamp(),
-					String.valueOf(cons.getDayOfYear()));
-			m.put("el", "MaxAmount", cons.getTimestamp(), String.valueOf(cons.getAmount()));
+			long ts = cons.getTimestamp();
+			m.put("el", "date", cons.getTimestamp(),
+					calculateDate(ts));
+			m.put("el", "maxAmount", cons.getTimestamp(), String.valueOf(cons.getAmount()));
 		}
 		
 		for(Consumption cons: maxWaterColdConsumptions){
-			m.put("wc", "DayOfYear", cons.getTimestamp(),
-					String.valueOf(cons.getDayOfYear()));
-			m.put("wc", "MaxAmount", cons.getTimestamp(),
+			long ts = cons.getTimestamp();
+			m.put("wc", "date", cons.getTimestamp(),
+					calculateDate(ts));
+			m.put("wc", "maxAmount", cons.getTimestamp(),
 					String.valueOf(cons.getAmount()));
 		}
 		
 		for(Consumption cons: maxWaterHotConsumptions){
-			m.put("wh", "DayOfYear", cons.getTimestamp(),
-					String.valueOf(cons.getDayOfYear()));
-			m.put("wh", "MaxAmount", cons.getTimestamp(),
+			long ts = cons.getTimestamp();
+			m.put("wh", "date", cons.getTimestamp(),
+					calculateDate(ts));
+			m.put("wh", "maxAmount", cons.getTimestamp(),
 					String.valueOf(cons.getAmount()));
 		}
 		
 		for(Consumption cons: maxHeatingConsumptions){
-			m.put("he", "DayOfYear", cons.getTimestamp(),
-					String.valueOf(cons.getDayOfYear()));
-			m.put("he", "MaxAmount", cons.getTimestamp(),
+			long ts = cons.getTimestamp();
+			m.put("he", "date", cons.getTimestamp(),
+					calculateDate(ts));
+			m.put("he", "maxAmount", cons.getTimestamp(),
 					String.valueOf(cons.getAmount()));
 		}
 
 		String outputTableName = Config.getProperty("outputTableName");
 		c.write(new Text(outputTableName), m);
+	}
+	
+	/**
+	 * calculates the date from the timestamp
+	 * @param dayOfYear
+	 * @return String
+	 */
+	public String calculateDate(long timestamp){
+		Timestamp ts = new Timestamp(timestamp);
+		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance(Locale.ENGLISH);
+		cal.setTime(ts);
+	
+		SimpleDateFormat monthDate = new SimpleDateFormat("MMMMMMMMM");
+		String monthName = monthDate.format(cal.getTime());
+		
+		return String.valueOf(cal.get(Calendar.DAY_OF_MONTH) + ". " + monthName + " " + cal.get(Calendar.YEAR));
+
 	}
 }

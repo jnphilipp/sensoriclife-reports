@@ -20,6 +20,7 @@ import org.sensoriclife.world.Consumption;
  * the second map reduce jobs complets the task "dayWithMaxConsumption".
  * 
  * @author marcel
+ * @deprecated
  * 
  */
 public class DayWithMaxConsumptionTest {

@@ -21,7 +21,7 @@ public class UnusualRiseOfConsumptionMapper extends
 		String rowId = k.getRow().toString();
 		Long timestamp = k.getTimestamp();
 		
-		if (timestamp == minTs || timestamp == maxTs) {
+		if (timestamp >= minTs && timestamp <= maxTs) {
 			String family = k.getColumnFamily().toString();
 			String qualifier = k.getColumnQualifier().toString();
 

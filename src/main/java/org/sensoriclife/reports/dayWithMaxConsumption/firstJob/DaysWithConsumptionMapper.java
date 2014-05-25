@@ -1,6 +1,9 @@
 package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -33,15 +36,11 @@ public class DaysWithConsumptionMapper extends
 				flat.setDeviceAmount(Float.parseFloat(v.toString()));
 				flat.setCounterType(counterType);
 				
-				/*
 				Timestamp ts = new Timestamp(timestamp);
 				GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 				cal.setTime(ts);
 				//emit day of year
-				c.write(new LongWritable(cal.get(Calendar.DAY_OF_YEAR)), flat);
-				*/
-				
-				c.write(new LongWritable(timestamp), flat);
+				c.write(new LongWritable(cal.get(Calendar.DAY_OF_YEAR)), flat);	
 			}
 			
 		}

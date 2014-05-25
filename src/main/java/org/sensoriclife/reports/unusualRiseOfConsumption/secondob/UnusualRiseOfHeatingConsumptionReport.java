@@ -39,10 +39,7 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 		conf.getProperties().setProperty("username", "");
 		conf.getProperties().setProperty("password", "");
 		
-		//config for map reduce job
-		//time interval: weekly
-		conf.getProperties().setProperty("minTimestamp", "1");
-		conf.getProperties().setProperty("maxTimestamp", "2");
+		//time intervall is constant
 		
 		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(Config.getProperty("inputTableName"), new Authorizations());
 

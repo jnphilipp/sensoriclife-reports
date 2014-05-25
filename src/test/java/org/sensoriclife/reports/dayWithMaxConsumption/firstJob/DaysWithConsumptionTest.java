@@ -23,6 +23,7 @@ import org.sensoriclife.world.ResidentialUnit;
  * calculation right.
  * 
  * @author marcel
+ * @deprecated
  * 
  */
 public class DaysWithConsumptionTest {

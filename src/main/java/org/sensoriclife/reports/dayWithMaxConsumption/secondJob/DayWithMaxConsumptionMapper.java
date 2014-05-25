@@ -28,9 +28,8 @@ public class DayWithMaxConsumptionMapper extends
 		}
 
 		double amount = Double.parseDouble(v.toString());
-		int dayOfYear = Integer.parseInt(String.valueOf(k.getTimestamp()));
-		cons.setDayOfYear(dayOfYear);
-		Long timestamp = k.getTimestamp();
+		long timestamp = k.getTimestamp();
+
 		cons.setTimestamp(timestamp);
 		cons.setAmount(amount);
 		c.write(new IntWritable(1), cons);
