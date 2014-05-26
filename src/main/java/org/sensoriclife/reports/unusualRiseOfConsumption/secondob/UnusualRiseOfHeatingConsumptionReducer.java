@@ -48,7 +48,7 @@ public class UnusualRiseOfHeatingConsumptionReducer extends
 		m.put(flat.getCounterType(), "consumptionCurrentWeek", maxTs,
 				String.valueOf(overallAmountHeatingsCurrent));
 		
-		String outputTableName = Config.getProperty("outputTableName");
+		String outputTableName = Config.getProperty("report.unusualRiseOfHeatingConsumption.outputTableName");
 		
 		String counterType = flat.getCounterType();
 		if (counterType.equals("he")) {

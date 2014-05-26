@@ -34,17 +34,17 @@ public class DayWithMaxConsumptionReport extends Configured implements Tool {
 		Config conf = Config.getInstance();
 		//config for mockinstance
 		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
-		conf.getProperties().setProperty("inputTableName", "DaysWithConsumption");
-		conf.getProperties().setProperty("outputTableName", "DaysWithMaxConsumption");
-		conf.getProperties().setProperty("username", "");
-		conf.getProperties().setProperty("password", "");
+		conf.getProperties().setProperty("report.dayWithMaxConsumption.inputTableName", "DaysWithConsumption");
+		conf.getProperties().setProperty("report.dayWithMaxConsumption.outputTableName", "DaysWithMaxConsumption");
+		conf.getProperties().setProperty("accumulo.username", "");
+		conf.getProperties().setProperty("accumulo.password", "");
 		
 		Connector connector = accumulo.getConnector();
 
-		accumulo.createTable(Config.getProperty("outputTableName"), false);
+		accumulo.createTable(Config.getProperty("report.dayWithMaxConsumption.outputTableName"), false);
 		
 		//print inputtable
-		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(Config.getProperty("inputTableName"), new Authorizations());
+		Iterator<Entry<Key,Value>> scanner = accumulo.scanAll(Config.getProperty("report.dayWithMaxConsumption.inputTableName"), new Authorizations());
 		while(scanner.hasNext()){
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
@@ -55,14 +55,14 @@ public class DayWithMaxConsumptionReport extends Configured implements Tool {
 				args);
 		
 		//print outputtable
-		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(Config.getProperty("outputTableName"), new Authorizations());
+		Iterator<Entry<Key,Value>> scanner2 = accumulo.scanAll(Config.getProperty("report.dayWithMaxConsumption.outputTableName"), new Authorizations());
 		while(scanner2.hasNext()){
 			Entry<Key, Value> entry = scanner2.next();	
 			System.out.println("Key: " + entry.getKey().toString() + " Value: " + entry.getValue().toString());
 		}
 		
 		//this is for production mode - save storage
-		connector.tableOperations().delete(Config.getProperty("inputTableName"));	
+		connector.tableOperations().delete(Config.getProperty("report.dayWithMaxConsumption.inputTableName"));	
 	}
 
 	/**
@@ -80,14 +80,14 @@ public class DayWithMaxConsumptionReport extends Configured implements Tool {
 		job.setReducerClass(DayWithMaxConsumptionReducer.class);
 
 		AccumuloInputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
-		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
-				Config.getProperty("password")));
-		AccumuloInputFormat.setInputTableName(job, Config.getProperty("inputTableName"));
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.username"), new PasswordToken(
+				Config.getProperty("accumulo.password")));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("report.dayWithMaxConsumption.inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("username"), new PasswordToken(
-				Config.getProperty("password")));
-		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("outputTableName"));
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.username"), new PasswordToken(
+				Config.getProperty("accumulo.password")));
+		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("report.dayWithMaxConsumption.outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
 		AccumuloOutputFormat.setMockInstance(job, Config.getProperty("mockInstanceName"));
 

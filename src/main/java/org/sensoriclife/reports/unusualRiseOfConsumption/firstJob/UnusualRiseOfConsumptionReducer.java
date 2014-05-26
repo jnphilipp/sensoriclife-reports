@@ -119,9 +119,9 @@ public class UnusualRiseOfConsumptionReducer extends
 					String.valueOf(currentConsumption));
 		}		
 
-		String outputTableName = Config.getProperty("outputTableName");
+		String outputTableName = Config.getProperty("report.unusualRiseOfConsumption.outputTableName");
 		String helperOutputTableName = Config
-				.getProperty("helperOutputTableName");
+				.getProperty("report.unusualRiseOfConsumption.helperOutputTableName");
 
 		if (counterType.equals("el")) {
 			// more than 200% rise when consumption of last week is at least 200

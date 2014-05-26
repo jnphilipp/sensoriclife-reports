@@ -1,5 +1,6 @@
 package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -37,28 +38,34 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		Config conf = Config.getInstance();
 		// config for mockinstance
 		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
-		conf.getProperties().setProperty("inputTableName", "Consumption");
-		conf.getProperties().setProperty("outputTableName",
+		conf.getProperties().setProperty("report.daysWithConsumption.inputTableName", "Consumption");
+		conf.getProperties().setProperty("report.daysWithConsumption.outputTableName",
 				"DaysWithConsumption");
-		conf.getProperties().setProperty("username", "");
-		conf.getProperties().setProperty("password", "");
+		conf.getProperties().setProperty("accumulo.username", "");
+		conf.getProperties().setProperty("accumulo.password", "");
 
 		// config for map reduce job
 		// minTimestamp ~ 01.01.LastYear 0:00.00
-		conf.getProperties().setProperty("minTimestamp", "1");
+		Calendar cal = Calendar.getInstance();
+		cal.set(cal.get(Calendar.YEAR) - 1, 0, 1, 0, 0, 0);
+		cal.getTimeInMillis();
+		conf.getProperties().setProperty("minTimestamp",
+				String.valueOf(cal.getTimeInMillis()));
 		// maxTimestamp ~ 31.12.LastYear 23:59.59
-		conf.getProperties().setProperty("maxTimestamp", String.valueOf(Long.MAX_VALUE));
+		cal.set(cal.get(Calendar.YEAR), 11, 31, 23, 59, 59);
+		conf.getProperties().setProperty("maxTimestamp",
+				String.valueOf(cal.getTimeInMillis()));
 
 		Accumulo accumulo = Accumulo.getInstance();
 		accumulo.connect();
 
-		accumulo.createTable(Config.getProperty("inputTableName"), false);
-		accumulo.createTable(Config.getProperty("outputTableName"), false);
+		accumulo.createTable(Config.getProperty("report.daysWithConsumption.inputTableName"), false);
+		accumulo.createTable(Config.getProperty("report.daysWithConsumption.outputTableName"), false);
 
-		insertData(accumulo, Config.getProperty("inputTableName"));
+		insertData(accumulo, Config.getProperty("report.daysWithConsumption.inputTableName"));
 
 		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(
-				Config.getProperty("inputTableName"), new Authorizations());
+				Config.getProperty("report.daysWithConsumption.inputTableName"), new Authorizations());
 		while (scanner.hasNext()) {
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
@@ -70,7 +77,7 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 				args);
 
 		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(
-				Config.getProperty("outputTableName"), new Authorizations());
+				Config.getProperty("report.daysWithConsumption.outputTableName"), new Authorizations());
 		while (scanner2.hasNext()) {
 			Entry<Key, Value> entry = scanner2.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
@@ -96,17 +103,17 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		AccumuloInputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));
 		AccumuloInputFormat.setConnectorInfo(job,
-				Config.getProperty("username"),
-				new PasswordToken(Config.getProperty("password")));
+				Config.getProperty("accumulo.username"),
+				new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloInputFormat.setInputTableName(job,
-				Config.getProperty("inputTableName"));
+				Config.getProperty("report.daysWithConsumption.inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
 		AccumuloOutputFormat.setConnectorInfo(job,
-				Config.getProperty("username"),
-				new PasswordToken(Config.getProperty("password")));
+				Config.getProperty("accumulo.username"),
+				new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloOutputFormat.setDefaultTableName(job,
-				Config.getProperty("outputTableName"));
+				Config.getProperty("report.daysWithConsumption.outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
 		AccumuloOutputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));
@@ -138,17 +145,22 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		String colFam2 = "residential";
 		String colQual2 = "id";
 
-		long ts1 = System.currentTimeMillis();
-		
+		// data for last year
+		Calendar cal = Calendar.getInstance();
+		// 20. may
+		cal.set(cal.get(Calendar.YEAR) - 1, 4, 20, 0, 0, 0);
+		cal.getTimeInMillis();
+		long ts1 = cal.getTimeInMillis();
+
 		Mutation mutation = accumulo.newMutation(String.valueOf(consumptionId)
 				+ "_wc", colFam, colQual, ts1, new Value("4".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
-		//one day = 86400000 ms
+		// one day = 86400000 ms
 		long ts2 = ts1 + 86400000;
-		
+
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_wc", colFam, colQual, ts2, new Value("125".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
@@ -156,13 +168,13 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		accumulo.addMutation(tableName, mutation);
 
 		ts1 += 900000;
-		
+
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_wh",
 				colFam, colQual, ts1, new Value("12".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts1,
 				new Value("1-2-10".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-		
+
 		ts2 += 86400000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
@@ -171,14 +183,14 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 				new Value("1-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
-		long ts3 = ts2 + 86400000; 
-		
+		long ts3 = ts2 + 86400000;
+
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_el",
 				colFam, colQual, ts3, new Value("111".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts3,
 				new Value("1-2-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-		
+
 		ts2 += 900000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
@@ -186,15 +198,15 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-0".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-		
-		long ts10 = ts1 + 9*86400000;
+
+		long ts10 = ts1 + 9 * 86400000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_el", colFam, colQual, ts10, new Value("42".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts10,
 				new Value("1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-		
+
 		ts2 += 900000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 3)
@@ -202,7 +214,7 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("2-2-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-		
+
 		ts3 += 900000;
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 4)

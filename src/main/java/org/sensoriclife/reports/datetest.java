@@ -8,21 +8,14 @@ import java.util.GregorianCalendar;
 
 public class datetest {
 	public static void main(String[] args) {
-		long timestamp = System.currentTimeMillis();
-		System.out.println(timestamp);
-		//long timestamp = 1401273184964;
-		Timestamp ts = new Timestamp(timestamp);
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(ts);
+		//minTs
+		 Calendar cal = Calendar.getInstance();
+		 cal.set(cal.get(Calendar.YEAR) - 1, 0, 1, 0, 0, 0);
+		 cal.getTimeInMillis();
+		 //maxTs
+		 cal.set(cal.get(Calendar.YEAR), 11, 31, 23, 59, 59);
+		 cal.getTimeInMillis();
 
-		//Date date = calendar.getTime();
-		//calendar.setTime(date);
-		String outputDate = String.valueOf(cal.get(Calendar.DAY_OF_MONTH)) + "." + String.valueOf(cal.get(Calendar.MONTH) + 1 + ".");
-		
-		System.out.println(outputDate);
-		
-		int long1 = 5;
-		int long2 = 12;
-		System.out.println((int)(long2 - long1)/2);
+		 
 	}
 }
