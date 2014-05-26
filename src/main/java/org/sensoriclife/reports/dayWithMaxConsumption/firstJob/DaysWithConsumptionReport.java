@@ -14,7 +14,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
@@ -111,7 +111,7 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		AccumuloOutputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));
 
-		job.setMapOutputKeyClass(LongWritable.class);
+		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Mutation.class);

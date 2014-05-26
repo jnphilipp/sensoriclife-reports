@@ -7,13 +7,13 @@ import java.util.GregorianCalendar;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class DaysWithConsumptionMapper extends
-		Mapper<Key, Value, LongWritable, ResidentialUnit> {
+		Mapper<Key, Value, IntWritable, ResidentialUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
@@ -40,7 +40,7 @@ public class DaysWithConsumptionMapper extends
 				GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 				cal.setTime(ts);
 				//emit day of year
-				c.write(new LongWritable(cal.get(Calendar.DAY_OF_YEAR)), flat);	
+				c.write(new IntWritable(cal.get(Calendar.DAY_OF_YEAR)), flat);	
 			}
 			
 		}

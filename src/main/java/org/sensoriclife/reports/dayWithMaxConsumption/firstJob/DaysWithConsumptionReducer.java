@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.accumulo.core.data.Mutation;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.sensoriclife.Config;
@@ -17,9 +17,9 @@ import org.sensoriclife.world.ResidentialUnit;
  * 
  */
 public class DaysWithConsumptionReducer extends
-		Reducer<LongWritable, ResidentialUnit, Text, Mutation> {
+		Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
 
-	public void reduce(LongWritable key, Iterable<ResidentialUnit> values,
+	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,
 			Context c) throws IOException, InterruptedException {
 
 		double overallElecConsumption = 0;
