@@ -1,4 +1,4 @@
-package org.sensoriclife.reports.unusualRiseOfConsumption;
+package org.sensoriclife.reports.emptyResidentialUnitsConsumption;
 
 import java.text.DateFormat;
 import java.text.ParseException;

@@ -1,4 +1,4 @@
-package org.sensoriclife.reports.unusualRiseOfConsumption;
+package org.sensoriclife.reports.emptyResidentialUnitsConsumption;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -30,28 +30,28 @@ import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.helper.ConsumptionGeneralizeReport;
 import org.sensoriclife.util.Helpers;
 
-public class UnusualRiseOfConsumptionReport {
+public class EmptyResidentialUnitsConsumptionReport {
 	
 	public static boolean test = true;
 	
-	public static void runUnusualRiseOfConsumption() throws Exception {
+	public static void runEmptyResidentialUnitsConsumption() throws Exception {
 	
 		String[] args = new String[13];
-		args[0] = "Report: MinMaxConsumption"; //Name :)
+		args[0] = "Report: emptyResidentialUnitsConsumption"; //Name :)
 		args[1] = Config.getProperty("accumulo.name");//inputInstanceName
 		args[2] = Config.getProperty("accumulo.zooServers");//inputTableName
 		args[3] = Config.getProperty("accumulo.user");//inputUserName
 		args[4] = Config.getProperty("accumulo.password");//inputPassword
 		  
-		args[5] = Config.getProperty("accumulo.unusualRiseOfConsumption.outPutTable.name");//outputInstanceName
-		args[6] = Config.getProperty("accumulo.unusualRiseOfConsumption.outPutTable.zooServers");//outputTableName
-		args[7] = Config.getProperty("accumulo.unusualRiseOfConsumption.outPutTable.user");//outputUserName
-		args[8] = Config.getProperty("accumulo.unusualRiseOfConsumption.outPutTable.password");//outputPassword
+		args[5] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.outPutTable.name");//outputInstanceName
+		args[6] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.outPutTable.zooServers");//outputTableName
+		args[7] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.outPutTable.user");//outputUserName
+		args[8] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.outPutTable.password");//outputPassword
 		   
-		args[9] = Config.getProperty("accumulo.unusualRiseOfConsumption.dateRange.min");//(time) minTimestamp
-		args[10] = Config.getProperty("accumulo.unusualRiseOfConsumption.dateRange.max");//(long) maxTimestamp
-		args[11] = Config.getProperty("accumulo.unusualRiseOfConsumption.dataRange.onlyYear");//(boolean) onlyYear -> is false, when the compute inside the year
-		args[12] = Config.getProperty("accumulo.unusualRiseOfConsumption.outPutTable.pastLimitation");//(time) pastLimitation
+		args[9] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.dateRange.min");//(time) minTimestamp
+		args[10] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.dateRange.max");//(long) maxTimestamp
+		args[11] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.dataRange.onlyYear");//(boolean) onlyYear -> is false, when the compute inside the year
+		args[12] = Config.getProperty("accumulo.emptyResidentialUnitsConsumption.outPutTable.pastLimitation");//(time) pastLimitation
 		/* Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss*/
 		

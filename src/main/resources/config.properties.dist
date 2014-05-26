@@ -50,3 +50,17 @@ accumulo.yearInvoice.outPutTable.pastLimitation=DATE2
  	#set price per Consumption | cp = [consumptionType]+";"+[price]
  	#                          | pricePerConsumption = [cp+";"]*[cp]?   
 accumulo.yearInvoice.pricePerConsumption=PRICEPERCONSUMTION
+
+###### Report: emptyResidentialUnitsConsumption  ####
+
+	#output Table values
+accumulo.emptyResidentialUnitsConsumption.outPutTable.name=NAME
+accumulo.emptyResidentialUnitsConsumption.outPutTable.zooServers=SERVERS
+accumulo.emptyResidentialUnitsConsumption.outPutTable.user=USER
+accumulo.emptyResidentialUnitsConsumption.outPutTable.password=PASSWORD
+	
+	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+accumulo.emptyResidentialUnitsConsumption.dateRange.min=DATE1		
+accumulo.emptyResidentialUnitsConsumption.dateRange.max=DATE2	
+accumulo.emptyResidentialUnitsConsumption.dataRange.onlyYear=BOOLEAN
+accumulo.emptyResidentialUnitsConsumption.outPutTable.pastLimitation=DATE3

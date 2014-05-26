@@ -1,5 +1,6 @@
 package org.sensoriclife.reports.helper;
 
+import org.apache.accumulo.core.client.ClientConfiguration;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
@@ -12,6 +13,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
+import com.sun.jersey.api.client.config.ClientConfig;
 
 
 public class ConsumptionGeneralizeReport extends Configured implements Tool{
@@ -71,8 +74,11 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 		}
 		else
 		{
-			//AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			//AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
+			//ClientConfiguration clientConfig = ClientConfiguration.loadDefault();
+			//clientConfig.s
+			//AccumuloInputFormat.setZooKeeperInstance(job, clientConfig);
+			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
+			AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
 		}
 		
 		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password

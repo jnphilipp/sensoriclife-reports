@@ -3,8 +3,8 @@ package org.sensoriclife.reports;
 
 import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
+import org.sensoriclife.reports.emptyResidentialUnitsConsumption.EmptyResidentialUnitsConsumptionReport;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxConsumptionReport;
-import org.sensoriclife.reports.unusualRiseOfConsumption.UnusualRiseOfConsumptionReport;
 import org.sensoriclife.reports.yearConsumption.YearConsumptionReport;
 import org.sensoriclife.reports.yearInvoiceResidentialUnit.YearInvoiceReport;
 
@@ -21,7 +21,7 @@ public class App {
 		//testArgs[0] = "minMaxConsumption";
 		//testArgs[0] = "yearConsumption";
 		//testArgs[0] = "yearInvoice";
-		testArgs[0] = "unusualRiseOfConsumption";
+		testArgs[0] = "emptyResidentialUnitsConsumption";
 		Config.getInstance();
 		
 		Logger.getInstance();
@@ -40,8 +40,8 @@ public class App {
 				YearInvoiceReport.runYearInvoice();
 				break;
 			
-			case "unusualRiseOfConsumption":
-				UnusualRiseOfConsumptionReport.runUnusualRiseOfConsumption();
+			case "emptyResidentialUnitsConsumption":
+				EmptyResidentialUnitsConsumptionReport.runEmptyResidentialUnitsConsumption();
 				break;
 		}
 	}
