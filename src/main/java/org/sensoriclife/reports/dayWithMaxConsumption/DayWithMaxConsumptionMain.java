@@ -5,7 +5,7 @@ import org.sensoriclife.reports.dayWithMaxConsumption.firstJob.DaysWithConsumpti
 import org.sensoriclife.reports.dayWithMaxConsumption.secondJob.DaysWithMaxConsumptionReport;
 
 public class DayWithMaxConsumptionMain {
-	public static void main(String[] args) throws Exception {
+	public static void main1(String[] args) throws Exception {
 		Accumulo accumulo = DaysWithConsumptionReport.runFirstJob();
 		DaysWithMaxConsumptionReport.runSecondJob(accumulo);
 	}
