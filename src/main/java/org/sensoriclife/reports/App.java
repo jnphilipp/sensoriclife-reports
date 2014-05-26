@@ -18,10 +18,10 @@ public class App {
 	public static void main(String[] args) throws Exception {
 		
 		String testArgs[] = new String[1];
-		//testArgs[0] = "minMaxConsumption";
+		testArgs[0] = "minMaxConsumption";
 		//testArgs[0] = "yearConsumption";
 		//testArgs[0] = "yearInvoice";
-		testArgs[0] = "emptyResidentialUnitsConsumption";
+		//testArgs[0] = "emptyResidentialUnitsConsumption";
 		Config.getInstance();
 		
 		Logger.getInstance();

@@ -93,7 +93,7 @@ public class EmptyResidentialUnitsConsumptionReport {
 		ConsumptionGeneralizeReport.runYearConsumptionGeneralize(summeryArgs);
 		
 		Accumulo.getInstance().connect(args[5]);
-		Accumulo.getInstance().addMutation(args[6], "UnusualRiseOfConsum", "report", "version", Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().addMutation(args[6], "EmptyResidentialUnitsConsumption", "report", "version", Helpers.toByteArray(reportTimestamp));
 		Accumulo.getInstance().flushBashWriter(args[6]);
 		Accumulo.getInstance().disconnect();
 		/*

@@ -74,9 +74,6 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 		}
 		else
 		{
-			//ClientConfiguration clientConfig = ClientConfiguration.loadDefault();
-			//clientConfig.s
-			//AccumuloInputFormat.setZooKeeperInstance(job, clientConfig);
 			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
 			AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
 		}
