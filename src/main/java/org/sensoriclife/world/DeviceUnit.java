@@ -19,6 +19,7 @@ public class DeviceUnit implements Serializable, Writable {
 	private String consumptionID = "";
 	private float deviceAmount = 0;
 	private float deviceSecontAmount = 0;
+	
 	private String counterType = "";
 	private String residentialID = "";
 	private long userID = 0;

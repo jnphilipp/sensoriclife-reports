@@ -25,39 +25,35 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
+import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
-import org.sensoriclife.reports.convert.ConvertForAYearReport;
+import org.sensoriclife.reports.helper.ConsumptionGeneralizeReport;
+import org.sensoriclife.reports.helper.ConvertForAYearReport;
 import org.sensoriclife.util.Helpers;
 
 public class YearConsumptionReport {
 	
 	public static boolean test = true;
 	
-	public static void runYearConsumption(String[] args) throws Exception
+	public static void runYearConsumption() throws Exception
 	{
-		/*
-		 * Todo: Versionierung muss noch rein 
-		 */
-		
-		/*
-		 * 
-		 * args[0] = reportName
-		 * 
-		 * args[1] = inputInstanceName
-		 * args[2] = inputTableName
-		 * args[3] = inputUserName
-		 * args[4] = inputPassword
-		 * 
-		 * args[5] = outputInstanceName
-		 * args[6] = outputTableName
-		 * args[7] = outputUserName
-		 * args[8] = outputPassword
-		 *  
-		 * args[9] = (Times) timestamp
-		 * args[10] = (boolean) onlyYear -> is true, when the compute inside the year
-		 * args[11] = (times dd.MM.yyyy) pastLimitation 
-		 * 
-		 * Times: dd.MM.yyyy or
+		String[] args = new String[12];
+		args[0] = "Report: yearConsumption"; //Name :)
+		args[1] = Config.getProperty("accumulo.name");//inputInstanceName
+		args[2] = Config.getProperty("accumulo.zooServers");//inputTableName
+		args[3] = Config.getProperty("accumulo.user");//inputUserName
+		args[4] = Config.getProperty("accumulo.password");//inputPassword
+		  
+		args[5] = Config.getProperty("accumulo.yearConsumption.outPutTable.name");//outputInstanceName
+		args[6] = Config.getProperty("accumulo.yearConsumption.outPutTable.zooServers");//outputTableName
+		args[7] = Config.getProperty("accumulo.yearConsumption.outPutTable.user");//outputUserName
+		args[8] = Config.getProperty("accumulo.yearConsumption.outPutTable.password");//outputPassword
+		   
+		args[9] = Config.getProperty("accumulo.yearConsumption.dateRange.untilDate");//(Times) timestamp	
+		args[10] = Config.getProperty("accumulo.yearConsumption.dataRange.onlyYear");//(boolean) onlyYear -> is false, when the compute inside the year
+		args[11] = Config.getProperty("accumulo.yearConsumption.outPutTable.pastLimitation");//(times dd.MM.yyyy) pastLimitation 
+				
+		/* Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		

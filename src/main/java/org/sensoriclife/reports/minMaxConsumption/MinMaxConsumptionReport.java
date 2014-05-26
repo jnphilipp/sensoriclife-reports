@@ -24,44 +24,41 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
+import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
 import org.apache.hadoop.io.Text;
-import org.sensoriclife.reports.convert.ConvertMinMaxTimeStampReport;
-import org.sensoriclife.reports.yearConsumption.ConsumptionGeneralizeReport;
+import org.sensoriclife.reports.helper.ConsumptionGeneralizeReport;
+import org.sensoriclife.reports.helper.ConvertMinMaxTimeStampReport;
 import org.sensoriclife.util.Helpers;
 
 public class MinMaxConsumptionReport {
 	
 	public static boolean test = true;
 	
-	public static void runMinMaxConsumption(String[] args) throws Exception{/*
-		 * Todo: Versionierung muss noch rein 
-		 */
+	public static void runMinMaxConsumption() throws Exception{
 		
-		/*
-		 * 
-		 * args[0] = reportName
-		 * 
-		 * args[1] = inputInstanceName
-		 * args[2] = inputTableName
-		 * args[3] = inputUserName
-		 * args[4] = inputPassword
-		 * 
-		 * args[5] = outputInstanceName
-		 * args[6] = outputTableName
-		 * args[7] = outputUserName
-		 * args[8] = outputPassword
-		 *  
-		 * args[9] = (time) minTimestamp
-		 * args[10] = (long) maxTimestamp
-		 * args[11] = (boolean) onlyYear -> is true, when the compute inside the year
-		 * args[12] = (time) pastLimitation
-		 * args[13] = (boolean) compute min max consumption for residentialunit
-		 * args[14] = (boolean) compute min max consumption for builiding
-		 * Times: dd.MM.yyyy or
-		 * 		  dd.MM.yyyy kk:mm:ss
-		 */
-		
+		String[] args = new String[15];
+		args[0] = "Report: MinMaxConsumption"; //Name :)
+		args[1] = Config.getProperty("accumulo.name");//inputInstanceName
+		args[2] = Config.getProperty("accumulo.zooServers");//inputTableName
+		args[3] = Config.getProperty("accumulo.user");//inputUserName
+		args[4] = Config.getProperty("accumulo.password");//inputPassword
+		  
+		args[5] = Config.getProperty("accumulo.minMaxConsumption.outPutTable.name");//outputInstanceName
+		args[6] = Config.getProperty("accumulo.minMaxConsumption.outPutTable.zooServers");//outputTableName
+		args[7] = Config.getProperty("accumulo.minMaxConsumption.outPutTable.user");//outputUserName
+		args[8] = Config.getProperty("accumulo.minMaxConsumption.outPutTable.password");//outputPassword
+		   
+		args[9] = Config.getProperty("accumulo.minMaxConsumption.dateRange.min");//(time) minTimestamp
+		args[10] = Config.getProperty("accumulo.minMaxConsumption.dateRange.max");//(long) maxTimestamp
+		args[11] = Config.getProperty("accumulo.minMaxConsumption.dataRange.onlyYear");//(boolean) onlyYear -> is false, when the compute inside the year
+		args[12] = Config.getProperty("accumulo.minMaxConsumption.outPutTable.pastLimitation");//(time) pastLimitation
+		 
+		args[13] = Config.getProperty("accumulo.minMaxConsumption.run.residentialUnit");//(boolean) compute min max consumption for residentialunit
+		args[14] = Config.getProperty("accumulo.minMaxConsumption.run.builiding");//(boolean) compute min max consumption for builiding
+		/* Times: dd.MM.yyyy or
+		 * 		  dd.MM.yyyy kk:mm:ss*/
+		 		
 		if(test)
 		{
 			MockInstance inputMockInstance = new MockInstance(args[1]);
