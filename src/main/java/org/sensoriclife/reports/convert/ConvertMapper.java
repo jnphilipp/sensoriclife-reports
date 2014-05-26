@@ -43,7 +43,7 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 				
 				
 			}
-			else if(onlyYear)
+			else if(!onlyYear)
 			{
 				if(timestamp < minTs && timestamp >= pastLimitation)
 				{
