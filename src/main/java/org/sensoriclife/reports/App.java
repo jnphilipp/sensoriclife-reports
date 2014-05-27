@@ -1,85 +1,42 @@
 package org.sensoriclife.reports;
 
+import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
-import org.sensoriclife.reports.minMaxConsumption.MinMaxReport;
+import org.sensoriclife.db.Accumulo;
+import org.sensoriclife.reports.dayWithMaxConsumption.firstJob.DaysWithConsumptionReport;
+import org.sensoriclife.reports.dayWithMaxConsumption.secondJob.DayWithMaxConsumptionReport;
+import org.sensoriclife.reports.unusualRiseOfConsumption.firstJob.UnusualRiseOfConsumptionReport;
+import org.sensoriclife.reports.unusualRiseOfConsumption.secondob.UnusualRiseOfHeatingConsumptionReport;
 
 /**
- *
+ * 
  * @author jnphilipp, marcel
  * @version 0.0.1
- *
+ * 
  */
 public class App {
 	public static void main(String[] args) throws Exception {
-		
 
-		/*
-		 * args[0] = (String) reportName
-		 * args[1-n] = reportArgs
-		 */
-		
-		/*
-		 * Testdata generally
-		 * /*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = inputInstanceName
-		 * args[2] = inputTableName
-		 * args[3] = inputUserName
-		 * args[4] = inputPassword
-		 * 
-		 * args[5] = outputInstanceName
-		 * args[6] = outputTableName
-		 * args[7] = outputUserName
-		 * args[8] = outputPassword
-		 * 
-		 */
-		
-		/*
-		 * Testdata minMaxConsumption
-		 *  
-		 * args[9] = (boolean) allTime 
-		 * args[10] = (long) minTimestamp
-		 * args[11] = (long) maxTimestamp
-		 * 
-		 * Times: dd.MM.yyyy or
-		 * 		  dd.MM.yyyy kk:mm:ss
-		 */
-		
-		String[] testArgs = new String[12];
-		testArgs[0] = "minMaxConsumption";
-		testArgs[1] = "mockInstance";
-		testArgs[2] = "InputTable";
-		testArgs[3] = "";
-		testArgs[4] = "";
-		testArgs[5] = "mockInstance";
-		testArgs[6] = "OutputTable";
-		testArgs[7] = "";
-		testArgs[8] = "";
-		testArgs[9] = "true";
-		testArgs[10] = "24.12.2007";
-		testArgs[11] = "24.12.2007 12:15:12";
+		String testArgs[] = new String[1];
+		testArgs[0] = "dayWithMaxConsumption";
+		//testArgs[0] = "unusualRiseOfConsumption";
+		Config.getInstance();
 
-		
 		Logger.getInstance();
 		Logger.info("SensoricLife - reports");
-		//Config c = Config.getInstance();
-		//System.out.println("hallo: "+ c.getProperty("name"));
-		
-	
-		switch(testArgs[0]){
-			case "minMaxConsumption":
-				MinMaxReport.runMinMax(testArgs);
-				break;
-		}
-		/*int res = 0;
-		try {
-			res = ToolRunner.run(CachedConfiguration.getInstance(),
-					new DaysWithConsumptionReport(), args);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
-		System.exit(res);*/
+		Accumulo accumulo;
+
+		switch (testArgs[0]) {
+		case "dayWithMaxConsumption":
+			accumulo = DaysWithConsumptionReport.runFirstJob();
+			DayWithMaxConsumptionReport.runSecondJob(accumulo);
+			break;
+
+		case "unusualRiseOfConsumption":
+			accumulo = UnusualRiseOfConsumptionReport.runFirstJob();
+			UnusualRiseOfHeatingConsumptionReport.runSecondJob(accumulo);
+			break;
+		}
 	}
 }

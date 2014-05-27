@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mrunit.mapreduce.MapDriver;
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver;
@@ -31,12 +31,12 @@ public class DaysWithConsumptionTest {
 	/**
 	 * the map function will be tested
 	 */
-	private MapDriver<Key, Value, LongWritable, ResidentialUnit> mapDriver;
+	private MapDriver<Key, Value, IntWritable, ResidentialUnit> mapDriver;
 
 	/**
 	 * the reduce function will be tested
 	 */
-	private ReduceDriver<LongWritable, ResidentialUnit, Text, Mutation> reduceDriver;
+	private ReduceDriver<IntWritable, ResidentialUnit, Text, Mutation> reduceDriver;
 
 	/**
 	 * this method is called before the execution of the test.
@@ -159,106 +159,106 @@ public class DaysWithConsumptionTest {
 
 		mapDriver.withAll(mapperInput);
 
-		List<Pair<LongWritable, ResidentialUnit>> expectedMapperOutput = new ArrayList<Pair<LongWritable, ResidentialUnit>>();
+		List<Pair<IntWritable, ResidentialUnit>> expectedMapperOutput = new ArrayList<Pair<IntWritable, ResidentialUnit>>();
 
 		ResidentialUnit flat = new ResidentialUnit();
 		flat.setDeviceAmount(4);
 		flat.setTimeStamp(1);
 		flat.setConsumptionID("1_wc");
 		flat.setCounterType("wc");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(1), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(1), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(125);
 		flat.setTimeStamp(2);
 		flat.setConsumptionID("2_wc");
 		flat.setCounterType("wc");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(2), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(2), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(12);
 		flat.setTimeStamp(1);
 		flat.setConsumptionID("1_wh");
 		flat.setCounterType("wh");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(1), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(1), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(13);
 		flat.setTimeStamp(2);
 		flat.setConsumptionID("2_wh");
 		flat.setCounterType("wh");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(2), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(2), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(111);
 		flat.setTimeStamp(3);
 		flat.setConsumptionID("1_el");
 		flat.setCounterType("el");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(3), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(3), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(7);
 		flat.setTimeStamp(2);
 		flat.setConsumptionID("2_el");
 		flat.setCounterType("el");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(2), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(2), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(42);
 		flat.setTimeStamp(10);
 		flat.setConsumptionID("3_el");
 		flat.setCounterType("el");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(10), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(10), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(105);
 		flat.setTimeStamp(2);
 		flat.setConsumptionID("4_el");
 		flat.setCounterType("el");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(2), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(2), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(1);
 		flat.setTimeStamp(3);
 		flat.setConsumptionID("5_el");
 		flat.setCounterType("el");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(3), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(3), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(18);
 		flat.setTimeStamp(3);
 		flat.setConsumptionID("1_he");
 		flat.setCounterType("he");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(3), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(3), flat));
 
 		flat = new ResidentialUnit();
 		flat.setDeviceAmount(20);
 		flat.setTimeStamp(2);
 		flat.setConsumptionID("2_he");
 		flat.setCounterType("he");
-		expectedMapperOutput.add(new Pair<LongWritable, ResidentialUnit>(
-				new LongWritable(2), flat));
+		expectedMapperOutput.add(new Pair<IntWritable, ResidentialUnit>(
+				new IntWritable(2), flat));
 
-		List<Pair<LongWritable, ResidentialUnit>> realMapperOutput = new ArrayList<Pair<LongWritable, ResidentialUnit>>();
+		List<Pair<IntWritable, ResidentialUnit>> realMapperOutput = new ArrayList<Pair<IntWritable, ResidentialUnit>>();
 		realMapperOutput = mapDriver.run();
 
 		boolean isCorrect = true;
 		int count = 0;
-		for (Pair<LongWritable, ResidentialUnit> pair : realMapperOutput) {
-			long timestamp = Long.parseLong(String.valueOf((LongWritable) pair
+		for (Pair<IntWritable, ResidentialUnit> pair : realMapperOutput) {
+			long timestamp = Integer.parseInt(String.valueOf((IntWritable) pair
 					.getFirst()));
 			if (timestamp != Long.parseLong(String
-					.valueOf((LongWritable) realMapperOutput.get(count)
+					.valueOf((IntWritable) realMapperOutput.get(count)
 							.getFirst()))) {
 				isCorrect = false;
 				break;
@@ -289,7 +289,7 @@ public class DaysWithConsumptionTest {
 	@Test
 	public void testReducer() throws IOException {
 
-		List<Pair<LongWritable, List<ResidentialUnit>>> reducerInput = new ArrayList<Pair<LongWritable, List<ResidentialUnit>>>();
+		List<Pair<IntWritable, List<ResidentialUnit>>> reducerInput = new ArrayList<Pair<IntWritable, List<ResidentialUnit>>>();
 		List<ResidentialUnit> valuesForCertainKey = new ArrayList<ResidentialUnit>();
 		// expected keys: 1,2,3,10
 
@@ -308,8 +308,8 @@ public class DaysWithConsumptionTest {
 		flat.setCounterType("wh");
 		valuesForCertainKey.add(flat);
 
-		reducerInput.add(new Pair<LongWritable, List<ResidentialUnit>>(
-				new LongWritable(1), valuesForCertainKey));
+		reducerInput.add(new Pair<IntWritable, List<ResidentialUnit>>(
+				new IntWritable(1), valuesForCertainKey));
 
 		// values for key "2"
 		valuesForCertainKey = new ArrayList<ResidentialUnit>();
@@ -349,8 +349,8 @@ public class DaysWithConsumptionTest {
 		flat.setCounterType("he");
 		valuesForCertainKey.add(flat);
 
-		reducerInput.add(new Pair<LongWritable, List<ResidentialUnit>>(
-				new LongWritable(2), valuesForCertainKey));
+		reducerInput.add(new Pair<IntWritable, List<ResidentialUnit>>(
+				new IntWritable(2), valuesForCertainKey));
 
 		// values for key "3"
 		valuesForCertainKey = new ArrayList<ResidentialUnit>();
@@ -376,8 +376,8 @@ public class DaysWithConsumptionTest {
 		flat.setCounterType("he");
 		valuesForCertainKey.add(flat);
 
-		reducerInput.add(new Pair<LongWritable, List<ResidentialUnit>>(
-				new LongWritable(3), valuesForCertainKey));
+		reducerInput.add(new Pair<IntWritable, List<ResidentialUnit>>(
+				new IntWritable(3), valuesForCertainKey));
 
 		// values for key "4"
 		valuesForCertainKey = new ArrayList<ResidentialUnit>();
@@ -389,8 +389,8 @@ public class DaysWithConsumptionTest {
 		flat.setCounterType("el");
 		valuesForCertainKey.add(flat);
 
-		reducerInput.add(new Pair<LongWritable, List<ResidentialUnit>>(
-				new LongWritable(10), valuesForCertainKey));
+		reducerInput.add(new Pair<IntWritable, List<ResidentialUnit>>(
+				new IntWritable(10), valuesForCertainKey));
 
 		reduceDriver.withAll(reducerInput);
 

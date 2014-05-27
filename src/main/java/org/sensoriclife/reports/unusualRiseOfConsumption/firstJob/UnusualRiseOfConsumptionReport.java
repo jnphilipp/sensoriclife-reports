@@ -1,14 +1,10 @@
 package org.sensoriclife.reports.unusualRiseOfConsumption.firstJob;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
-import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
@@ -34,20 +30,6 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 	public static Accumulo runFirstJob() throws Exception {
 
 		Config conf = Config.getInstance();
-		// config for mockinstance
-		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
-		conf.getProperties()
-				.setProperty("report.unusualRiseOfConsumption.inputTableName",
-						"Consumption");
-		conf.getProperties().setProperty(
-				"report.unusualRiseOfConsumption.outputTableName",
-				"UnusualRiseOfConsumption");
-		conf.getProperties().setProperty(
-				"report.unusualRiseOfConsumption.helperOutputTableName",
-				"HeatingConsumption");
-		conf.getProperties().setProperty("accumulo.username", "");
-		conf.getProperties().setProperty("accumulo.password", "");
-
 		// config for map reduce job
 		// time interval: weekly for two weeks
 		// week2 - week1 = oldConsumption
@@ -75,6 +57,8 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 		insertData(
 				accumulo,
 				Config.getProperty("report.unusualRiseOfConsumption.inputTableName"));
+		
+		/*
 		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(Config
 				.getProperty("report.unusualRiseOfConsumption.inputTableName"),
 				new Authorizations());
@@ -84,11 +68,13 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
 					+ entry.getValue().toString());
 		}
+		*/
 
 		String[] args = new String[0];
 		ToolRunner.run(new Configuration(),
 				new UnusualRiseOfConsumptionReport(), args);
 
+		/*
 		Iterator<Entry<Key, Value>> scanner2 = accumulo
 				.scanAll(
 						Config.getProperty("report.unusualRiseOfConsumption.outputTableName"),
@@ -99,6 +85,7 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
 					+ entry.getValue().toString());
 		}
+		*/
 
 		return accumulo;
 	}

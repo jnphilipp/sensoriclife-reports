@@ -1,15 +1,12 @@
 package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
 import java.util.Calendar;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
-import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
@@ -35,20 +32,12 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 	 */
 	public static Accumulo runFirstJob() throws Exception {
 
-		Config conf = Config.getInstance();
-		// config for mockinstance
-		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
-		conf.getProperties().setProperty("report.daysWithConsumption.inputTableName", "Consumption");
-		conf.getProperties().setProperty("report.daysWithConsumption.outputTableName",
-				"DaysWithConsumption");
-		conf.getProperties().setProperty("accumulo.username", "");
-		conf.getProperties().setProperty("accumulo.password", "");
-
 		// config for map reduce job
 		// minTimestamp ~ 01.01.LastYear 0:00.00
 		Calendar cal = Calendar.getInstance();
 		cal.set(cal.get(Calendar.YEAR) - 1, 0, 1, 0, 0, 0);
 		cal.getTimeInMillis();
+		Config conf = Config.getInstance();
 		conf.getProperties().setProperty("minTimestamp",
 				String.valueOf(cal.getTimeInMillis()));
 		// maxTimestamp ~ 31.12.LastYear 23:59.59
@@ -59,30 +48,43 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 		Accumulo accumulo = Accumulo.getInstance();
 		accumulo.connect();
 
-		accumulo.createTable(Config.getProperty("report.daysWithConsumption.inputTableName"), false);
-		accumulo.createTable(Config.getProperty("report.daysWithConsumption.outputTableName"), false);
+		accumulo.createTable(
+				Config.getProperty("report.daysWithConsumption.inputTableName"),
+				false);
+		accumulo.createTable(Config
+				.getProperty("report.daysWithConsumption.outputTableName"),
+				false);
 
-		insertData(accumulo, Config.getProperty("report.daysWithConsumption.inputTableName"));
+		insertData(accumulo,
+				Config.getProperty("report.daysWithConsumption.inputTableName"));
 
-		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(
-				Config.getProperty("report.daysWithConsumption.inputTableName"), new Authorizations());
+		/*
+		Iterator<Entry<Key, Value>> scanner = accumulo
+				.scanAll(
+						Config.getProperty("report.daysWithConsumption.inputTableName"),
+						new Authorizations());
 		while (scanner.hasNext()) {
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
 					+ entry.getValue().toString());
 		}
+		*/
 
 		String[] args = new String[0];
 		ToolRunner.run(new Configuration(), new DaysWithConsumptionReport(),
 				args);
 
-		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(
-				Config.getProperty("report.daysWithConsumption.outputTableName"), new Authorizations());
+		/*
+		Iterator<Entry<Key, Value>> scanner2 = accumulo.scanAll(Config
+				.getProperty("report.daysWithConsumption.outputTableName"),
+				new Authorizations());
 		while (scanner2.hasNext()) {
 			Entry<Key, Value> entry = scanner2.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
 					+ entry.getValue().toString());
 		}
+		*/
+		
 		return accumulo;
 	}
 
@@ -102,18 +104,20 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 
 		AccumuloInputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));
-		AccumuloInputFormat.setConnectorInfo(job,
-				Config.getProperty("accumulo.username"),
+		AccumuloInputFormat.setConnectorInfo(job, Config
+				.getProperty("accumulo.username"),
 				new PasswordToken(Config.getProperty("accumulo.password")));
-		AccumuloInputFormat.setInputTableName(job,
-				Config.getProperty("report.daysWithConsumption.inputTableName"));
+		AccumuloInputFormat
+				.setInputTableName(
+						job,
+						Config.getProperty("report.daysWithConsumption.inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job,
-				Config.getProperty("accumulo.username"),
+		AccumuloOutputFormat.setConnectorInfo(job, Config
+				.getProperty("accumulo.username"),
 				new PasswordToken(Config.getProperty("accumulo.password")));
-		AccumuloOutputFormat.setDefaultTableName(job,
-				Config.getProperty("report.daysWithConsumption.outputTableName"));
+		AccumuloOutputFormat.setDefaultTableName(job, Config
+				.getProperty("report.daysWithConsumption.outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
 		AccumuloOutputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));

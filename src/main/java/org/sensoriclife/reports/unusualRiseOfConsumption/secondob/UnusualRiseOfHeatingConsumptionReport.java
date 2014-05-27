@@ -33,30 +33,17 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 	 */
 	public static Accumulo runSecondJob(Accumulo accumulo) throws Exception {
 
-		Config conf = Config.getInstance();
-		// config for mockinstance
-		conf.getProperties().setProperty("mockInstanceName", "mockInstance");
-		conf.getProperties().setProperty(
-				"report.unusualRiseOfHeatingConsumption.inputTableName",
-				"HeatingConsumption");
-		conf.getProperties().setProperty(
-				"report.unusualRiseOfHeatingConsumption.outputTableName",
-				"UnusualRiseOfConsumption");
-		conf.getProperties().setProperty("accumulo.username", "");
-		conf.getProperties().setProperty("accumulo.password", "");
-
-		// time intervall is constant
-
+		/*
 		Iterator<Entry<Key, Value>> scanner = accumulo
 				.scanAll(
 						Config.getProperty("report.unusualRiseOfHeatingConsumption.inputTableName"),
 						new Authorizations());
-
 		while (scanner.hasNext()) {
 			Entry<Key, Value> entry = scanner.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
 					+ entry.getValue().toString());
 		}
+		*/
 
 		String[] args = new String[0];
 		ToolRunner.run(new Configuration(),
@@ -66,7 +53,6 @@ public class UnusualRiseOfHeatingConsumptionReport extends Configured implements
 				.scanAll(
 						Config.getProperty("report.unusualRiseOfHeatingConsumption.outputTableName"),
 						new Authorizations());
-
 		while (scanner2.hasNext()) {
 			Entry<Key, Value> entry = scanner2.next();
 			System.out.println("Key: " + entry.getKey().toString() + " Value: "
