@@ -15,19 +15,26 @@ import org.sensoriclife.reports.yearInvoiceResidentialUnit.YearInvoiceReport;
  *
  */
 public class App {
+	
+	public static boolean test = true;
+	
 	public static void main(String[] args) throws Exception {
 		
-		String testArgs[] = new String[1];
-		testArgs[0] = "minMaxConsumption";
-		//testArgs[0] = "yearConsumption";
-		//testArgs[0] = "yearInvoice";
-		//testArgs[0] = "emptyResidentialUnitsConsumption";
+		if(test)
+		{
+			args = new String[1];
+			//testArgs[0] = "minMaxConsumption";
+			//testArgs[0] = "yearConsumption";
+			//testArgs[0] = "yearInvoice";
+			args[0] = "emptyResidentialUnitsConsumption";
+		}
+		
 		Config.getInstance();
 		
 		Logger.getInstance();
 		Logger.info("SensoricLife - reports");
 		
-		switch(testArgs[0]){
+		switch(args[0]){
 			case "minMaxConsumption":
 				MinMaxConsumptionReport.runMinMaxConsumption();
 				break;
