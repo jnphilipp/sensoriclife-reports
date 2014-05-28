@@ -1,17 +1,18 @@
 accumulo.name=NAME
 accumulo.zooServers=SERVERS
+accumulo.table_name=TABLE NAME
 accumulo.user=USER
 accumulo.password=PASSWORD
 
 ###### Report: MinMaxConsumption ####
 
-	#output Table values
-accumulo.minMaxConsumption.outPutTable.name=NAME
-accumulo.minMaxConsumption.outPutTable.zooServers=SERVERS
-accumulo.minMaxConsumption.outPutTable.user=USER
-accumulo.minMaxConsumption.outPutTable.password=PASSWORD
+#output Table values
+reports.min_max_consumption.output_table.name=NAME
+reports.min_max_consumption.output_table.zooServers=SERVERS
+reports.min_max_consumption.output_table.user=USER
+reports.min_max_consumption.output_table.password=PASSWORD
 	
-	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
 accumulo.minMaxConsumption.dateRange.min=DATE1		
 accumulo.minMaxConsumption.dateRange.max=DATE1	
 accumulo.minMaxConsumption.dataRange.onlyYear=BOOLEAN

@@ -1,5 +1,6 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
+import org.apache.accumulo.core.client.ClientConfiguration;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
@@ -13,43 +14,24 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class ConsumptionGeneralizeToBuildingReport extends Configured implements Tool{
-	
-	public static boolean test = true;
-	
+public class ConsumptionGeneralizeToBuildingReport extends Configured implements Tool {
+	/**
+	 * 
+	 * @param args reportName, InstanceName, TableName, UserName, Password, -, reportTimestamp
+	 * @throws Exception 
+	 */
 	public static void runConsumptionGeneralize(String[] args) throws Exception {
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * args[5] = -
-		 * args[6] = reportTimestamp
-		 * 
-		 */
-		
-		// run the map reduce job to read the edge table and populate the node
-		// table
 		ToolRunner.run(new Configuration(), new ConsumptionGeneralizeToBuildingReport(),args);
-
 	}
 	
+	/**
+	 * 
+	 * @param args reportName, InstanceName, TableName, UserName, Password, -, reportTimestamp, zooServers
+	 * @return 
+	 * @throws Exception 
+	 */
 	@Override
 	public int run(String[] args) throws Exception {
-		
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * args[5] = -
-		 * args[6] = reportTimestamp	  
-		 */
-		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
 		conf.setLong("reportTimestamp", new Long(args[6]));
@@ -62,25 +44,20 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 		job.setMapperClass(ConsumptionGeneralizeToBuildingMapper.class);
 		job.setReducerClass(ConsumptionGeneralizeToBuildingReducer.class);
 
-		if(test)
-		{
-			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[1]);
-		}
-		else
-		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-		}
+		ClientConfiguration c = new ClientConfiguration();
+		c.withInstance(args[1]);
+		c.withZkHosts(args[7]);
 		
 		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
 		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
+		AccumuloInputFormat.setZooKeeperInstance(job, c);
 		
 		AccumuloOutputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4]));
 		AccumuloOutputFormat.setDefaultTableName(job, args[2]);
 		AccumuloOutputFormat.setCreateTables(job, false);
-		
+		AccumuloOutputFormat.setZooKeeperInstance(job, c);
+
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(FloatWritable.class);
 		job.setOutputKeyClass(Text.class);
@@ -91,5 +68,4 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 
 		return job.waitForCompletion(true) ? 0 : -1;
 	}
-	
 }

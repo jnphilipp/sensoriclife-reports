@@ -1,5 +1,6 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
+import org.apache.accumulo.core.client.ClientConfiguration;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
@@ -11,6 +12,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
 import org.sensoriclife.world.DeviceUnit;
 
 /**
@@ -19,48 +21,14 @@ import org.sensoriclife.world.DeviceUnit;
  *
  */
 public class MinMaxReport extends Configured implements Tool {
-	
-	public static boolean test = true;
-	
-	
 	public static void runMinMax(String[] args) throws Exception {
-		
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * 
-		 * args[5] = (4|5) select to get Max Min for residentialUnit(5) or building(4)
-		 * args[6] = reportTimestamp
-		 */
-		
-		// run the map reduce job to read the edge table and populate the node
-		// table
 		ToolRunner.run(new Configuration(), new MinMaxReport(),args);
-
-
 	}
 
 	@Override
 	public int run(String[] args) throws Exception {
-		
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * 
-		 * args[5] = (4|5) select to get Max Min for residentialUnit(5) or building(4)
-		 * args[6] = reportTimestamp
-		 */
-		
 		Configuration conf = new Configuration();
-		conf.setStrings("outputTableName", args[2]);
+		conf.setStrings("outputTableName", Config.getProperty("reports.min_max_consumption.output_table.name"));
 		conf.setInt("selectModus", Integer.parseInt(args[5]));
 		conf.setLong("reportTimestamp", new Long(args[6]));
 		
@@ -72,24 +40,19 @@ public class MinMaxReport extends Configured implements Tool {
 		job.setMapperClass(MinMaxMapper.class);
 		job.setReducerClass(MinMaxReducer.class);
 
-		if(test)
-		{
-			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[1]);
-		}
-		else
-		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-		}
-		
-		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
-		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+		ClientConfiguration c = new ClientConfiguration();
+		c.withInstance(Config.getProperty("accumulo.name"));
+		c.withZkHosts(Config.getProperty("reports.min_max_consumption.output_table.name.zooServers"));
+	
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("reports.min_max_consumption.output_table.user"), new PasswordToken(Config.getProperty("reports.min_max_consumption.output_table.password")));
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("reports.min_max_consumption.output_table.name"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
-		
-		AccumuloOutputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[2]);
+		AccumuloInputFormat.setZooKeeperInstance(job, c);
+
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("reports.min_max_consumption.output_table.user"), new PasswordToken(Config.getProperty("reports.min_max_consumption.output_table.password")));
+		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("reports.min_max_consumption.output_table.name"));
 		AccumuloOutputFormat.setCreateTables(job, false);
+		AccumuloOutputFormat.setZooKeeperInstance(job, c);
 		
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(DeviceUnit.class);

@@ -1,7 +1,6 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
@@ -11,12 +10,11 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.util.Helpers;
 
 public class ConsumptionGeneralizeToBuildingMapper extends Mapper<Key, Value, Text, FloatWritable> {
-
+	@Override
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
-		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
-		
+
 		long timestamp = k.getTimestamp();
 		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		if((timestamp == reportTimestamp)|| (reportTimestamp == 0))
@@ -37,4 +35,3 @@ public class ConsumptionGeneralizeToBuildingMapper extends Mapper<Key, Value, Te
 		}
 	}
 }
-
