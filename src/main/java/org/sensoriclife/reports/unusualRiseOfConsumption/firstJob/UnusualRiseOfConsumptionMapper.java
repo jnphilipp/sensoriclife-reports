@@ -21,10 +21,21 @@ public class UnusualRiseOfConsumptionMapper extends
 		String rowId = k.getRow().toString();
 		Long timestamp = k.getTimestamp();
 		
+		String family = k.getColumnFamily().toString();
+		String qualifier = k.getColumnQualifier().toString();
+		
+		if(family.equals("residential") && qualifier.equals("id"))
+		{
+			String counterType = rowId.split("_")[1];
+			ResidentialUnit flat = new ResidentialUnit();
+			flat.setTimeStamp(timestamp);
+			flat.setConsumptionID(rowId);
+			flat.setCounterType(counterType);
+			flat.setResidentialID(v.toString());
+			c.write(new Text(rowId), flat);
+		}	
+		
 		if (timestamp >= minTs && timestamp <= maxTs) {
-			String family = k.getColumnFamily().toString();
-			String qualifier = k.getColumnQualifier().toString();
-
 			if (family.equals("device") && qualifier.equals("amount")) {
 				String counterType = rowId.split("_")[1];
 				ResidentialUnit flat = new ResidentialUnit();
@@ -35,16 +46,6 @@ public class UnusualRiseOfConsumptionMapper extends
 
 				c.write(new Text(rowId), flat);
 			}
-			else if(family.equals("residential") && qualifier.equals("id"))
-			{
-				String counterType = rowId.split("_")[1];
-				ResidentialUnit flat = new ResidentialUnit();
-				flat.setTimeStamp(timestamp);
-				flat.setConsumptionID(rowId);
-				flat.setCounterType(counterType);
-				flat.setResidentialID(v.toString());
-				c.write(new Text(rowId), flat);
-			}	
 		}
 	}
 

@@ -18,8 +18,8 @@ public class App {
 	public static void main(String[] args) throws Exception {
 
 		String testArgs[] = new String[1];
-		testArgs[0] = "dayWithMaxConsumption";
-		//testArgs[0] = "unusualRiseOfConsumption";
+		//testArgs[0] = "dayWithMaxConsumption";
+		testArgs[0] = "unusualRiseOfConsumption";
 		Config.getInstance();
 
 		Logger.getInstance();

@@ -155,179 +155,154 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 		long tsCurrent = System.currentTimeMillis() - 900000;
 		long tsLastWeek = tsCurrent - 86400000 * 7 + 900000;
 		long tsTwoWeeksAgo = tsCurrent - 86400000 * 14 + 900000;
+		long tsOrigin = tsCurrent - 86400000*365*2;
 
 		Mutation mutation = accumulo.newMutation(String.valueOf(consumptionId)
+				+ "_el", colFam2, colQual2,
+				tsOrigin, new Value("1-1-1-1-1".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
+		mutation = accumulo.newMutation(String.valueOf(consumptionId)
 				+ "_el", colFam, colQual, tsTwoWeeksAgo,
 				new Value("90".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsTwoWeeksAgo, new Value("1-1-1-1-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-
+		
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_el",
 				colFam, colQual, tsLastWeek - 900000,
 				new Value("150".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek - 900000, new Value("1-1-1-1-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_el",
 				colFam, colQual, tsLastWeek, new Value("200".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek, new Value("1-1-1-1-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_el",
 				colFam, colQual, tsLastWeek + 900000,
 				new Value("300".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek + 900000, new Value("1-1-1-1-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_el",
 				colFam, colQual, tsCurrent, new Value("390".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsCurrent, new Value("1-1-1-1-1".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		// second device - consumption very high
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
+				+ "_el", colFam2, colQual2,
+				tsOrigin, new Value("1-1-1-1-2".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
+		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_el", colFam, colQual, tsTwoWeeksAgo,
 				new Value("40".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsTwoWeeksAgo, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
-
+		
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_el", colFam, colQual, tsLastWeek - 900000,
 				new Value("150".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek - 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_el", colFam, colQual, tsLastWeek,
 				new Value("260".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_el", colFam, colQual, tsLastWeek + 900000,
 				new Value("600".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek + 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_el", colFam, colQual, tsCurrent,
 				new Value("1190".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsCurrent, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		// third device
+		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he", colFam2, colQual2,
+				tsOrigin, new Value("1-1-1-1-2".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he",
 				colFam, colQual, tsTwoWeeksAgo, new Value("110".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsTwoWeeksAgo, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he",
 				colFam, colQual, tsLastWeek - 900000,
 				new Value("160".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek - 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he",
 				colFam, colQual, tsLastWeek, new Value("190".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he",
 				colFam, colQual, tsLastWeek + 900000,
 				new Value("400".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek + 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId) + "_he",
 				colFam, colQual, tsCurrent, new Value("620".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsCurrent, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		// fourth device (+ third device) in combination too high
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
+				+ "_he", colFam2, colQual2,
+				tsOrigin, new Value("1-1-1-1-2".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
+		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_he", colFam, colQual, tsTwoWeeksAgo,
 				new Value("80".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsTwoWeeksAgo, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_he", colFam, colQual, tsLastWeek - 900000,
 				new Value("110".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek - 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_he", colFam, colQual, tsLastWeek,
 				new Value("150".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_he", colFam, colQual, tsLastWeek + 900000,
 				new Value("220".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek + 900000, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 1)
 				+ "_he", colFam, colQual, tsCurrent,
 				new Value("300".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsCurrent, new Value("1-1-1-1-2".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		// fifth device
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
+				+ "_he", colFam2, colQual2,
+				tsOrigin, new Value("1-1-1-1-3".getBytes()));
+		accumulo.addMutation(tableName, mutation);
+		
+		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_he", colFam, colQual, tsTwoWeeksAgo,
 				new Value("110".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsTwoWeeksAgo, new Value("1-1-1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_he", colFam, colQual, tsLastWeek - 900000,
 				new Value("140".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek - 900000, new Value("1-1-1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_he", colFam, colQual, tsLastWeek,
 				new Value("220".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek, new Value("1-1-1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_he", colFam, colQual, tsLastWeek + 900000,
 				new Value("444".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsLastWeek + 900000, new Value("1-1-1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 
 		mutation = accumulo.newMutation(String.valueOf(consumptionId + 2)
 				+ "_he", colFam, colQual, tsCurrent,
 				new Value("640".getBytes()));
-		mutation = accumulo.putToMutation(mutation, colFam2, colQual2,
-				tsCurrent, new Value("1-1-1-1-3".getBytes()));
 		accumulo.addMutation(tableName, mutation);
 	}
 }
