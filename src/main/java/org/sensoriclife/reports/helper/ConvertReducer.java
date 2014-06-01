@@ -30,32 +30,23 @@ public class ConvertReducer extends Reducer<Text, DeviceUnit, Text, Mutation> {
 		
 		for(DeviceUnit rU : values)
 		{
-			if(rU.isSetDeviceAmount())
+			if(rU.isSetDeviceMinAmount())
 			{
-				amount = rU.getDeviceAmount();
-				if(amount < minAmount)				
-					minAmount = amount;
-					
-				if(amount > maxAmount)
-					maxAmount = amount;
-					
+				minAmount = rU.getDeviceMinAmount();
 				existAmount = true;
+			}
+			if(rU.isSetDeviceMaxAmount()){
+				maxAmount = rU.getDeviceMaxAmount();
+				existAmount = true;
+			}
+			if(rU.isSetDeviceSecontAmount()){
+				maxAmountOutOfTimeRange = rU.getDeviceSecontAmount();
+				existOutOfTimeRangeAmount = true;
 			}
 			if(rU.isSetResidentialID())
 			{
 				address = rU.getResidentialID();
 			}
-			
-			if(rU.isSetDeviceSecontAmount())
-			{
-				amount = rU.getDeviceSecontAmount();
-				if(amount < maxAmountOutOfTimeRange){
-					maxAmountOutOfTimeRange = amount;
-				}
-				
-				existOutOfTimeRangeAmount = true;
-			}
-			
 		}
 		
 		if(!existOutOfTimeRangeAmount)
@@ -82,6 +73,5 @@ public class ConvertReducer extends Reducer<Text, DeviceUnit, Text, Mutation> {
 			
 			c.write(new Text(outputTableName), m1);
 		}
-		
 	}
 }

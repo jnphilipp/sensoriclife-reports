@@ -17,8 +17,11 @@ public class DeviceUnit implements Serializable, Writable {
 	private static final long serialVersionUID = 1L;
 
 	private String consumptionID = "";
+	
 	private float deviceAmount = 0;
 	private float deviceSecontAmount = 0;
+	private float deviceMinAmount = 0;
+	private float deviceMaxAmount = 0;
 	
 	private String counterType = "";
 	private String residentialID = "";
@@ -29,6 +32,8 @@ public class DeviceUnit implements Serializable, Writable {
 	private boolean isSetConsumptionID = false;
 	private boolean isSetDeviceAmount = false;
 	private boolean isSetDeviceSecontAmount = false;
+	private boolean isSetDeviceMinAmount = false;
+	private boolean isSetDeviceMaxAmount = false;
 	private boolean isSetCounterType = false;
 	private boolean isSetResidentialID = false;
 	private boolean isSetUserID = false;
@@ -138,6 +143,32 @@ public class DeviceUnit implements Serializable, Writable {
 		return isSetDeviceSecontAmount;
 	}
 	
+	public float getDeviceMinAmount() {
+		return deviceMinAmount;
+	}
+
+	public void setDeviceMinAmount(float deviceMinAmount) {
+		this.isSetDeviceMinAmount = true;
+		this.deviceMinAmount = deviceMinAmount;
+	}
+
+	public float getDeviceMaxAmount() {
+		return deviceMaxAmount;
+	}
+
+	public void setDeviceMaxAmount(float deviceMaxAmount) {
+		this.isSetDeviceMaxAmount = true;
+		this.deviceMaxAmount = deviceMaxAmount;
+	}
+
+	public boolean isSetDeviceMinAmount() {
+		return isSetDeviceMinAmount;
+	}
+
+	public boolean isSetDeviceMaxAmount() {
+		return isSetDeviceMaxAmount;
+	}
+	
 	public Object deepCopy(Object oldObj) throws Exception {
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
@@ -165,6 +196,8 @@ public class DeviceUnit implements Serializable, Writable {
 	public void write(DataOutput out) throws IOException {
 		out.writeLong(this.userID);
 		out.writeFloat(this.deviceAmount);
+		out.writeFloat(this.deviceMinAmount);
+		out.writeFloat(this.deviceMaxAmount);
 		out.writeFloat(this.deviceSecontAmount);
 		out.writeUTF(this.counterType);
 		out.writeUTF(this.consumptionID);
@@ -174,6 +207,8 @@ public class DeviceUnit implements Serializable, Writable {
 
 		out.writeBoolean(this.isSetConsumptionID);
 		out.writeBoolean(this.isSetDeviceAmount);
+		out.writeBoolean(this.isSetDeviceMinAmount);
+		out.writeBoolean(this.isSetDeviceMaxAmount);
 		out.writeBoolean(this.isSetDeviceSecontAmount);
 		out.writeBoolean(this.isSetCounterType);
 		out.writeBoolean(this.isSetUserID);
@@ -186,6 +221,8 @@ public class DeviceUnit implements Serializable, Writable {
 	public void readFields(DataInput in) throws IOException {
 		this.userID = in.readLong();
 		this.deviceAmount = in.readFloat();
+		this.deviceMinAmount = in.readFloat();
+		this.deviceMaxAmount = in.readFloat();
 		this.deviceSecontAmount = in.readFloat();
 		this.counterType = in.readUTF();
 		this.consumptionID = in.readUTF();
@@ -195,6 +232,8 @@ public class DeviceUnit implements Serializable, Writable {
 
 		this.isSetConsumptionID = in.readBoolean();
 		this.isSetDeviceAmount = in.readBoolean();
+		this.isSetDeviceMinAmount = in.readBoolean();
+		this.isSetDeviceMaxAmount = in.readBoolean();
 		this.isSetDeviceSecontAmount = in.readBoolean();
 		this.isSetCounterType = in.readBoolean();
 		this.isSetUserID = in.readBoolean();

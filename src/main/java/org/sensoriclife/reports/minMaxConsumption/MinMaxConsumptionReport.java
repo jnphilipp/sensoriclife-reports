@@ -320,7 +320,7 @@ public class MinMaxConsumptionReport {
 			Date date = new Date(key.getTimestamp());
 			Format format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 			
-			String timestamp = format.format(date).toString();;
+			String timestamp = format.format(date).toString();
 			
 			if(key.getColumnQualifier().toString().equals("amount"))//getColumnFamily().toString().equals("device"))
 			{

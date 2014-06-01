@@ -30,9 +30,9 @@ public class App {
 		if(test)
 		{
 			args = new String[2];
-			//args[0] = "-report" ; args[1] = "minMaxConsumption";
+			args[0] = "-report" ; args[1] = "minMaxConsumption";
 			//args[0] = "-report" ; args[1] = "yearConsumption";
-			args[0] = "-report" ; args[1] = "yearInvoice";
+			//args[0] = "-report" ; args[1] = "yearInvoice";
 			//args[0] = "-report" ; args[1] = "emptyResidentialUnitsConsumption";
 		}
 		
