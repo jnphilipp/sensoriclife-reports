@@ -20,7 +20,6 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 	private String residentialID = "";
 	private String consumptionID = "";
 	
-	private boolean wurdeGesetzt = false;
 	private boolean isSetMinAmount = false;
 	private boolean isSetMaxAmount = false;
 	private boolean isSetNextAmount = false;
