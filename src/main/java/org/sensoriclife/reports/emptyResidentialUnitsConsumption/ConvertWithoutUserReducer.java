@@ -15,18 +15,17 @@ public class ConvertWithoutUserReducer extends Reducer<Text, DeviceUnit, Text, M
 
 	public void reduce(Text key, Iterable<DeviceUnit> values,Context c) 
 			throws IOException, InterruptedException {
-	
+		
 		String counterType = key.toString();//.split("_")[1];
 		
 		String address = "";
-		float minAmountOutOfYear = Float.MAX_VALUE;
+		float maxAmountOutOfTimeRange = Float.MAX_VALUE;
 		float minAmount = Float.MAX_VALUE;
 		float maxAmount = Float.MIN_VALUE;
 		float amount = 0;
 		boolean existAmount = false;
-		boolean existOutOfYearAmount = false;
+		boolean existOutOfTimeRangeAmount = false;
 		boolean existUser = false;
-		
 		for(DeviceUnit rU : values)
 		{
 			if(rU.isSetDeviceAmount())
@@ -48,25 +47,26 @@ public class ConvertWithoutUserReducer extends Reducer<Text, DeviceUnit, Text, M
 			if(rU.isSetDeviceSecontAmount())
 			{
 				amount = rU.getDeviceSecontAmount();
-				if(amount < minAmountOutOfYear)
-					minAmountOutOfYear = amount;
+				if(amount < maxAmountOutOfTimeRange){
+					maxAmountOutOfTimeRange = amount;
+				}
 				
-				existOutOfYearAmount = true;
+				existOutOfTimeRangeAmount = true;
 			}
 			if(rU.isSetUserID())
 			{
 				existUser = true;
 			}
-			
 		}
 		
-		if(!existOutOfYearAmount)
+		if(!existOutOfTimeRangeAmount)
 		{
-			
 			amount = maxAmount - minAmount;
 		}
 		else
-			amount = maxAmount - minAmountOutOfYear;
+		{
+			amount = maxAmountOutOfTimeRange - minAmount;
+		}
 		
 		if(!address.equals("") && existAmount && !existUser && amount > 0)
 		{

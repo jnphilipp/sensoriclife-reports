@@ -10,7 +10,6 @@ import org.sensoriclife.world.DeviceUnit;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-
 public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
@@ -25,16 +24,13 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 			conf = c.getConfiguration();
 			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
 			long minTs = conf.getLong("minTimestamp", 0);
-			boolean onlyYear = conf.getBoolean("onlyYear", false);
-			long pastLimitation = conf.getLong("pastLimitation",Long.MIN_VALUE);
+			boolean onlyInTimeRange = conf.getBoolean("onlyInTimeRange", false);
 			
 			Long timestamp = k.getTimestamp();
 			
-			if (timestamp >= minTs && timestamp < maxTs) {
+			if (timestamp > minTs && timestamp <= maxTs) {
 				DeviceUnit flat = new DeviceUnit();
 				flat.setConsumptionID(consumptionID);
-				//flat.setTimeStamp(k.getTimestamp());
-				
 				
 				try {
 					flat.setDeviceAmount((Float)Helpers.toObject(v.get()));
@@ -43,13 +39,12 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 				
 				
 			}
-			else if(!onlyYear)
+			else if(!onlyInTimeRange)
 			{
-				if(timestamp < minTs && timestamp >= pastLimitation)
+				if(timestamp > maxTs)
 				{
 					DeviceUnit flat = new DeviceUnit();
 					flat.setConsumptionID(consumptionID);
-					//flat.setTimeStamp(k.getTimestamp());
 					
 					try {
 						flat.setDeviceSecontAmount((Float)Helpers.toObject(v.get()));

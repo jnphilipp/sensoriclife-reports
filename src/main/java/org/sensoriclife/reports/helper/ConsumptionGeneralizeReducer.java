@@ -31,6 +31,9 @@ public class ConsumptionGeneralizeReducer extends Reducer<Text, FloatWritable, T
 		String summaryObjectName = "";
 		
 		switch (identifier){
+			case 0:
+				summaryObjectName = "world";
+				break;
 			case 1:
 				summaryObjectName = "city";
 				break;

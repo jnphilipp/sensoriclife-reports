@@ -18,41 +18,23 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 	public static boolean test = true;
 	
 	public static void runConsumptionGeneralize(String[] args) throws Exception {
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * args[5] = -
-		 * args[6] = reportTimestamp
-		 * 
-		 */
-		
-		// run the map reduce job to read the edge table and populate the node
-		// table
 		ToolRunner.run(new Configuration(), new ConsumptionGeneralizeToBuildingReport(),args);
-
 	}
-	
 	@Override
 	public int run(String[] args) throws Exception {
 		
 		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = InstanceName
+		 * args[0] = InstanceName
+		 * args[1] = zooServers
 		 * args[2] = TableName
 		 * args[3] = UserName
 		 * args[4] = Password
-		 * args[5] = -
-		 * args[6] = reportTimestamp	  
+		 * args[5] = reportTimestamp	  
 		 */
 		
 		Configuration conf = new Configuration();
 		conf.setStrings("outputTableName", args[2]);
-		conf.setLong("reportTimestamp", new Long(args[6]));
+		conf.setLong("reportTimestamp", new Long(args[5]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConsumptionGeneralizeToBuildingReport.class.getName());
@@ -64,13 +46,13 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[1]);
+			AccumuloInputFormat.setMockInstance(job, args[0]); // Instanzname
+			AccumuloOutputFormat.setMockInstance(job, args[0]);
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
+			AccumuloInputFormat.setZooKeeperInstance(job, args[0], args[1]);
+			AccumuloOutputFormat.setZooKeeperInstance(job, args[0], args[1]);
 		}
 		
 		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password

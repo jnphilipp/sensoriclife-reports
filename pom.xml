@@ -4,7 +4,7 @@
 	<groupId>sensoriclife</groupId>
 	<artifactId>reports</artifactId>
 
-	<version>2.0.0</version>
+	<version>2.0.1</version>
 
 	<packaging>jar</packaging>
 
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>sensoriclife</groupId>
 			<artifactId>lib</artifactId>
-			<version>0.5.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -57,7 +57,6 @@
 			<version>2.4.0</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.apache.mrunit</groupId>
 			<artifactId>mrunit</artifactId>
 			<version>1.0.0</version>

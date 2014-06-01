@@ -14,7 +14,6 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
 		
-		
 		String consumptionID = k.getRow().toString();
 		String family = k.getColumnFamily().toString();
 		String qualifier = k.getColumnQualifier().toString();
@@ -25,16 +24,13 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 			conf = c.getConfiguration();
 			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
 			long minTs = conf.getLong("minTimestamp", 0);
-			boolean onlyYear = conf.getBoolean("onlyYear", false);
-			long pastLimitation = conf.getLong("pastLimitation",Long.MIN_VALUE);
+			boolean onlyInTimeRange = conf.getBoolean("onlyInTimeRange", false);
 			
 			Long timestamp = k.getTimestamp();
 			
-			if (timestamp >= minTs && timestamp < maxTs) {
+			if (timestamp > minTs && timestamp <= maxTs) {
 				DeviceUnit flat = new DeviceUnit();
 				flat.setConsumptionID(consumptionID);
-				//flat.setTimeStamp(k.getTimestamp());
-				
 				
 				try {
 					flat.setDeviceAmount((Float)Helpers.toObject(v.get()));
@@ -43,13 +39,12 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 				
 				
 			}
-			else if(!onlyYear)
+			else if(!onlyInTimeRange)
 			{
-				if(timestamp < minTs && timestamp >= pastLimitation)
+				if(timestamp > maxTs)
 				{
 					DeviceUnit flat = new DeviceUnit();
 					flat.setConsumptionID(consumptionID);
-					//flat.setTimeStamp(k.getTimestamp());
 					
 					try {
 						flat.setDeviceSecontAmount((Float)Helpers.toObject(v.get()));
@@ -58,7 +53,6 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 				}
 			}
 		}
-		
 		else if(family.equals("residential") && qualifier.equals("id"))
 		{
 			DeviceUnit flat = new DeviceUnit();

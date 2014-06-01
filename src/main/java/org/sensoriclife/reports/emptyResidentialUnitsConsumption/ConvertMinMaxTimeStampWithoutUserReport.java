@@ -4,12 +4,15 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.security.Authorizations;
+import org.apache.accumulo.core.util.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.Text;
@@ -23,69 +26,42 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 	public static boolean test = true;
 	
 	public static void runConvert(String[] args) throws Exception {
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = inputInstanceName
-		 * args[2] = inputTableName
-		 * args[3] = inputUserName
-		 * args[4] = inputPassword
-		 * 
-		 * args[5] = outputInstanceName
-		 * args[6] = outputTableName
-		 * args[7] = outputUserName
-		 * args[8] = outputPassword
-		 * 
-		 * args[9] = (date) timeStamp -> min
-		 * args[10] = (date) timeStamp -> max
-		 * args[11] = (boolean) onlyYear -> is true, when the compute inside the year
-		 * args[12] = (day;month;year) pastLimitation
-		 * args[13] = (long) reportTimestamp
-		 * Times: dd.MM.yyyy or
-		 * 		  dd.MM.yyyy kk:mm:ss
-		 */
-		
-		// run the map reduce job to read the edge table and populate the node
-		// table
 		ToolRunner.run(new Configuration(), new ConvertMinMaxTimeStampWithoutUserReport(),args);
-		
 	}
 	
 	@Override
 	public int run(String[] args) throws Exception {
 		
-		/*
-		 * args[0] = reportName
-		 * 
-		 * args[1] = inputInstanceName
+		/* 
+		 * args[0] = inputInstanceName
+		 * args[1] = inputZooServer
 		 * args[2] = inputTableName
 		 * args[3] = inputUserName
 		 * args[4] = inputPassword
 		 * 
 		 * args[5] = outputInstanceName
-		 * args[6] = outputTableName
-		 * args[7] = outputUserName
-		 * args[8] = outputPassword
+		 * args[6] = outputZooServer
+		 * args[7] = outputTableName
+		 * args[8] = outputUserName
+		 * args[9] = outputPassword
 		 * 
-		 * args[9] = (date) timeStamp -> min
-		 * args[10] = (date) timeStamp -> max
-		 * args[11] = (boolean) onlyYear -> is true, when the compute inside the year
-		 * args[12] = (day;month;year) pastLimitation
+		 * args[10] = (date) timeStamp -> min
+		 * args[11] = (date) timeStamp -> max
+		 * args[12] = (boolean) onlyInTimeRange -> is true, when the compute inside the timerange
 		 * args[13] = (long) reportTimestamp
-		 * 
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
 		Configuration conf = new Configuration();
-		conf.setStrings("outputTableName", args[6]);
-		conf.setBoolean("onlyYear", args[11].equals("true"));
+		conf.setStrings("outputTableName", args[7]);
+		conf.setBoolean("onlyInTimeRange", args[11].equals("true"));
 		conf.setLong("reportTimestamp", Long.parseLong(args[13]));
 		
 		try
 		{
-			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
-			Date d  = formatter.parse( args[9]);// day.month.year"
+			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
+			Date d  = formatter.parse( args[10]);// day.month.year"
 			conf.setLong("minTimestamp", d.getTime());
 		}
 		catch ( ParseException e )
@@ -93,17 +69,16 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 			try
 			{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
-				Date d  = formatter.parse( args[9]);// day.month.year hour:minut:second
+				Date d  = formatter.parse( args[10]);// day.month.year hour:minut:second
 				conf.setLong("minTimestamp", d.getTime());
-				System.out.println("minTimestamp: "+args[9]);
 			}
 			catch ( ParseException ee ) {}
 		}
 		
 		try
 		{
-			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy hh:mm:ss" );
-			Date d  = formatter.parse( args[10]);// day.month.year"
+			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
+			Date d  = formatter.parse( args[11]);// day.month.year"
 			conf.setLong("maxTimestamp", d.getTime());
 		}
 		catch ( ParseException e )
@@ -111,21 +86,12 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 			try
 			{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
-				Date d  = formatter.parse( args[10]);// day.month.year"
+				Date d  = formatter.parse( args[11]);// day.month.year"
 				conf.setLong("maxTimestamp", d.getTime());
 			}
 			catch ( ParseException ee ) {}
 		}
-		try
-		{
-			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
-			Date d  = formatter.parse( args[12]);// day.month.year"
-			conf.setLong("pastLimitation", d.getTime());
-		}
-		catch ( ParseException e ){}
 			
-		
-		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConvertMinMaxTimeStampWithoutUserReport.class.getName());
 
@@ -136,21 +102,26 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, args[1]); // Instanzname
+			AccumuloInputFormat.setMockInstance(job, args[0]); // Instanzname
 			AccumuloOutputFormat.setMockInstance(job, args[5]);
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[1], "zooserver-one,zooserver-two");
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[5], "zooserver-one,zooserver-two");
+			AccumuloInputFormat.setZooKeeperInstance(job, args[0], args[1]);
+			AccumuloOutputFormat.setZooKeeperInstance(job, args[5], args[6]);
 		}
 		
 		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
 		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
+		Set cols = new HashSet();
+		cols.add(new Pair(new Text("device"), new Text("amount")));
+		cols.add(new Pair(new Text("residential"), new Text("id")));
+		cols.add(new Pair(new Text("user"), new Text("id")));
+		AccumuloInputFormat.fetchColumns(job, cols);
 		
-		AccumuloOutputFormat.setConnectorInfo(job, args[7], new PasswordToken(args[8]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[6]);
+		AccumuloOutputFormat.setConnectorInfo(job, args[8], new PasswordToken(args[9]));
+		AccumuloOutputFormat.setDefaultTableName(job, args[7]);
 		AccumuloOutputFormat.setCreateTables(job, true);
 
 		job.setMapOutputKeyClass(Text.class);

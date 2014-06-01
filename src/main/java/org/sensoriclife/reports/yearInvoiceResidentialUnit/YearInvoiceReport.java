@@ -2,6 +2,7 @@ package org.sensoriclife.reports.yearInvoiceResidentialUnit;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,84 +37,88 @@ public class YearInvoiceReport {
 	
 	public static void runYearInvoice() throws Exception
 	{
-		String[] args = new String[13];
-		args[0] = "Report: YearInvoice"; //Name :)
-		args[1] = Config.getProperty("accumulo.name");//inputInstanceName
-		args[2] = Config.getProperty("accumulo.zooServers");//inputTableName
-		args[3] = Config.getProperty("accumulo.user");//inputUserName
-		args[4] = Config.getProperty("accumulo.password");//inputPassword
-		  
-		args[5] = Config.getProperty("accumulo.yearInvoice.outPutTable.name");//outputInstanceName
-		args[6] = Config.getProperty("accumulo.yearInvoice.outPutTable.zooServers");//outputTableName
-		args[7] = Config.getProperty("accumulo.yearInvoice.outPutTable.user");//outputUserName
-		args[8] = Config.getProperty("accumulo.yearInvoice.outPutTable.password");//outputPassword
-		   
-		args[9] = Config.getProperty("accumulo.yearInvoice.dateRange.untilDate");//(Times) timestamp	
-		args[10] = Config.getProperty("accumulo.yearInvoice.dataRange.onlyYear");//(boolean) onlyYear -> is false, when the compute inside the year
-		args[11] = Config.getProperty("accumulo.yearInvoice.outPutTable.pastLimitation");//(times dd.MM.yyyy) pastLimitation
-		args[12] = Config.getProperty("accumulo.yearInvoice.pricePerConsumption");
-		/* Times: dd.MM.yyyy or
-		 * 		  dd.MM.yyyy kk:mm:ss
-		 * */
+
 		if(test)
 		{
-			MockInstance inputMockInstance = new MockInstance(args[1]);
-			MockInstance outputMockInstance = new MockInstance(args[5]);
+			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
+			MockInstance outputMockInstance = new MockInstance(Config.getProperty("reports.yearInvoice.outputTable.name"));
 			
-			Connector inputConnector = inputMockInstance.getConnector(args[3], new PasswordToken(args[4]));
-			Connector outputConnector = outputMockInstance.getConnector(args[7], new PasswordToken(args[8]));
+			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
+			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
 			
-			inputConnector.tableOperations().create(args[2], false);
-			outputConnector.tableOperations().create(args[6], false);
+			inputConnector.tableOperations().create(Config.getProperty("accumulo.tableName"), false);
+			outputConnector.tableOperations().create(Config.getProperty("reports.yearInvoice.outputTable.tableName"), false);
 
 			// insert some test data
-			insertData(inputConnector, args[2]);
+			insertData(inputConnector, Config.getProperty("accumulo.tableName"));
 		}
 		
 		GregorianCalendar now = new GregorianCalendar(); 
 		long reportTimestamp = now.getTimeInMillis();
 		
-		String[] filterArgs = new String[13];
-		for(int i = 0; (i < args.length);i++)
-			filterArgs[i] = args[i];
-		filterArgs[12] = new Long(reportTimestamp).toString();
+		String[] jobArgs = new String[13];
+		jobArgs[0] = Config.getProperty("accumulo.name");//inputInstanceName
+		jobArgs[1] = Config.getProperty("accumulo.zooServers");//Server
+		jobArgs[2] = Config.getProperty("accumulo.tableName");//inputTableName	
+		jobArgs[3] = Config.getProperty("accumulo.user");//inputUserName
+		jobArgs[4] = Config.getProperty("accumulo.password");//inputPassword
+		
+		jobArgs[5] = Config.getProperty("reports.yearInvoice.outputTable.name");//OutputInstanceName
+		jobArgs[6] = Config.getProperty("reports.yearInvoice.outputTable.zooServers");//Server
+		jobArgs[7] = Config.getProperty("reports.yearInvoice.outputTable.tableName");//outputTableName	
+		jobArgs[8] = Config.getProperty("reports.yearInvoice.outputTable.user");//outputUserName
+		jobArgs[9] = Config.getProperty("reports.yearInvoice.outputTable.password");//outputPassword
+						
+		jobArgs[10] = Config.getProperty("reports.yearInvoice.dateRange.untilDate");
+		jobArgs[11] = Config.getProperty("reports.yearInvoice.dataRange.onlyInTimeRange");//in the TimeRange
+		
+		jobArgs[12] = new Long(reportTimestamp).toString();
 		
 		//first report: merge residentialID,consumptionID and Consumption -> filter timestamp
-		ConvertForAYearReport.runConvert(filterArgs);
+		ConvertForAYearReport.test=test;
+		ConvertForAYearReport.runConvert(jobArgs);
 		
 		//second report: consumption for a residentialUnits
-		String[] summeryArgs = new String[7];
-		summeryArgs[0] = args[0];
-		summeryArgs[1] = args[5];
-		summeryArgs[2] = args[6];
-		summeryArgs[3] = args[7];
-		summeryArgs[4] = args[8];
-		summeryArgs[5] = args[12];
-		summeryArgs[6] = new Long(reportTimestamp).toString();
+		jobArgs = new String[7];
+		jobArgs[0] = Config.getProperty("reports.yearInvoice.outputTable.name");
+		jobArgs[1] = Config.getProperty("reports.yearInvoice.outputTable.zooServers");
+		jobArgs[2] = Config.getProperty("reports.yearInvoice.outputTable.tableName");
+		jobArgs[3] = Config.getProperty("reports.yearInvoice.outputTable.user");
+		jobArgs[4] = Config.getProperty("reports.yearInvoice.outputTable.password");
+		jobArgs[5] = Config.getProperty("reports.yearInvoice.pricePerConsumption");
+		jobArgs[6] = new Long(reportTimestamp).toString();
 		
-		YearInvoiceComputeReport.runYearInvouce(summeryArgs);
+		YearInvoiceComputeReport.test=test;
+		YearInvoiceComputeReport.runYearInvouce(jobArgs);
 		
-		Accumulo.getInstance().connect(args[5]);
-		Accumulo.getInstance().addMutation(args[6], "YearInvoice", "report", "version", Helpers.toByteArray(reportTimestamp));
-		Accumulo.getInstance().flushBashWriter(args[6]);
+		if(test){
+			Accumulo.getInstance().connect(Config.getProperty("reports.yearInvoice.outputTable.name"));
+		}
+		else{
+			Accumulo.getInstance().connect(Config.getProperty("reports.yearInvoice.outputTable.name"),
+			Config.getProperty("reports.yearInvoice.outputTable.zooServers"),
+			Config.getProperty("reports.yearInvoice.outputTable.user"),
+			Config.getProperty("reports.yearInvoice.outputTable.password"));
+		}
+		Accumulo.getInstance().addMutation(Config.getProperty("reports.yearInvoice.outputTable.tableName"), "YearInvoice", "report", "version", Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().flushBashWriter(Config.getProperty("reports.yearInvoice.outputTable.tableName"));
 		Accumulo.getInstance().disconnect();
-		
 		/*
 		 * Test
 		 */
 		if(test)
 		{
-			MockInstance inputMockInstance = new MockInstance(args[1]);
-			MockInstance outputMockInstance = new MockInstance(args[5]);
+			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
+			MockInstance outputMockInstance = new MockInstance(Config.getProperty("reports.yearInvoice.outputTable.name"));
 			
-			Connector inputConnector = inputMockInstance.getConnector(args[3], new PasswordToken(args[4]));
-			Connector outputConnector = outputMockInstance.getConnector(args[7], new PasswordToken(args[8]));
+			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
+			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
 			
 			// print the inputtable
-			printTable(inputConnector, args[2]);
+			printTable(inputConnector, Config.getProperty("accumulo.tableName"));
 			System.out.println("############################################");
 			// print the results of mapreduce
-			printTable(outputConnector, args[6]);
+			printTable(outputConnector, Config.getProperty("reports.yearInvoice.outputTable.tableName"));
 		}
 	}
 	
@@ -228,43 +233,43 @@ public class YearInvoiceReport {
 				
 				
 				d = formatter.parse( "12.03.2012");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
 				mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(1))));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "13.03.2012");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
 				mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "14.03.2012");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
 				mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "13.04.2012");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
 				mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "13.10.2012");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
 				mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(5))));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "12.03.2013");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
 				mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(6))));
 				wr.addMutation(mutation);
 				
 				d = formatter.parse( "13.03.2013");
-				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wu"));
+				mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
 				//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
 				mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(7))));
 				wr.addMutation(mutation);
@@ -282,12 +287,17 @@ public class YearInvoiceReport {
 			Map.Entry<Key, Value> entry = iterator.next();
 			Key key = entry.getKey();
 			Value v = entry.getValue();
-			if(key.getColumnQualifier().toString().equals("amount") ||
-					key.getColumnQualifier().toString().equals("invoice"))//getColumnFamily().toString().equals("device"))
+			Date date = new Date(key.getTimestamp());
+			Format format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+			
+			String timestamp = format.format(date).toString();;
+			
+			if(key.getColumnQualifier().toString().equals("amount")|| (key.getColumnQualifier().toString().equals("invoice")))//getColumnFamily().toString().equals("device"))
 			{
 				try {
+					
 					System.out.println("Row: " + key.getRow() + " Fam: " + key.getColumnFamily() + " Qual: " + key.getColumnQualifier() +" Ts:" + 
-							key.getTimestamp() +  " Value: " + (Float) Helpers.toObject(v.get()));
+							timestamp +  " Value: " + (Float) Helpers.toObject(v.get()));
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -299,7 +309,7 @@ public class YearInvoiceReport {
 			else
 			{
 				System.out.println("Row: " + key.getRow() + " Fam: " + key.getColumnFamily() + " Qual: " + key.getColumnQualifier() +" Ts:" + 
-						key.getTimestamp() +  " Value: " + v);
+						timestamp +  " Value: " + v);
 			}
 		}
 	}	
