@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
+import org.sensoriclife.reports.consumptionInDaytime.ConsumptionInDaytimeReport;
 import org.sensoriclife.reports.emptyResidentialUnitsConsumption.EmptyResidentialUnitsConsumptionReport;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxConsumptionReport;
 import org.sensoriclife.reports.yearConsumption.YearConsumptionReport;
@@ -77,6 +78,11 @@ public class App {
 			case "emptyResidentialUnitsConsumption":
 				EmptyResidentialUnitsConsumptionReport.test=test;
 				EmptyResidentialUnitsConsumptionReport.runEmptyResidentialUnitsConsumption();
+				break;
+			case "5":
+			case "consumptionInDaytime":
+				ConsumptionInDaytimeReport.test=test;
+				ConsumptionInDaytimeReport.runReport();
 				break;
 			default:
 				Logger.info("Wrong report.");
