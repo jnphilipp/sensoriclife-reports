@@ -12,7 +12,6 @@ import org.apache.hadoop.io.Writable;
  * @version 0.0.1
  */
 public class ResidentialUnit implements Serializable, Writable, Comparable<ResidentialUnit> {
-
 	private static final long serialVersionUID = 1L;
 
 	private String consumptionID = "";

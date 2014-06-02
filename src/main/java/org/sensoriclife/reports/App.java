@@ -1,5 +1,6 @@
 package org.sensoriclife.reports;
 
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +9,7 @@ import org.sensoriclife.Logger;
 import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.reports.consumptionInDaytime.ConsumptionInDaytimeReport;
 import org.sensoriclife.reports.dayWithMaxConsumption.firstJob.DaysWithConsumptionReport;
-import org.sensoriclife.reports.dayWithMaxConsumption.secondJob.DayWithMaxConsumptionReport;
+import org.sensoriclife.reports.dayWithMaxConsumption.secondJob.DaysWithMaxConsumptionReport;
 import org.sensoriclife.reports.emptyResidentialUnitsConsumption.EmptyResidentialUnitsConsumptionReport;
 import org.sensoriclife.reports.minMaxConsumption.MinMaxConsumptionReport;
 import org.sensoriclife.reports.unusualRiseOfConsumption.firstJob.UnusualRiseOfConsumptionReport;
@@ -80,7 +81,7 @@ public class App {
 			case "6":
 			case "dayWithMaxConsumption":
 				accumulo = DaysWithConsumptionReport.runFirstJob();
-				DayWithMaxConsumptionReport.runSecondJob(accumulo);
+				DaysWithMaxConsumptionReport.runSecondJob(accumulo);
 				break;
 			case "7":
 			case "unusualRiseOfConsumption":

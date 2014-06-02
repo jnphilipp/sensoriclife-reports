@@ -2,6 +2,7 @@ package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
 import java.util.Calendar;
 
+
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;

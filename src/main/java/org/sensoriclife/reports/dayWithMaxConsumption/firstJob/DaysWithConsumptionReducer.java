@@ -27,11 +27,9 @@ public class DaysWithConsumptionReducer extends Reducer<IntWritable, Residential
 		ResidentialUnit wcFlat = new ResidentialUnit();
 		ResidentialUnit whFlat = new ResidentialUnit();
 		ResidentialUnit heFlat = new ResidentialUnit();
-		
+
 		Iterator<ResidentialUnit> valuesIt = values.iterator();
-
 		while (valuesIt.hasNext()) {
-
 			ResidentialUnit flat = valuesIt.next();
 			if (flat == null)
 				continue;
