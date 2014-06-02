@@ -34,20 +34,22 @@ public class ConsumptionInDaytimeReport {
 
 	public static void runReport() throws Exception {
 
-		String[] args = new String[13];
+		String[] args = new String[15];
 		args[0] = "Report: consumptionInDaytime";
 		args[1] = Config.getProperty("accumulo.name");
 		args[2] = Config.getProperty("accumulo.zooServers");
 		args[3] = Config.getProperty("accumulo.user");
 		args[4] = Config.getProperty("accumulo.password");
-		args[5] = Config.getProperty("accumulo.consumptionInDaytime.outPutTable.name");
-		args[6] = Config.getProperty("accumulo.consumptionInDaytime.outPutTable.zooServers");
-		args[7] = Config.getProperty("accumulo.consumptionInDaytime.outPutTable.user");
-		args[8] = Config.getProperty("accumulo.consumptionInDaytime.outPutTable.password");
-		args[9] = Config.getProperty("accumulo.consumptionInDaytime.dateRange.min");
-		args[10] = Config.getProperty("accumulo.consumptionInDaytime.dateRange.max");
-		args[11] = Config.getProperty("accumulo.consumptionInDaytime.district").trim();
+		args[5] = Config.getProperty("reports.consumptionInDaytime.outPutTable.name");
+		args[6] = Config.getProperty("reports.consumptionInDaytime.outPutTable.zooServers");
+		args[7] = Config.getProperty("reports.consumptionInDaytime.outPutTable.user");
+		args[8] = Config.getProperty("reports.consumptionInDaytime.outPutTable.password");
+		args[9] = Config.getProperty("reports.consumptionInDaytime.dateRange.min");
+		args[10] = Config.getProperty("reports.consumptionInDaytime.dateRange.max");
+		args[11] = Config.getProperty("reports.consumptionInDaytime.district").trim();
 		args[12] = String.valueOf(new GregorianCalendar().getTimeInMillis());
+		args[13] = Config.getProperty("reports.consumptionInDaytime.outputTable.tableName");
+		args[14] = Config.getProperty("accumulo.tableName");
 
 		if (test) {
 			MockInstance inputMockInstance = new MockInstance(args[1]);
@@ -58,8 +60,8 @@ public class ConsumptionInDaytimeReport {
 	
 		ConsumptionInDaytimeStarter.runConvert(args);
 
-		Accumulo.getInstance().connect(args[5]);
-		Accumulo.getInstance().flushBashWriter(args[6]);
+		Accumulo.getInstance().connect(args[5],args[6],args[7],args[8]);
+		Accumulo.getInstance().flushBashWriter(args[13]);
 		Accumulo.getInstance().disconnect();
 
 		/*
