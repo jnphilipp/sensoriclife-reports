@@ -22,7 +22,7 @@ import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.world.Consumption;
 
-public class DayWithMaxConsumptionReport extends Configured implements Tool {
+public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 
 	/**
 	 * runs the whole process of the second map reduce job, including
@@ -51,7 +51,7 @@ public class DayWithMaxConsumptionReport extends Configured implements Tool {
 		*/
 
 		String[] args = new String[0];
-		ToolRunner.run(new Configuration(), new DayWithMaxConsumptionReport(),
+		ToolRunner.run(new Configuration(), new DaysWithMaxConsumptionReport(),
 				args);
 
 		// print outputtable
@@ -78,12 +78,12 @@ public class DayWithMaxConsumptionReport extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 
 		Job job = Job.getInstance(getConf());
-		job.setJobName(DayWithMaxConsumptionReport.class.getName());
+		job.setJobName(DaysWithMaxConsumptionReport.class.getName());
 
 		job.setJarByClass(this.getClass());
 
-		job.setMapperClass(DayWithMaxConsumptionMapper.class);
-		job.setReducerClass(DayWithMaxConsumptionReducer.class);
+		job.setMapperClass(DaysWithMaxConsumptionMapper.class);
+		job.setReducerClass(DaysWithMaxConsumptionReducer.class);
 
 		AccumuloInputFormat.setMockInstance(job,
 				Config.getProperty("mockInstanceName"));

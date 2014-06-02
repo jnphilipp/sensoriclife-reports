@@ -1,4 +1,71 @@
 accumulo.name=NAME
 accumulo.zooServers=SERVERS
+accumulo.tableName=TABLENAME
 accumulo.user=USER
 accumulo.password=PASSWORD
+
+###### Report: MinMaxConsumption ####
+
+	#output Table values
+reports.minMaxConsumption.outputTable.name=NAME
+reports.minMaxConsumption.outputTable.zooServers=SERVERS
+reports.minMaxConsumption.outputTable.tableName=TABLENAME
+reports.minMaxConsumption.outputTable.user=USER
+reports.minMaxConsumption.outputTable.password=PASSWORD
+	
+	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+reports.minMaxConsumption.dateRange.min=DATE1		
+reports.minMaxConsumption.dateRange.max=DATE1	
+reports.minMaxConsumption.dataRange.onlyInTimeRage=BOOLEAN
+reports.minMaxConsumption.outPutTable.pastLimitation=DATE2 
+
+	#select Compute for ResidentialUnit or/and Building
+reports.minMaxConsumption.run.residentialUnit=BOOLEAN
+reports.minMaxConsumption.run.builiding=BOOLEAN
+
+###### Report: YearConsumption ####
+
+	#output Table values
+reports.yearConsumption.outputTable.name=NAME
+reports.yearConsumption.outputTable.zooServers=SERVERS
+reports.yearConsumption.outputTable.tableName=TABLENAME
+reports.yearConsumption.outputTable.user=USER
+reports.yearConsumption.outputTable.password=PASSWORD
+
+	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+reports.yearConsumption.dateRange.untilDate=DATE1		
+reports.yearConsumption.dataRange.onlyInTimeRage=BOOLEAN
+reports.yearConsumption.outPutTable.pastLimitation=DATE2 
+
+###### Report: YearInvoice  ####
+
+	#output Table values
+reports.yearInvoice.outputTable.name=NAME
+reports.yearInvoice.outputTable.zooServers=SERVERS
+reports.yearInvoice.outputTable.tableName=TABLENAME
+reports.yearInvoice.outputTable.user=USER
+reports.yearInvoice.outputTable.password=PASSWORD
+
+	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+reports.yearInvoice.dateRange.untilDate=DATE1		
+reports.yearInvoice.dataRange.onlyInTimeRage=BOOLEAN
+reports.yearInvoice.outPutTable.pastLimitation=DATE2 
+
+ 	#set price per Consumption | cp = [consumptionType]+";"+[price]
+ 	#                          | pricePerConsumption = [cp+";"]*[cp]?   
+reports.yearInvoice.pricePerConsumption=PRICEPERCONSUMTION
+
+###### Report: emptyResidentialUnitsConsumption  ####
+
+	#output Table values
+reports.emptyResidentialUnitsConsumption.outputTable.name=NAME
+reports.emptyResidentialUnitsConsumption.outputTable.zooServers=SERVERS
+reports.emptyResidentialUnitsConsumption.outputTable.tableName=TABLENAME
+reports.emptyResidentialUnitsConsumption.outputTable.user=USER
+reports.emptyResidentialUnitsConsumption.outputTable.password=PASSWORD
+	
+	#set Dates |DATE1 = [DD.MM.YYYY HH.MM.SS]|[DD.MM.YYYY] |DATE2 = [DD.MM.YYYY]
+reports.emptyResidentialUnitsConsumption.dateRange.min=DATE1		
+reports.emptyResidentialUnitsConsumption.dateRange.max=DATE2	
+reports.emptyResidentialUnitsConsumption.dataRange.onlyInTimeRage=BOOLEAN
+reports.emptyResidentialUnitsConsumption.outPutTable.pastLimitation=DATE3

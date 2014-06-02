@@ -2,7 +2,6 @@ package org.sensoriclife.reports.dayWithMaxConsumption.firstJob;
 
 import java.io.IOException;
 import java.util.Iterator;
-
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -16,23 +15,21 @@ import org.sensoriclife.world.ResidentialUnit;
  * @author marcel
  * 
  */
-public class DaysWithConsumptionReducer extends
-		Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
-
-	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,
-			Context c) throws IOException, InterruptedException {
-
+public class DaysWithConsumptionReducer extends Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
+	@Override
+	public void reduce(IntWritable key, Iterable<ResidentialUnit> values, Context c) throws IOException, InterruptedException {
 		double overallElecConsumption = 0;
 		double overallWaterColdConsumption = 0;
 		double overallWaterHotConsumption = 0;
 		double overallHeatingConsumption = 0;
-		
+
 		ResidentialUnit elecFlat = new ResidentialUnit();
 		ResidentialUnit wcFlat = new ResidentialUnit();
 		ResidentialUnit whFlat = new ResidentialUnit();
 		ResidentialUnit heFlat = new ResidentialUnit();
 		
 		Iterator<ResidentialUnit> valuesIt = values.iterator();
+
 		while (valuesIt.hasNext()) {
 
 			ResidentialUnit flat = valuesIt.next();

@@ -1,22 +1,25 @@
 package org.sensoriclife.world;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import org.apache.hadoop.io.Writable;
 
-/**
- *
- * @author marcel
- * @version 0.0.1
- */
-public class ResidentialUnit implements Serializable, Writable, Comparable<ResidentialUnit> {
-
+public class DeviceUnit implements Serializable, Writable {
 	private static final long serialVersionUID = 1L;
 
 	private String consumptionID = "";
-	private float deviceAmount = -1;
+	
+	private float deviceAmount = 0;
+	private float deviceSecontAmount = 0;
+	private float deviceMinAmount = 0;
+	private float deviceMaxAmount = 0;
+	
 	private String counterType = "";
 	private String residentialID = "";
 	private long userID = 0;
@@ -25,13 +28,16 @@ public class ResidentialUnit implements Serializable, Writable, Comparable<Resid
 
 	private boolean isSetConsumptionID = false;
 	private boolean isSetDeviceAmount = false;
+	private boolean isSetDeviceSecontAmount = false;
+	private boolean isSetDeviceMinAmount = false;
+	private boolean isSetDeviceMaxAmount = false;
 	private boolean isSetCounterType = false;
 	private boolean isSetResidentialID = false;
 	private boolean isSetUserID = false;
 	private boolean isSetUserResidential = false;
 	private boolean isSetTimeStamp = false;
 
-	public ResidentialUnit() {
+	public DeviceUnit() {
 	}
 
 	public String getConsumptionID() {
@@ -121,10 +127,75 @@ public class ResidentialUnit implements Serializable, Writable, Comparable<Resid
 		this.counterType = counterType;
 	}
 
+	public float getDeviceSecontAmount() {
+		return deviceSecontAmount;
+	}
+
+	public void setDeviceSecontAmount(float deviceSecontAmount) {
+		this.isSetDeviceSecontAmount = true;
+		this.deviceSecontAmount = deviceSecontAmount;
+	}
+
+	public boolean isSetDeviceSecontAmount() {
+		return isSetDeviceSecontAmount;
+	}
+	
+	public float getDeviceMinAmount() {
+		return deviceMinAmount;
+	}
+
+	public void setDeviceMinAmount(float deviceMinAmount) {
+		this.isSetDeviceMinAmount = true;
+		this.deviceMinAmount = deviceMinAmount;
+	}
+
+	public float getDeviceMaxAmount() {
+		return deviceMaxAmount;
+	}
+
+	public void setDeviceMaxAmount(float deviceMaxAmount) {
+		this.isSetDeviceMaxAmount = true;
+		this.deviceMaxAmount = deviceMaxAmount;
+	}
+
+	public boolean isSetDeviceMinAmount() {
+		return isSetDeviceMinAmount;
+	}
+
+	public boolean isSetDeviceMaxAmount() {
+		return isSetDeviceMaxAmount;
+	}
+	
+	public Object deepCopy(Object oldObj) throws Exception {
+		ObjectOutputStream oos = null;
+		ObjectInputStream ois = null;
+		try {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(bos);
+			// serialize and pass the object
+			oos.writeObject(oldObj);
+			oos.flush();
+			ByteArrayInputStream bin = new ByteArrayInputStream(
+					bos.toByteArray());
+			ois = new ObjectInputStream(bin);
+			// return the new object
+			return ois.readObject();
+		} catch (Exception e) {
+			System.out.println("Exception = " + e);
+			throw (e);
+		} finally {
+			oos.close();
+			ois.close();
+		}
+	}
+
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeLong(this.userID);
 		out.writeFloat(this.deviceAmount);
+		out.writeFloat(this.deviceMinAmount);
+		out.writeFloat(this.deviceMaxAmount);
+		out.writeFloat(this.deviceSecontAmount);
 		out.writeUTF(this.counterType);
 		out.writeUTF(this.consumptionID);
 		out.writeUTF(this.userResidential);
@@ -133,6 +204,9 @@ public class ResidentialUnit implements Serializable, Writable, Comparable<Resid
 
 		out.writeBoolean(this.isSetConsumptionID);
 		out.writeBoolean(this.isSetDeviceAmount);
+		out.writeBoolean(this.isSetDeviceMinAmount);
+		out.writeBoolean(this.isSetDeviceMaxAmount);
+		out.writeBoolean(this.isSetDeviceSecontAmount);
 		out.writeBoolean(this.isSetCounterType);
 		out.writeBoolean(this.isSetUserID);
 		out.writeBoolean(this.isSetResidentialID);
@@ -144,6 +218,9 @@ public class ResidentialUnit implements Serializable, Writable, Comparable<Resid
 	public void readFields(DataInput in) throws IOException {
 		this.userID = in.readLong();
 		this.deviceAmount = in.readFloat();
+		this.deviceMinAmount = in.readFloat();
+		this.deviceMaxAmount = in.readFloat();
+		this.deviceSecontAmount = in.readFloat();
 		this.counterType = in.readUTF();
 		this.consumptionID = in.readUTF();
 		this.userResidential = in.readUTF();
@@ -152,35 +229,13 @@ public class ResidentialUnit implements Serializable, Writable, Comparable<Resid
 
 		this.isSetConsumptionID = in.readBoolean();
 		this.isSetDeviceAmount = in.readBoolean();
+		this.isSetDeviceMinAmount = in.readBoolean();
+		this.isSetDeviceMaxAmount = in.readBoolean();
+		this.isSetDeviceSecontAmount = in.readBoolean();
 		this.isSetCounterType = in.readBoolean();
 		this.isSetUserID = in.readBoolean();
 		this.isSetResidentialID = in.readBoolean();
 		this.isSetUserResidential = in.readBoolean();
 		this.isSetTimeStamp = in.readBoolean();
-	}
-
-	@Override
-	public int compareTo(ResidentialUnit ru) {
-		if (ru.getConsumptionID().equals(getConsumptionID())
-				&& ru.getCounterType().equals(getCounterType())
-				&& ru.getDeviceAmount() == getDeviceAmount()
-				&& ru.getResidentialID().equals(getResidentialID())
-				&& ru.getTimeStamp() == getTimeStamp()
-				&& ru.getUserID() == getUserID()
-				&& ru.getUserResidential().equals(getUserResidential())) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
-	@Override
-	public String toString() {
-		String output = "residentialId: " + getResidentialID()
-				+ " consumptionId: " + getConsumptionID() + " counterType: "
-				+ getCounterType() + " deviceAmount: " + getDeviceAmount()
-				+ " timestamp: " + getTimeStamp() + " userId: " + getUserID()
-				+ " userResidential: " + getUserResidential();
-		return output;
 	}
 }

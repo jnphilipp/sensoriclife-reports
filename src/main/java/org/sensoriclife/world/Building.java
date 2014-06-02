@@ -7,17 +7,17 @@ public class Building implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
-	private ArrayList<ResidentialUnit> residentialUnits;
+	private ArrayList<DeviceUnit> residentialUnits;
 
 	public Building() {
-		residentialUnits = new ArrayList<ResidentialUnit>();
+		residentialUnits = new ArrayList<DeviceUnit>();
 	}
 
-	public ArrayList<ResidentialUnit> getResidentialUnits() {
+	public ArrayList<DeviceUnit> getResidentialUnits() {
 		return residentialUnits;
 	}
 
-	public void setResidentialUnits(ArrayList<ResidentialUnit> residentialUnits) {
+	public void setResidentialUnits(ArrayList<DeviceUnit> residentialUnits) {
 		this.residentialUnits = residentialUnits;
 	}
 

@@ -8,7 +8,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.world.Consumption;
 
-public class DayWithMaxConsumptionMapper extends
+public class DaysWithMaxConsumptionMapper extends
 		Mapper<Key, Value, IntWritable, Consumption> {
 
 	public void map(Key k, Value v, Context c) throws IOException,

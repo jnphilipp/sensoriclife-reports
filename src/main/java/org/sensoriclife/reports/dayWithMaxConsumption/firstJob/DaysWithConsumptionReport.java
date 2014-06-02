@@ -237,6 +237,7 @@ public class DaysWithConsumptionReport extends Configured implements Tool {
 				+ "_he", colFam, colQual, ts2, new Value("20".getBytes()));
 		mutation = accumulo.putToMutation(mutation, colFam2, colQual2, ts2,
 				new Value("1-2-0".getBytes()));
+
 		accumulo.addMutation(tableName, mutation);
 	}
 }

@@ -35,8 +35,8 @@ public class DayWithMaxConsumptionTest {
 	 */
 	@Before
 	public void setUp() {
-		DayWithMaxConsumptionMapper mapper = new DayWithMaxConsumptionMapper();
-		DayWithMaxConsumptionReducer reducer = new DayWithMaxConsumptionReducer();
+		DaysWithMaxConsumptionMapper mapper = new DaysWithMaxConsumptionMapper();
+		DaysWithMaxConsumptionReducer reducer = new DaysWithMaxConsumptionReducer();
 		mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer);
 
 		Config conf = Config.getInstance();

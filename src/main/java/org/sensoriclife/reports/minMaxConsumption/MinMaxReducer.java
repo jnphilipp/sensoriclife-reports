@@ -1,14 +1,14 @@
 package org.sensoriclife.reports.minMaxConsumption;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.util.Helpers;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -16,70 +16,67 @@ import org.sensoriclife.world.ResidentialUnit;
  * 
  */
 public class MinMaxReducer extends
-		Reducer<Text, ResidentialUnit, Text, Mutation> {
+		Reducer<Text, DeviceUnit, Text, Mutation> {
 
-	public void reduce(Text key, Iterable<ResidentialUnit> values, Context c)
-			throws IOException, InterruptedException {
-
-		ArrayList<ResidentialUnit> residentials = new ArrayList<ResidentialUnit>();
-
-		float min = Float.MAX_VALUE;
-		String minConID = "";
-		String minResID = "";
-		long minTimeStamp = 0;
-		float max = Float.MIN_VALUE;
-		String maxConID = "";
-		String maxResID = "";
-		long maxTimeStamp = 0;
-
-		for (ResidentialUnit value : values) {
-			if (value.isSetDeviceAmount()) {
-				if (value.getDeviceAmount() < min) {
-					minConID = value.getConsumptionID();
-					min = value.getDeviceAmount();
-					minTimeStamp = value.getTimeStamp();
-				}
-
-				if (value.getDeviceAmount() > max) {
-					maxConID = value.getConsumptionID();
-					max = value.getDeviceAmount();
-					maxTimeStamp = value.getTimeStamp();
-				}
-			}
-			if (value.isSetResidentialID()) {
-				ResidentialUnit res = new ResidentialUnit();
-				res.setConsumptionID(value.getConsumptionID());
-				res.setResidentialID(value.getResidentialID());
-				residentials.add(res);
-			}
-		}
-
-		for (ResidentialUnit value : residentials) {
-			if (value.getConsumptionID().equals(minConID))
-				minResID = value.getResidentialID();
-
-			if (value.getConsumptionID().equals(maxConID))
-				maxResID = value.getResidentialID();
-		}
-
-		Mutation m1 = new Mutation(key);
-
-		// write minimum/maximum
-		m1.put("min", "residentialID", minTimeStamp,
-				new Value(minResID.getBytes()));
-		m1.put("min", "amount", minTimeStamp, new Value(new Float(min)
-				.toString().getBytes()));
-		m1.put("max", "residentialID", maxTimeStamp,
-				new Value(maxResID.getBytes()));
-		m1.put("max", "amount", maxTimeStamp, new Value(new Float(max)
-				.toString().getBytes()));
-
+	public void reduce(Text key, Iterable<DeviceUnit> values,
+			Context c) throws IOException, InterruptedException {
+		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
-		String outputTableName = conf.getStrings("outputTableName",
-				"MinMaxTable")[0];
+		String outputTableName = conf.getStrings("outputTableName","MinMaxTable")[0];
+		int selector = conf.getInt("selectModus", 0);
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
+		String qualifierName = "";
+		
+		
+		float min = Float.MAX_VALUE;
+		String minResID = "";
+		float max = Float.MIN_VALUE;
+		String maxResID = "";
 
-		c.write(new Text(outputTableName), m1);
 
+		for(DeviceUnit value:values)
+		{
+			if(min > value.getDeviceAmount())
+			{
+				min = value.getDeviceAmount();
+				minResID = value.getResidentialID();
+			}
+			if(max < value.getDeviceAmount())
+			{
+				max = value.getDeviceAmount();
+				maxResID = value.getResidentialID();
+			}
+		}
+		
+		if(selector != 0)
+		{
+			if(selector == 5)
+				qualifierName = "residentialUnit";
+			if(selector == 4)
+				qualifierName = "building";
+			
+			Mutation m1 = new Mutation(key+"_"+qualifierName);
+			
+			// write minimum/maximum
+			if(reportTimestamp != 0)
+			{
+				m1.put("min", qualifierName,reportTimestamp,new Value(minResID.getBytes()));
+				m1.put("min", "amount",reportTimestamp,new Value(Helpers.toByteArray(min)));
+				m1.put("max", qualifierName,reportTimestamp,new Value(maxResID.getBytes()));
+				m1.put("max", "amount",reportTimestamp,new Value(Helpers.toByteArray(max)));
+			}
+			else
+			{
+				m1.put("min", qualifierName,new Value(minResID.getBytes()));
+				m1.put("min", "amount",new Value(Helpers.toByteArray(min)));
+				m1.put("max", qualifierName,new Value(maxResID.getBytes()));
+				m1.put("max", "amount",new Value(Helpers.toByteArray(max)));
+			}
+				
+				
+		
+			c.write(new Text(outputTableName), m1);
+		}
 	}
 }

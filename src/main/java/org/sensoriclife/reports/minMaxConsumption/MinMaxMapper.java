@@ -7,7 +7,8 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.sensoriclife.world.ResidentialUnit;
+import org.sensoriclife.util.Helpers;
+import org.sensoriclife.world.DeviceUnit;
 
 /**
  * 
@@ -15,43 +16,38 @@ import org.sensoriclife.world.ResidentialUnit;
  *
  */
 public class MinMaxMapper extends
-		Mapper<Key, Value, Text, ResidentialUnit> {
+		Mapper<Key, Value, Text, DeviceUnit> {
 
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
-
-		String consumptionID = k.getRow().toString();
-		String family = k.getColumnFamily().toString();
-		String qualifier = k.getColumnQualifier().toString();
-			
-		if(family.equals("device") && qualifier.equals("amount"))
+		
+		Configuration conf = new Configuration();
+		conf = c.getConfiguration();
+		int selector = conf.getInt("selectModus", 0);
+		long timestamp = k.getTimestamp();
+		long reportTimestamp = conf.getLong("reportTimestamp", 0);
+		
+		if((timestamp == reportTimestamp)|| (reportTimestamp == 0))
 		{
-			Configuration conf = new Configuration();
-			conf = c.getConfiguration();
-			long maxTs = conf.getLong("maxTimestamp", Long.MAX_VALUE);
-			long minTs = conf.getLong("minTimestamp", 0);
+			int rowIDindicator = k.getRow().toString().split("_").length;
 			
-			Long timestamp = k.getTimestamp();
-			
-			if (timestamp >= minTs && timestamp <= maxTs) {
-				String counterType = consumptionID.split("_")[1];
-				ResidentialUnit flat = new ResidentialUnit();
-				flat.setConsumptionID(consumptionID);
-				flat.setTimeStamp(k.getTimestamp());
-				flat.setDeviceAmount(Float.parseFloat(v.toString()));
+			if(rowIDindicator == 2)
+			{
+				int resIDindicator = k.getRow().toString().split("_")[0].split("-").length;
 				
-				c.write(new Text(counterType),flat);
+				if(resIDindicator == selector)
+				{
+					String counterType = k.getRow().toString().split("_")[1];
+					String resID = k.getRow().toString().split("_")[0];
+					
+					DeviceUnit rU = new DeviceUnit();
+					try {
+						rU.setDeviceAmount((float) Helpers.toObject(v.get()));
+						rU.setResidentialID(resID);
+						c.write(new Text(counterType),rU);
+					} catch (ClassNotFoundException e) {}
+				}
 			}
 		}
-		else if(family.equals("residential") && qualifier.equals("id"))
-		{
-			String counterType = consumptionID.split("_")[1];
-			ResidentialUnit flat = new ResidentialUnit();
-			flat.setConsumptionID(consumptionID);
-			flat.setResidentialID(v.toString());
-			c.write(new Text(counterType),flat);
-		}	
-		
 	}
-
 }

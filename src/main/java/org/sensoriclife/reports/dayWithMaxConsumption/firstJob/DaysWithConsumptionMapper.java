@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
@@ -12,9 +11,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.Config;
 import org.sensoriclife.world.ResidentialUnit;
 
-public class DaysWithConsumptionMapper extends
-		Mapper<Key, Value, IntWritable, ResidentialUnit> {
-
+public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, ResidentialUnit> {
+	@Override
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 		
@@ -45,5 +43,4 @@ public class DaysWithConsumptionMapper extends
 			
 		}
 	}
-
 }

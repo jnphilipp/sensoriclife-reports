@@ -22,7 +22,7 @@ import org.sensoriclife.world.Consumption;
  * @author marcel
  * 
  */
-public class DayWithMaxConsumptionReducer extends
+public class DaysWithMaxConsumptionReducer extends
 		Reducer<IntWritable, Consumption, Text, Mutation> {
 
 	public void reduce(IntWritable key, Iterable<Consumption> values, Context c)
