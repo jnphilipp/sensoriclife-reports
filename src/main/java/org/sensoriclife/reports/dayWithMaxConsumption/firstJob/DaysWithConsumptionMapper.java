@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.sensoriclife.Config;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, ResidentialUnit> {
@@ -16,9 +18,19 @@ public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, R
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 		
-		String consumptionID = k.getRow().toString();
-		String family = k.getColumnFamily().toString();
-		String qualifier = k.getColumnQualifier().toString();
+		String consumptionID = null;
+		String family = null;
+		String qualifier = null;
+	//try {
+			consumptionID = k.getRow().toString();
+			family = k.getColumnFamily().toString();
+			qualifier = k.getColumnQualifier().toString();
+//			consumptionID = (String) Helpers.toObject(k.getRow().toString().getBytes());
+//			family = (String) Helpers.toObject(k.getColumnFamily().toString().getBytes());
+//			qualifier = (String) Helpers.toObject(k.getColumnQualifier().toString().getBytes());
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
 		Long timestamp = k.getTimestamp();
 			
 		if(family.equals("device") && qualifier.equals("amount"))
@@ -32,6 +44,11 @@ public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, R
 				flat.setConsumptionID(consumptionID);
 				flat.setTimeStamp(k.getTimestamp());
 				flat.setDeviceAmount(Float.parseFloat(v.toString()));
+//				try {
+//					flat.setDeviceAmount((float) Helpers.toObject(v.toString().getBytes()));
+//				} catch (ClassNotFoundException e) {
+//					e.printStackTrace();
+//				}
 				flat.setCounterType(counterType);
 				
 				Timestamp ts = new Timestamp(timestamp);

@@ -57,7 +57,6 @@ public class DaysWithConsumptionReducer extends
 		}
 
 		Mutation m = new Mutation(String.valueOf(key));
-
 		m.put("el", "amount", elecFlat.getTimeStamp(),
 				String.valueOf(overallElecConsumption));
 		m.put("wc", "amount", wcFlat.getTimeStamp(),
@@ -66,6 +65,16 @@ public class DaysWithConsumptionReducer extends
 				String.valueOf(overallWaterHotConsumption));
 		m.put("he", "amount", heFlat.getTimeStamp(),
 				String.valueOf(overallHeatingConsumption));
+		
+//		Mutation m = new Mutation(Helpers.toByteArray(String.valueOf(key)));
+//		m.put(Helpers.toByteArray("el"), Helpers.toByteArray("amount"), elecFlat.getTimeStamp(),
+//				Helpers.toByteArray(String.valueOf(overallElecConsumption)));
+//		m.put(Helpers.toByteArray("wc"), Helpers.toByteArray("amount"), wcFlat.getTimeStamp(),
+//				Helpers.toByteArray(String.valueOf(overallWaterColdConsumption)));
+//		m.put(Helpers.toByteArray("wh"), Helpers.toByteArray("amount"), whFlat.getTimeStamp(),
+//				Helpers.toByteArray(String.valueOf(overallWaterHotConsumption)));
+//		m.put(Helpers.toByteArray("he"), Helpers.toByteArray("amount"), heFlat.getTimeStamp(),
+//				Helpers.toByteArray(String.valueOf(overallHeatingConsumption)));
 
 		String outputTableName = Config
 				.getProperty("report.daysWithConsumption.outputTableName");
