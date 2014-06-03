@@ -26,6 +26,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.sensoriclife.Config;
+import org.sensoriclife.Logger;
 import org.sensoriclife.db.Accumulo;
 import org.apache.hadoop.io.Text;
 import org.sensoriclife.reports.helper.ConsumptionGeneralizeReport;
@@ -36,19 +37,21 @@ public class MinMaxConsumptionReport {
 	
 	public static boolean test = true;
 	
-	public static void runMinMaxConsumption() throws Exception{
+	public static boolean runMinMaxConsumption() throws Exception{
 			
+		Map<String, String> confs = Config.toMap();
+		
 		if(test)
 		{
 			
 			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
-			MockInstance outputMockInstance = new MockInstance(Config.getProperty("reports.minMaxConsumption.outputTable.name"));
+			MockInstance outputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
 			
 			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
 			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
 			
 			inputConnector.tableOperations().create(Config.getProperty("accumulo.tableName"),false);
-			outputConnector.tableOperations().create(Config.getProperty("reports.minMaxConsumption.outputTable.tableName"), false);
+			//outputConnector.tableOperations().create(Config.getProperty("reports.minMaxConsumption.outputTable.tableName"), false);
 			
 			// insert some test data
 			insertData(inputConnector, Config.getProperty("accumulo.tableName"));
@@ -58,31 +61,30 @@ public class MinMaxConsumptionReport {
 		GregorianCalendar now = new GregorianCalendar(); 
 		long reportTimestamp = now.getTimeInMillis();
 		
-		String[] jobArgs = new String[14];
-		jobArgs[0] = Config.getProperty("accumulo.name");//inputInstanceName
-		jobArgs[1] = Config.getProperty("accumulo.zooServers");//Server
-		jobArgs[2] = Config.getProperty("accumulo.tableName");//inputTableName	
-		jobArgs[3] = Config.getProperty("accumulo.user");//inputUserName
-		jobArgs[4] = Config.getProperty("accumulo.password");//inputPassword
+		String[] jobArgs = new String[6];
+		if(confs.containsKey("accumulo.tableName")){
+			jobArgs[0] = confs.get("accumulo.tableName");}
+		else{Logger.error("ConfigError: accumulo.tableName doesn't exist");return false;}
+		if(confs.containsKey("reports.minMaxConsumption.outputTable.tableName")){
+			jobArgs[1] = confs.get("reports.minMaxConsumption.outputTable.tableName");}
+		else{Logger.error("ConfigError: reports.minMaxConsumption.outputTable.tableName doesn't exist");return false;}
+		if(confs.containsKey("reports.minMaxConsumption.dateRange.min")){
+			jobArgs[2] = confs.get("reports.minMaxConsumption.dateRange.min");}
+		else{jobArgs[2] = "";}
+		if(confs.containsKey("reports.minMaxConsumption.dateRange.max")){
+			jobArgs[3] = confs.get("reports.minMaxConsumption.dateRange.max");}
+		else{jobArgs[3] = "";}
+		if(confs.containsKey("reports.minMaxConsumption.dataRange.onlyInTimeRange")){
+			jobArgs[4] = confs.get("reports.minMaxConsumption.dataRange.onlyInTimeRange");}
+		else{jobArgs[4] = "false";}
+		jobArgs[5] = new Long(reportTimestamp).toString();
 		
-		jobArgs[5] = Config.getProperty("reports.minMaxConsumption.outputTable.name");//OutputInstanceName
-		jobArgs[6] = Config.getProperty("reports.minMaxConsumption.outputTable.zooServers");//Server
-		jobArgs[7] = Config.getProperty("reports.minMaxConsumption.outputTable.tableName");//outputTableName	
-		jobArgs[8] = Config.getProperty("reports.minMaxConsumption.outputTable.user");//outputUserName
-		jobArgs[9] = Config.getProperty("reports.minMaxConsumption.outputTable.password");//outputPassword
-						
-		jobArgs[10] = Config.getProperty("reports.minMaxConsumption.dateRange.min");//minTimestamp
-		jobArgs[11] = Config.getProperty("reports.minMaxConsumption.dateRange.max");//maxTimeStamp
-		jobArgs[12] = Config.getProperty("reports.minMaxConsumption.dataRange.onlyInTimeRange");//in the TimeRange
-		
-		jobArgs[13] = new Long(reportTimestamp).toString();
-	
 		//first report: merge residentialID,consumptionID and Consumption -> filter timestamp
 		ConvertMinMaxTimeStampReport.test = test;
 		ConvertMinMaxTimeStampReport.runConvert(jobArgs);
 		
 		//second report: consumption for a residentialUnits
-		if(Config.getProperty("reports.minMaxConsumption.run.residentialUnit").equals("true"))
+		/*if(Config.getProperty("reports.minMaxConsumption.run.residentialUnit").equals("true"))
 		{
 			jobArgs = new String[7];
 			jobArgs[0] = Config.getProperty("reports.minMaxConsumption.outputTable.name");//OutputInstanceName
@@ -119,19 +121,20 @@ public class MinMaxConsumptionReport {
 			jobArgs[1] = new Long(reportTimestamp).toString();
 			MinMaxReport.test=test;
 			MinMaxReport.runMinMax(jobArgs);
-		}
+		}*/
 		
 		if(test){
-			Accumulo.getInstance().connect(Config.getProperty("reports.minMaxConsumption.outputTable.name"));
+			Accumulo.getInstance().connect(Config.getProperty("accumulo.name"));
 		}
 		else{
-			Accumulo.getInstance().connect(Config.getProperty("reports.minMaxConsumption.outputTable.name"),
-					Config.getProperty("reports.minMaxConsumption.outputTable.zooServers"),
-					Config.getProperty("reports.minMaxConsumption.outputTable.user"),
-					Config.getProperty("reports.minMaxConsumption.outputTable.password"));
+			Accumulo.getInstance().connect(confs.get("accumulo.name"),
+					confs.get("accumulo.zooServers"),
+					confs.get("accumulo.user"),
+					confs.get("accumulo.password"));
 		}
-		Accumulo.getInstance().addMutation(Config.getProperty("reports.minMaxConsumption.outputTable.tableName"), "MinMaxConsumption", "report", "version", Helpers.toByteArray(reportTimestamp));
-		Accumulo.getInstance().flushBashWriter(Config.getProperty("reports.minMaxConsumption.outputTable.tableName"));
+		
+		Accumulo.getInstance().addMutation(confs.get("reports.minMaxConsumption.outputTable.tableName"), Helpers.toByteArray("MinMaxConsumption"), Helpers.toByteArray("report"), Helpers.toByteArray("version"), Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().flushBashWriter(confs.get("reports.minMaxConsumption.outputTable.tableName"));
 		Accumulo.getInstance().disconnect();
 		/*
 		 * Test
@@ -139,7 +142,7 @@ public class MinMaxConsumptionReport {
 		if(test)
 		{
 			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
-			MockInstance outputMockInstance = new MockInstance(Config.getProperty("reports.minMaxConsumption.outputTable.name"));
+			MockInstance outputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
 			
 			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
 			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
@@ -150,6 +153,8 @@ public class MinMaxConsumptionReport {
 			// print the results of mapreduce
 			printTable(outputConnector, Config.getProperty("reports.minMaxConsumption.outputTable.tableName"));
 		}
+		
+		return true;
 	}
 	
 	public static void insertData(Connector conn, String tableName)
@@ -163,145 +168,125 @@ public class MinMaxConsumptionReport {
 		int consumptionId = 1;
 		DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
 		
-		Text colFam = new Text("device");
-		Text colQual = new Text("amount");
-		Text colFam2 = new Text("residential");
-		Text colQual2 = new Text("id");
+		byte[] colFam = Helpers.toByteArray("device");
+		byte[] colQual = Helpers.toByteArray("amount");
+		byte[] colFam2 = Helpers.toByteArray("residential");
+		byte[] colQual2 = Helpers.toByteArray("id");
 		ColumnVisibility colVis = new ColumnVisibility();// "public");
 		// long timestamp = System.currentTimeMillis();
 		
 		Float floatValue = new Float(1);
 		Date d = formatter.parse( "12.03.2012");
-		Value value = new Value(Helpers.toByteArray(floatValue));
 		//mutation with consumptionId as rowId
-		Mutation mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		mutation.put(colFam, colQual, colVis, d.getTime(), value);
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		Mutation mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(), Helpers.toByteArray(floatValue));
+		mutation.put(colFam2, colQual2, colVis, 2, Helpers.toByteArray("1-1-1-1-1"));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(2)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "14.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(3)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.04.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(4)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.10.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(5))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(5)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "12.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(6))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(6)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(7))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_el"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(7)));
 		wr.addMutation(mutation);
 		
 		
 		
 		d = formatter.parse( "12.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-2".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(1))));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam2, colQual2, colVis, 2,Helpers.toByteArray("1-1-1-1-2"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(1)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(2)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "14.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(3)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.04.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(4)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.10.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(10))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(10)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "12.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(13))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(13)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId+1) + "_el"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(15))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId+1) + "_el"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(15)));
 		wr.addMutation(mutation);
 		
 		
 		
 		d = formatter.parse( "12.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(1))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(1)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(2))));
-		mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-1".getBytes()));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(2)));
+		mutation.put(colFam2, colQual2, colVis, 2,Helpers.toByteArray("1-1-1-1-1"));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "14.03.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-3".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(3))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(3)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.04.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-4".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(4))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(4)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.10.2012");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, colVis, d.getTime(),new Value(Helpers.toByteArray(new Float(5))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, colVis, d.getTime(),Helpers.toByteArray(new Float(5)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "12.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-5".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(6))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(6)));
 		wr.addMutation(mutation);
 		
 		d = formatter.parse( "13.03.2013");
-		mutation = new Mutation(new Text(String.valueOf(consumptionId) + "_wk"));
-		//mutation.put(colFam2, colQual2, colVis, 2,new Value("1-1-1-1-7".getBytes()));
-		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),new Value(Helpers.toByteArray(new Float(7))));
+		mutation = new Mutation(Helpers.toByteArray(String.valueOf(consumptionId) + "_wc"));
+		mutation.put(colFam, colQual, new ColumnVisibility(), d.getTime(),Helpers.toByteArray(new Float(7)));
 		wr.addMutation(mutation);
 		
 		wr.close();	
@@ -326,7 +311,7 @@ public class MinMaxConsumptionReport {
 			{
 				try {
 					
-					System.out.println("Row: " + key.getRow() + " Fam: " + key.getColumnFamily() + " Qual: " + key.getColumnQualifier() +" Ts:" + 
+					System.out.println("Row: " + (String) Helpers.toObject(key.getRow().getBytes()) + " Fam: " + (String) Helpers.toObject(key.getColumnFamily().getBytes()) + " Qual: " + (String) Helpers.toObject(key.getColumnQualifier().getBytes()) +" Ts:" + 
 							timestamp +  " Value: " + (Float) Helpers.toObject(v.get()));
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -338,8 +323,16 @@ public class MinMaxConsumptionReport {
 			}
 			else
 			{
-				System.out.println("Row: " + key.getRow() + " Fam: " + key.getColumnFamily() + " Qual: " + key.getColumnQualifier() +" Ts:" + 
-						timestamp +  " Value: " + v);
+				try {
+					System.out.println("Row: " + (String) Helpers.toObject(key.getRow().getBytes()) + " Fam: " + (String) Helpers.toObject(key.getColumnFamily().getBytes()) + " Qual: " + (String) Helpers.toObject(key.getColumnQualifier().getBytes()) +" Ts:" + 
+							timestamp +  " Value: " +  Helpers.toObject(v.get()));
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}	

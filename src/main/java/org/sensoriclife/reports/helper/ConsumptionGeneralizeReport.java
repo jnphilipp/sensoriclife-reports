@@ -16,6 +16,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.util.Helpers;
 
 
 
@@ -73,7 +74,7 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 		//Filter
 		Set cols = new HashSet();
 		if(args[5].equals("6")){
-			cols.add(new Pair(new Text("device"), new Text("amount")));
+			cols.add(new Pair(new Text(Helpers.toByteArray("device")), new Text(Helpers.toByteArray("amount"))));
 		}
 		else if(args[5].equals("5")){
 			cols.add(new Pair(new Text("residentialUnit"), new Text("amount")));

@@ -18,7 +18,7 @@ public class ConvertReducer extends Reducer<Text, DeviceUnit, Text, Mutation> {
 	public void reduce(Text key, Iterable<DeviceUnit> values,Context c) 
 			throws IOException, InterruptedException {
 	
-		String counterType = key.toString();//.split("_")[1];
+		String counterType = key.toString();
 		
 		String address = "";
 		float maxAmountOutOfTimeRange = Float.MAX_VALUE;
@@ -62,14 +62,14 @@ public class ConvertReducer extends Reducer<Text, DeviceUnit, Text, Mutation> {
 		{
 			Configuration conf = new Configuration();
 			conf = c.getConfiguration();
-			String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
+			String outputTableName = conf.getStrings("outputTableName","OutpuTable")[0];
 			long reportTimestamp = conf.getLong("reportTimestamp", 0);
 			
-			Mutation m1 = new Mutation(address+"_"+counterType);
+			Mutation m1 = new Mutation(Helpers.toByteArray(address+"_"+counterType));
 			if(reportTimestamp != 0)
-				m1.put("device", "amount",new ColumnVisibility(),reportTimestamp,new Value( Helpers.toByteArray(amount)));	
+				m1.put(Helpers.toByteArray("device"), Helpers.toByteArray("amount"),new ColumnVisibility(),reportTimestamp,Helpers.toByteArray(amount));	
 			else
-				m1.put("device", "amount",new Value( Helpers.toByteArray(amount)));	
+				m1.put(Helpers.toByteArray("device"), Helpers.toByteArray("amount"),Helpers.toByteArray(amount));	
 			
 			c.write(new Text(outputTableName), m1);
 		}

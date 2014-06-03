@@ -27,6 +27,13 @@ public class App {
 	public static boolean test = false;
 
 	public static void main(String[] args) throws Exception {
+		
+		if(test){
+			args = new String[2];
+			args[0] = "-report";
+			args[1] = "1";
+		}
+		
 		Logger.getInstance();
 		Logger.info("SensoricLife - reports");
 

@@ -29,9 +29,14 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 	
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
 		
-		consumptionID = k.getRow().toString();
-		String family = k.getColumnFamily().toString();
-		String qualifier = k.getColumnQualifier().toString();
+		String family = "";
+		String qualifier = "";
+		try {
+			consumptionID = (String) Helpers.toObject(k.getRow().getBytes());
+			family = (String) Helpers.toObject(k.getColumnFamily().getBytes());
+			qualifier = (String) Helpers.toObject(k.getColumnQualifier().getBytes());
+		} catch (ClassNotFoundException e1) {}
+		
 		
 		if(rowID.equals("")){
 			rowID = consumptionID;
@@ -103,9 +108,11 @@ public class ConvertMapper extends Mapper<Key, Value, Text, DeviceUnit> {
 		}
 		
 		else if(family.equals("residential") && qualifier.equals("id"))
-		{
-			isSetResidentialID = true;
-			residentialID = v.toString();
+		{	
+			try {
+				residentialID = (String) Helpers.toObject(v.get());
+				isSetResidentialID = true;
+			} catch (ClassNotFoundException e) {}
 		}	
 	}
 	
