@@ -15,9 +15,11 @@ import org.sensoriclife.world.ResidentialUnit;
  * @author marcel
  * 
  */
-public class DaysWithConsumptionReducer extends Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
+public class DaysWithConsumptionReducer extends
+		Reducer<IntWritable, ResidentialUnit, Text, Mutation> {
 	@Override
-	public void reduce(IntWritable key, Iterable<ResidentialUnit> values, Context c) throws IOException, InterruptedException {
+	public void reduce(IntWritable key, Iterable<ResidentialUnit> values,
+			Context c) throws IOException, InterruptedException {
 		double overallElecConsumption = 0;
 		double overallWaterColdConsumption = 0;
 		double overallWaterHotConsumption = 0;
@@ -35,28 +37,27 @@ public class DaysWithConsumptionReducer extends Reducer<IntWritable, Residential
 				continue;
 			double overallConsumption = flat.getDeviceAmount();
 			String counterType = flat.getCounterType();
-			try{
-				if(counterType.equals("el")){
+			try {
+				if (counterType.equals("el")) {
 					overallElecConsumption += overallConsumption;
 					elecFlat = (ResidentialUnit) Helpers.deepCopy(flat);
-				} else if(counterType.equals("wc")){
+				} else if (counterType.equals("wc")) {
 					overallWaterColdConsumption += overallConsumption;
 					wcFlat = (ResidentialUnit) Helpers.deepCopy(flat);
-				} else if(counterType.equals("wh")){
+				} else if (counterType.equals("wh")) {
 					overallWaterHotConsumption += overallConsumption;
 					whFlat = (ResidentialUnit) Helpers.deepCopy(flat);
-				} else if(counterType.equals("he")){
+				} else if (counterType.equals("he")) {
 					overallHeatingConsumption += overallConsumption;
 					heFlat = (ResidentialUnit) Helpers.deepCopy(flat);
-				}	
-			}
-			catch(ClassNotFoundException e){
+				}
+			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}		
+			}
 		}
 
 		Mutation m = new Mutation(String.valueOf(key));
-		
+
 		m.put("el", "amount", elecFlat.getTimeStamp(),
 				String.valueOf(overallElecConsumption));
 		m.put("wc", "amount", wcFlat.getTimeStamp(),
@@ -65,8 +66,9 @@ public class DaysWithConsumptionReducer extends Reducer<IntWritable, Residential
 				String.valueOf(overallWaterHotConsumption));
 		m.put("he", "amount", heFlat.getTimeStamp(),
 				String.valueOf(overallHeatingConsumption));
-		
-		String outputTableName = Config.getProperty("outputTableName");
+
+		String outputTableName = Config
+				.getProperty("report.daysWithConsumption.outputTableName");
 		c.write(new Text(outputTableName), m);
 	}
 }
