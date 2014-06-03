@@ -6,6 +6,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.Consumption;
 
 public class DaysWithMaxConsumptionMapper extends
@@ -15,6 +16,7 @@ public class DaysWithMaxConsumptionMapper extends
 			InterruptedException {
 
 		String family = k.getColumnFamily().toString();
+		//String family = (String) Helpers.toObject(k.getColumnFamily().toString().getBytes());
 
 		Consumption cons = new Consumption();
 		if (family.equals("el")) {
@@ -28,6 +30,8 @@ public class DaysWithMaxConsumptionMapper extends
 		}
 
 		double amount = Double.parseDouble(v.toString());
+		//double amount = (double) Helpers.toObject(v.toString().getBytes());
+		
 		long timestamp = k.getTimestamp();
 
 		cons.setTimestamp(timestamp);

@@ -125,6 +125,37 @@ public class DaysWithMaxConsumptionReducer extends
 			m.put("he", "maxAmount", cons.getTimestamp(),
 					String.valueOf(cons.getAmount()));
 		}
+	
+		
+//		Mutation m = new Mutation(Helpers.toByteArray("1"));
+//		for (Consumption cons : maxElecConsumptions) {
+//			long ts = cons.getTimestamp();
+//			m.put(Helpers.toByteArray("el"), Helpers.toByteArray("date"), cons.getTimestamp(), Helpers.toByteArray(calculateDate(ts)));
+//			m.put(Helpers.toByteArray("el"), Helpers.toByteArray("maxAmount"), cons.getTimestamp(),
+//					Helpers.toByteArray(String.valueOf(cons.getAmount())));
+//		}
+//
+//		for (Consumption cons : maxWaterColdConsumptions) {
+//			long ts = cons.getTimestamp();
+//			m.put(Helpers.toByteArray("wc"), Helpers.toByteArray("date"), cons.getTimestamp(), Helpers.toByteArray(calculateDate(ts)));
+//			m.put(Helpers.toByteArray("wc"), Helpers.toByteArray("maxAmount"), cons.getTimestamp(),
+//					Helpers.toByteArray(String.valueOf(cons.getAmount())));
+//		}
+//
+//		for (Consumption cons : maxWaterHotConsumptions) {
+//			long ts = cons.getTimestamp();
+//			m.put(Helpers.toByteArray("wh"), Helpers.toByteArray("date"), cons.getTimestamp(), Helpers.toByteArray(calculateDate(ts)));
+//			m.put(Helpers.toByteArray("wh"), Helpers.toByteArray("maxAmount"), cons.getTimestamp(),
+//					Helpers.toByteArray(String.valueOf(cons.getAmount())));
+//		}
+//
+//		for (Consumption cons : maxHeatingConsumptions) {
+//			long ts = cons.getTimestamp();
+//			m.put(Helpers.toByteArray("he"), Helpers.toByteArray("date"), cons.getTimestamp(), Helpers.toByteArray(calculateDate(ts)));
+//			m.put(Helpers.toByteArray("he"), Helpers.toByteArray("maxAmount"), cons.getTimestamp(),
+//					Helpers.toByteArray(String.valueOf(cons.getAmount())));
+//		}
+		
 
 		String outputTableName = Config
 				.getProperty("report.dayWithMaxConsumption.outputTableName");
