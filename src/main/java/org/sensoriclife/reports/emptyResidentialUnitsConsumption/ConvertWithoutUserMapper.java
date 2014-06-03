@@ -14,10 +14,16 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
 		
-		String consumptionID = k.getRow().toString();
-		String family = k.getColumnFamily().toString();
-		String qualifier = k.getColumnQualifier().toString();
-			
+		String consumptionID = "";
+		String family = "";
+		String qualifier = "";
+		try {
+			consumptionID = (String) Helpers.toObject(k.getRow().getBytes());
+			family = (String) Helpers.toObject(k.getColumnFamily().getBytes());
+			qualifier = (String) Helpers.toObject(k.getColumnQualifier().getBytes());
+		} catch (ClassNotFoundException e1) {}
+		
+		
 		if(family.equals("device") && qualifier.equals("amount"))
 		{
 			Configuration conf = new Configuration();
@@ -57,8 +63,11 @@ public class ConvertWithoutUserMapper extends Mapper<Key, Value, Text, DeviceUni
 		{
 			DeviceUnit flat = new DeviceUnit();
 			flat.setConsumptionID(consumptionID);
-			flat.setResidentialID(v.toString());
-			c.write(new Text(consumptionID),flat);
+			try {
+				flat.setResidentialID((String) Helpers.toObject(v.get()));
+				c.write(new Text(consumptionID),flat);
+			} catch (ClassNotFoundException e) {}
+			
 		}
 		else if(family.equals("user") && qualifier.equals("id"))
 		{

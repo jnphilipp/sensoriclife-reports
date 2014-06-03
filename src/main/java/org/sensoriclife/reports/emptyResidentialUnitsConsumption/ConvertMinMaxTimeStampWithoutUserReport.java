@@ -19,6 +19,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.DeviceUnit;
 
 public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implements Tool{
@@ -33,35 +35,25 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 	public int run(String[] args) throws Exception {
 		
 		/* 
-		 * args[0] = inputInstanceName
-		 * args[1] = inputZooServer
-		 * args[2] = inputTableName
-		 * args[3] = inputUserName
-		 * args[4] = inputPassword
+		 * args[0] = outputTableName
 		 * 
-		 * args[5] = outputInstanceName
-		 * args[6] = outputZooServer
-		 * args[7] = outputTableName
-		 * args[8] = outputUserName
-		 * args[9] = outputPassword
-		 * 
-		 * args[10] = (date) timeStamp -> min
-		 * args[11] = (date) timeStamp -> max
-		 * args[12] = (boolean) onlyInTimeRange -> is true, when the compute inside the timerange
-		 * args[13] = (long) reportTimestamp
+		 * args[1] = (date) timeStamp -> min
+		 * args[2] = (date) timeStamp -> max
+		 * args[3] = (boolean) onlyInTimeRange -> is true, when the compute inside the timerange
+		 * args[4] = (long) reportTimestamp
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
 		
 		Configuration conf = new Configuration();
-		conf.setStrings("outputTableName", args[7]);
-		conf.setBoolean("onlyInTimeRange", args[11].equals("true"));
-		conf.setLong("reportTimestamp", Long.parseLong(args[13]));
+		conf.setStrings("outputTableName", args[0]);
+		conf.setBoolean("onlyInTimeRange", args[3].equals("true"));
+		conf.setLong("reportTimestamp", Long.parseLong(args[4]));
 		
 		try
 		{
 			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
-			Date d  = formatter.parse( args[10]);// day.month.year"
+			Date d  = formatter.parse( args[1]);// day.month.year"
 			conf.setLong("minTimestamp", d.getTime());
 		}
 		catch ( ParseException e )
@@ -69,7 +61,7 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 			try
 			{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
-				Date d  = formatter.parse( args[10]);// day.month.year hour:minut:second
+				Date d  = formatter.parse( args[1]);// day.month.year hour:minut:second
 				conf.setLong("minTimestamp", d.getTime());
 			}
 			catch ( ParseException ee ) {}
@@ -78,7 +70,7 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 		try
 		{
 			DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" );
-			Date d  = formatter.parse( args[11]);// day.month.year"
+			Date d  = formatter.parse( args[2]);// day.month.year"
 			conf.setLong("maxTimestamp", d.getTime());
 		}
 		catch ( ParseException e )
@@ -86,7 +78,7 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 			try
 			{
 				DateFormat formatter = new SimpleDateFormat( "dd.MM.yyyy" );
-				Date d  = formatter.parse( args[11]);// day.month.year"
+				Date d  = formatter.parse( args[2]);// day.month.year"
 				conf.setLong("maxTimestamp", d.getTime());
 			}
 			catch ( ParseException ee ) {}
@@ -102,26 +94,26 @@ public class ConvertMinMaxTimeStampWithoutUserReport extends Configured implemen
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, args[0]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[5]);
+			AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name")); // Instanzname
+			AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[0], args[1]);
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[5], args[6]);
+			AccumuloInputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
+			AccumuloOutputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
 		}
 		
-		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
-		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("accumulo.tableName"));//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		Set cols = new HashSet();
-		cols.add(new Pair(new Text("device"), new Text("amount")));
-		cols.add(new Pair(new Text("residential"), new Text("id")));
-		cols.add(new Pair(new Text("user"), new Text("id")));
+		cols.add(new Pair(new Text(Helpers.toByteArray("device")), new Text(Helpers.toByteArray("amount"))));
+		cols.add(new Pair(new Text(Helpers.toByteArray("residential")), new Text(Helpers.toByteArray("id"))));
+		cols.add(new Pair(new Text(Helpers.toByteArray("user")), new Text(Helpers.toByteArray("id"))));
 		AccumuloInputFormat.fetchColumns(job, cols);
 		
-		AccumuloOutputFormat.setConnectorInfo(job, args[8], new PasswordToken(args[9]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[7]);
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
+		AccumuloOutputFormat.setDefaultTableName(job, args[0]);
 		AccumuloOutputFormat.setCreateTables(job, true);
 
 		job.setMapOutputKeyClass(Text.class);

@@ -75,23 +75,7 @@ public class MinMaxConsumptionReport {
 			password = confs.get("accumulo.password");}
 		else{Logger.error("ConfigError: accumulo.password doesn't exist");return false;}
 		
-		if(test)
-		{
-			
-			MockInstance inputMockInstance = new MockInstance(instanceName);
-			MockInstance outputMockInstance = new MockInstance(instanceName);
-			
-			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
-			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
-			
-			inputConnector.tableOperations().create(inputTableName,false);
-			outputConnector.tableOperations().create(outputTableName, false);
-			
-			// insert some test data
-			insertData(inputConnector, inputTableName);
-			
-		}
-		
+	
 		//JOB1
 		String[] jobArgs = new String[6];
 		if(confs.containsKey("accumulo.tableName")){
@@ -110,6 +94,23 @@ public class MinMaxConsumptionReport {
 			jobArgs[4] = confs.get("reports.minMaxConsumption.dataRange.onlyInTimeRange");}
 		else{jobArgs[4] = "false";}
 		jobArgs[5] = new Long(reportTimestamp).toString();
+		
+		if(test)
+		{
+			
+			MockInstance inputMockInstance = new MockInstance(instanceName);
+			MockInstance outputMockInstance = new MockInstance(instanceName);
+			
+			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
+			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
+			
+			inputConnector.tableOperations().create(inputTableName,false);
+			outputConnector.tableOperations().create(outputTableName, false);
+			
+			// insert some test data
+			insertData(inputConnector, inputTableName);
+			
+		}
 		
 		//first report: merge residentialID,consumptionID and Consumption -> filter timestamp
 		ConvertMinMaxTimeStampReport.test = test;
