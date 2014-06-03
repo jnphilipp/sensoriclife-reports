@@ -94,6 +94,7 @@ public class MinMaxConsumptionReport {
 			jobArgs[4] = confs.get("reports.minMaxConsumption.dataRange.onlyInTimeRange");}
 		else{jobArgs[4] = "false";}
 		jobArgs[5] = new Long(reportTimestamp).toString();
+
 		
 		if(test)
 		{

@@ -33,17 +33,27 @@ public class ConsumptionInDaytimeMapper extends Mapper<Key, Value, Text, FloatWr
 	public void map(Key key, Value value, Context context) throws IOException, InterruptedException {
 
 		long timestamp = key.getTimestamp();
-		String consumptionId = (String) Helpers.toObject(key.getRow().getBytes());
-		String family = (String) Helpers.toObject(key.getColumnFamily().getBytes());
-		String qualifier = (String) Helpers.toObject(key.getColumnQualifier().getBytes());
+		String consumptionId = "";
+		String family = "";
+		String qualifier = "";
+		
+		try {
+			consumptionId = (String) Helpers.toObject(key.getRow().getBytes());
+			family = (String) Helpers.toObject(key.getColumnFamily().getBytes());
+			qualifier = (String) Helpers.toObject(key.getColumnQualifier().getBytes());
+		} catch (ClassNotFoundException e1) {}
+		
 
 		// last row of each consumptionId
 		if (family.equals("residential") && qualifier.equals("id")) {
-			String val = ((String) Helpers.toObject(value.get());
-			if (val.startsWith(district))
-				writeConsumption(context, consumptionId.split("_")[1]);
-			currentConsumptionTotal = new float[4];
-			return;
+			String val;
+			try {
+				val = (String) Helpers.toObject(value.get());
+				if (val.startsWith(district))
+					writeConsumption(context, consumptionId.split("_")[1]);
+				currentConsumptionTotal = new float[4];
+				return;
+			} catch (ClassNotFoundException e) {}
 		}
 
 		if (minTimeStamp <= timestamp && timestamp <= maxTimeStamp) {

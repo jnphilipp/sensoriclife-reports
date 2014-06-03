@@ -49,6 +49,7 @@ public class App {
 						break;
 					case "-report":
 						report = it.next();
+						break;
 				}
 			}
 		}
