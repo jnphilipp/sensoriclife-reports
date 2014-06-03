@@ -28,7 +28,6 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.sensoriclife.Config;
 import org.sensoriclife.Logger;
 import org.sensoriclife.db.Accumulo;
-import org.apache.hadoop.io.Text;
 import org.sensoriclife.reports.helper.ConsumptionGeneralizeReport;
 import org.sensoriclife.reports.helper.ConvertMinMaxTimeStampReport;
 import org.sensoriclife.util.Helpers;
@@ -40,33 +39,66 @@ public class MinMaxConsumptionReport {
 	public static boolean runMinMaxConsumption() throws Exception{
 			
 		Map<String, String> confs = Config.toMap();
+
+		GregorianCalendar now = new GregorianCalendar(); 
+		long reportTimestamp = now.getTimeInMillis();
+		//System
+		boolean residentialUnit = false;
+		boolean building = false;
+		String instanceName = "";
+		String zooServer = "";
+		String userName = "";
+		String password = "";
+		String outputTableName = "";
+		String inputTableName = "";
+		
+		if(confs.containsKey("reports.minMaxConsumption.run.residentialUnit")){
+			residentialUnit = confs.get("reports.minMaxConsumption.run.residentialUnit").equals("true");}
+		else{Logger.warn("ConfigWarning: reports.minMaxConsumption.run.residentialUnit doesn't exist");}
+		if(confs.containsKey("reports.minMaxConsumption.run.builiding")){
+			building = confs.get("reports.minMaxConsumption.run.builiding").equals("true");}
+		else{Logger.warn("ConfigWarning: reports.minMaxConsumption.run.builiding doesn't exist");}
+		
+		if(confs.containsKey("accumulo.name")){
+			instanceName = confs.get("accumulo.name");}
+		else{Logger.error("ConfigError: accumulo.name doesn't exist");return false;}
+		if(confs.containsKey("accumulo.zooServers")){
+			zooServer = confs.get("accumulo.zooServers");}
+		else{Logger.error("ConfigError: accumulo.zooServers doesn't exist");return false;}
+		if(confs.containsKey("accumulo.tableName")){
+			inputTableName = confs.get("accumulo.tableName");}
+		else{Logger.error("ConfigError: accumulo.tableName doesn't exist");return false;}
+		if(confs.containsKey("accumulo.user")){
+			userName = confs.get("accumulo.user");}
+		else{Logger.error("ConfigError: accumulo.user doesn't exist");return false;}
+		if(confs.containsKey("accumulo.password")){
+			password = confs.get("accumulo.password");}
+		else{Logger.error("ConfigError: accumulo.password doesn't exist");return false;}
 		
 		if(test)
 		{
 			
-			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
-			MockInstance outputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
+			MockInstance inputMockInstance = new MockInstance(instanceName);
+			MockInstance outputMockInstance = new MockInstance(instanceName);
 			
 			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
 			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
 			
-			inputConnector.tableOperations().create(Config.getProperty("accumulo.tableName"),false);
-			//outputConnector.tableOperations().create(Config.getProperty("reports.minMaxConsumption.outputTable.tableName"), false);
+			inputConnector.tableOperations().create(inputTableName,false);
+			outputConnector.tableOperations().create(outputTableName, false);
 			
 			// insert some test data
-			insertData(inputConnector, Config.getProperty("accumulo.tableName"));
+			insertData(inputConnector, inputTableName);
 			
 		}
 		
-		GregorianCalendar now = new GregorianCalendar(); 
-		long reportTimestamp = now.getTimeInMillis();
-		
+		//JOB1
 		String[] jobArgs = new String[6];
 		if(confs.containsKey("accumulo.tableName")){
 			jobArgs[0] = confs.get("accumulo.tableName");}
 		else{Logger.error("ConfigError: accumulo.tableName doesn't exist");return false;}
 		if(confs.containsKey("reports.minMaxConsumption.outputTable.tableName")){
-			jobArgs[1] = confs.get("reports.minMaxConsumption.outputTable.tableName");}
+			outputTableName = jobArgs[1] = confs.get("reports.minMaxConsumption.outputTable.tableName");}
 		else{Logger.error("ConfigError: reports.minMaxConsumption.outputTable.tableName doesn't exist");return false;}
 		if(confs.containsKey("reports.minMaxConsumption.dateRange.min")){
 			jobArgs[2] = confs.get("reports.minMaxConsumption.dateRange.min");}
@@ -84,74 +116,68 @@ public class MinMaxConsumptionReport {
 		ConvertMinMaxTimeStampReport.runConvert(jobArgs);
 		
 		//second report: consumption for a residentialUnits
-		/*if(Config.getProperty("reports.minMaxConsumption.run.residentialUnit").equals("true"))
+		if(residentialUnit)
 		{
-			jobArgs = new String[7];
-			jobArgs[0] = Config.getProperty("reports.minMaxConsumption.outputTable.name");//OutputInstanceName
-			jobArgs[1] = Config.getProperty("reports.minMaxConsumption.outputTable.zooServers");//Server
-			jobArgs[2] = Config.getProperty("reports.minMaxConsumption.outputTable.tableName");//outputTableName	
-			jobArgs[3] = Config.getProperty("reports.minMaxConsumption.outputTable.user");//outputUserName
-			jobArgs[4] = Config.getProperty("reports.minMaxConsumption.outputTable.password");//outputPassword
-			jobArgs[5] = "6";
-			jobArgs[6] = new Long(reportTimestamp).toString();
-			ConsumptionGeneralizeReport.test=test;
-			ConsumptionGeneralizeReport.runConsumptionGeneralize(jobArgs);
+			String[] jobArgs2 = new String[3];
+			jobArgs2[0] = outputTableName;
+			jobArgs2[1] = "6";
+			jobArgs2[2] = new Long(reportTimestamp).toString();
 			
-			jobArgs = new String[2];
-			jobArgs[0] = "5";
-			jobArgs[1] = new Long(reportTimestamp).toString();
+			ConsumptionGeneralizeReport.test=test;
+			ConsumptionGeneralizeReport.runConsumptionGeneralize(jobArgs2);
+			
+			String[] jobArgs3 = new String[2];
+			jobArgs3[0] = "5";
+			jobArgs3[1] = new Long(reportTimestamp).toString();
 			MinMaxReport.test = test;
-			MinMaxReport.runMinMax(jobArgs);
+			MinMaxReport.runMinMax(jobArgs3);
 		}
 			
-		if(Config.getProperty("reports.minMaxConsumption.run.builiding").equals("true"))
+		if(building)
 		{
-			jobArgs = new String[6];
-			jobArgs[0] = Config.getProperty("reports.minMaxConsumption.outputTable.name");//OutputInstanceName
-			jobArgs[1] = Config.getProperty("reports.minMaxConsumption.outputTable.zooServers");//Server
-			jobArgs[2] = Config.getProperty("reports.minMaxConsumption.outputTable.tableName");//outputTableName	
-			jobArgs[3] = Config.getProperty("reports.minMaxConsumption.outputTable.user");//outputUserName
-			jobArgs[4] = Config.getProperty("reports.minMaxConsumption.outputTable.password");//outputPassword
-			jobArgs[5] = new Long(reportTimestamp).toString();
+			String[] jobArgs2 = new String[2];
+			jobArgs2[0] = outputTableName;//outputTableName	
+			jobArgs2[1] = new Long(reportTimestamp).toString();
 			ConsumptionGeneralizeToBuildingReport.test=test;
-			ConsumptionGeneralizeToBuildingReport.runConsumptionGeneralize(jobArgs);
+			ConsumptionGeneralizeToBuildingReport.runConsumptionGeneralize(jobArgs2);
 			
-			jobArgs = new String[2];
-			jobArgs[0] = "4";
-			jobArgs[1] = new Long(reportTimestamp).toString();
+			
+			String[] jobArgs3 = new String[2];
+			jobArgs3[0] = "4";
+			jobArgs3[1] = new Long(reportTimestamp).toString();
 			MinMaxReport.test=test;
-			MinMaxReport.runMinMax(jobArgs);
-		}*/
+			MinMaxReport.runMinMax(jobArgs3);
+		}
 		
 		if(test){
-			Accumulo.getInstance().connect(Config.getProperty("accumulo.name"));
+			Accumulo.getInstance().connect(instanceName);
 		}
 		else{
-			Accumulo.getInstance().connect(confs.get("accumulo.name"),
-					confs.get("accumulo.zooServers"),
-					confs.get("accumulo.user"),
-					confs.get("accumulo.password"));
+			Accumulo.getInstance().connect(instanceName,
+					zooServer,
+					userName,
+					password);
 		}
 		
-		Accumulo.getInstance().addMutation(confs.get("reports.minMaxConsumption.outputTable.tableName"), Helpers.toByteArray("MinMaxConsumption"), Helpers.toByteArray("report"), Helpers.toByteArray("version"), Helpers.toByteArray(reportTimestamp));
-		Accumulo.getInstance().flushBashWriter(confs.get("reports.minMaxConsumption.outputTable.tableName"));
+		Accumulo.getInstance().addMutation(outputTableName, Helpers.toByteArray("MinMaxConsumption"), Helpers.toByteArray("report"), Helpers.toByteArray("version"), Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().flushBashWriter(outputTableName);
 		Accumulo.getInstance().disconnect();
 		/*
 		 * Test
 		 */
 		if(test)
 		{
-			MockInstance inputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
-			MockInstance outputMockInstance = new MockInstance(Config.getProperty("accumulo.name"));
+			MockInstance inputMockInstance = new MockInstance(instanceName);
+			MockInstance outputMockInstance = new MockInstance(instanceName);
 			
 			Connector inputConnector = inputMockInstance.getConnector("", new PasswordToken(""));
 			Connector outputConnector = outputMockInstance.getConnector("", new PasswordToken(""));
 			
 			// print the inputtable
-			printTable(inputConnector, Config.getProperty("accumulo.tableName"));
+			printTable(inputConnector, inputTableName);
 			System.out.println("############################################");
 			// print the results of mapreduce
-			printTable(outputConnector, Config.getProperty("reports.minMaxConsumption.outputTable.tableName"));
+			printTable(outputConnector, outputTableName);
 		}
 		
 		return true;

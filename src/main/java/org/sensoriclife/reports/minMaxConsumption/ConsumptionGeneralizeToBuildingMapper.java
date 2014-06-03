@@ -14,6 +14,11 @@ public class ConsumptionGeneralizeToBuildingMapper extends Mapper<Key, Value, Te
 
 	public void map(Key k, Value v, Context c) throws IOException, InterruptedException {
 		
+		String rowID = "";
+		try {
+			rowID = (String) Helpers.toObject(k.getRow().getBytes());
+		} catch (ClassNotFoundException e1) {}
+		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
 		
@@ -21,7 +26,7 @@ public class ConsumptionGeneralizeToBuildingMapper extends Mapper<Key, Value, Te
 		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		if((timestamp == reportTimestamp)|| (reportTimestamp == 0))
 		{
-			String[] splitRowID = k.getRow().toString().split("_");
+			String[] splitRowID = rowID.split("_");
 			String reduceKey = "";
 			
 			if(splitRowID.length == 3)

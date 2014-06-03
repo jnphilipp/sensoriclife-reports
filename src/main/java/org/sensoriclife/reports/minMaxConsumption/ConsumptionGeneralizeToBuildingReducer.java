@@ -28,11 +28,11 @@ public class ConsumptionGeneralizeToBuildingReducer extends Reducer<Text, FloatW
 		long reportTimestamp = conf.getLong("reportTimestamp", 0);
 		String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
 		
-		Mutation m1 = new Mutation(key);
+		Mutation m1 = new Mutation(Helpers.toByteArray(key.toString()));
 		if(reportTimestamp != 0)
-			m1.put("building", "amount",new ColumnVisibility(),reportTimestamp,new Value( Helpers.toByteArray(amount)));
+			m1.put(Helpers.toByteArray("building"), Helpers.toByteArray("amount"),new ColumnVisibility(),reportTimestamp,Helpers.toByteArray(amount));
 		else
-			m1.put("building", "amount",new Value( Helpers.toByteArray(amount)));
+			m1.put(Helpers.toByteArray("building"), Helpers.toByteArray("amount"),Helpers.toByteArray(amount));
 		
 			
 		c.write(new Text(outputTableName), m1);
