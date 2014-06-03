@@ -21,6 +21,11 @@ public class MinMaxMapper extends
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 		
+		String rowID = "";
+		try {
+			rowID = (String) Helpers.toObject(k.getRow().getBytes());
+		} catch (ClassNotFoundException e1) {}
+		
 		Configuration conf = new Configuration();
 		conf = c.getConfiguration();
 		int selector = conf.getInt("selectModus", 0);
@@ -29,16 +34,16 @@ public class MinMaxMapper extends
 		
 		if((timestamp == reportTimestamp)|| (reportTimestamp == 0))
 		{
-			int rowIDindicator = k.getRow().toString().split("_").length;
+			int rowIDindicator = rowID.split("_").length;
 			
 			if(rowIDindicator == 2)
 			{
-				int resIDindicator = k.getRow().toString().split("_")[0].split("-").length;
+				int resIDindicator = rowID.split("_")[0].split("-").length;
 				
 				if(resIDindicator == selector)
 				{
-					String counterType = k.getRow().toString().split("_")[1];
-					String resID = k.getRow().toString().split("_")[0];
+					String counterType = rowID.split("_")[1];
+					String resID = rowID.split("_")[0];
 					
 					DeviceUnit rU = new DeviceUnit();
 					try {

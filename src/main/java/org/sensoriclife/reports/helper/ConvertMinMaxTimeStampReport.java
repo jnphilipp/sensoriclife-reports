@@ -106,7 +106,7 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		}
 		
 		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
-		AccumuloInputFormat.setInputTableName(job, args[0]);//tablename
+		AccumuloInputFormat.setInputTableName(job, Config.getProperty("accumulo.tableName"));//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		Set cols = new HashSet();
 		cols.add(new Pair(new Text(Helpers.toByteArray("device")), new Text(Helpers.toByteArray("amount"))));

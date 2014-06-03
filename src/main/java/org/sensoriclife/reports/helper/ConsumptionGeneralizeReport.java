@@ -16,6 +16,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
 import org.sensoriclife.util.Helpers;
 
 
@@ -33,20 +34,16 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
 		
 		/*
-		 * args[0] = InstanceName
-		 * args[1] = zooServer
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
+		 * args[0] = TableName
 		 * 
-		 * args[5] = indikator to select the rowID position
-		 * args[6] = reportTimestamp
+		 * args[1] = indikator to select the rowID position
+		 * args[2] = reportTimestamp
 		 */
 		
 		Configuration conf = new Configuration();
-		conf.setStrings("outputTableName", args[2]);
-		conf.setInt("indikator", Integer.parseInt(args[5]));
-		conf.setLong("reportTimestamp", new Long(args[6]));
+		conf.setStrings("outputTableName", args[0]);
+		conf.setInt("indikator", Integer.parseInt(args[1]));
+		conf.setLong("reportTimestamp", new Long(args[2]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConsumptionGeneralizeReport.class.getName());
@@ -58,43 +55,43 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, args[0]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[0]);
+			AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name")); // Instanzname
+			AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[0], args[1]);
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[0], args[1]);
+			AccumuloInputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
+			AccumuloOutputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
 		}
 		
-		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
-		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
+		AccumuloInputFormat.setInputTableName(job, args[0]);//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		
 		//Filter
 		Set cols = new HashSet();
-		if(args[5].equals("6")){
+		if(args[1].equals("6")){
 			cols.add(new Pair(new Text(Helpers.toByteArray("device")), new Text(Helpers.toByteArray("amount"))));
 		}
-		else if(args[5].equals("5")){
-			cols.add(new Pair(new Text("residentialUnit"), new Text("amount")));
+		else if(args[1].equals("5")){
+			cols.add(new Pair(new Text(Helpers.toByteArray("residentialUnit")), new Text(Helpers.toByteArray("amount"))));
 		}
-		else if(args[5].equals("4")){
-			cols.add(new Pair(new Text("building"), new Text("amount")));
+		else if(args[1].equals("4")){
+			cols.add(new Pair(new Text(Helpers.toByteArray("building")), new Text(Helpers.toByteArray("amount"))));
 		}
-		else if(args[5].equals("3")){
-			cols.add(new Pair(new Text("street"), new Text("amount")));
+		else if(args[1].equals("3")){
+			cols.add(new Pair(new Text(Helpers.toByteArray("street")), new Text(Helpers.toByteArray("amount"))));
 		}
-		else if(args[5].equals("2")){
-			cols.add(new Pair(new Text("district"), new Text("amount")));
+		else if(args[1].equals("2")){
+			cols.add(new Pair(new Text(Helpers.toByteArray("district")), new Text(Helpers.toByteArray("amount"))));
 		}
-		else if(args[5].equals("1")){
-			cols.add(new Pair(new Text("city"), new Text("amount")));
+		else if(args[1].equals("1")){
+			cols.add(new Pair(new Text(Helpers.toByteArray("city")), new Text(Helpers.toByteArray("amount"))));
 		}
 		AccumuloInputFormat.fetchColumns(job, cols);
 		
-		AccumuloOutputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[2]);
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
+		AccumuloOutputFormat.setDefaultTableName(job, args[0]);
 		AccumuloOutputFormat.setCreateTables(job, false);
 		
 		job.setMapOutputKeyClass(Text.class);

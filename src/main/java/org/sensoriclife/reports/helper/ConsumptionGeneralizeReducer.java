@@ -54,11 +54,11 @@ public class ConsumptionGeneralizeReducer extends Reducer<Text, FloatWritable, T
 				break;
 		}
 		
-		Mutation m1 = new Mutation(key);
+		Mutation m1 = new Mutation(Helpers.toByteArray(key.toString()));
 		if(reportTimestamp != 0)
-			m1.put(summaryObjectName, "amount",reportTimestamp,new Value( Helpers.toByteArray(amount)));
+			m1.put(Helpers.toByteArray(summaryObjectName), Helpers.toByteArray("amount"),reportTimestamp,Helpers.toByteArray(amount));
 		else
-			m1.put(summaryObjectName, "amount",new Value( Helpers.toByteArray(amount)));
+			m1.put(Helpers.toByteArray(summaryObjectName), Helpers.toByteArray("amount"),Helpers.toByteArray(amount));
 		
 		c.write(new Text(outputTableName), m1);
 		

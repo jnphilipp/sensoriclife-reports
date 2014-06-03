@@ -16,6 +16,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.Config;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.DeviceUnit;
 
 /**
@@ -55,31 +56,31 @@ public class MinMaxReport extends Configured implements Tool {
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, Config.getProperty("reports.minMaxConsumption.outputTable.name")); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, Config.getProperty("reports.minMaxConsumption.outputTable.name"));
+			AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name")); // Instanzname
+			AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, Config.getProperty("reports.minMaxConsumption.outputTable.name"), Config.getProperty("reports.minMaxConsumption.outputTable.zooServers"));
-			AccumuloOutputFormat.setZooKeeperInstance(job, Config.getProperty("reports.minMaxConsumption.outputTable.name"), Config.getProperty("reports.minMaxConsumption.outputTable.zooServers"));
+			AccumuloInputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
+			AccumuloOutputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
 		}
 		
-		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("reports.minMaxConsumption.outputTable.user"),
-				new PasswordToken(Config.getProperty("reports.minMaxConsumption.outputTable.password"))); //username,password
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"),
+				new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
 		AccumuloInputFormat.setInputTableName(job, Config.getProperty("reports.minMaxConsumption.outputTable.tableName"));//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		//Filter
 		Set cols = new HashSet();
 		if(args[0].equals("5")){
-			cols.add(new Pair(new Text("residentialUnit"), new Text("amount")));
+			cols.add(new Pair(new Text(Helpers.toByteArray("residentialUnit")), new Text(Helpers.toByteArray("amount"))));
 		}
 		else if(args[0].equals("4")){
-			cols.add(new Pair(new Text("building"), new Text("amount")));
+			cols.add(new Pair(new Text(Helpers.toByteArray("building")), new Text(Helpers.toByteArray("amount"))));
 		}
 		AccumuloInputFormat.fetchColumns(job, cols);
 		
-		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("reports.minMaxConsumption.outputTable.user"),
-				new PasswordToken(Config.getProperty("reports.minMaxConsumption.outputTable.password"))); //username,password
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"),
+				new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
 		AccumuloOutputFormat.setDefaultTableName(job, Config.getProperty("reports.minMaxConsumption.outputTable.tableName"));
 		AccumuloOutputFormat.setCreateTables(job, false);
 		

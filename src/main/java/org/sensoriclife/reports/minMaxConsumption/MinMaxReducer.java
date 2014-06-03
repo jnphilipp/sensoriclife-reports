@@ -56,22 +56,22 @@ public class MinMaxReducer extends
 			if(selector == 4)
 				qualifierName = "building";
 			
-			Mutation m1 = new Mutation(key+"_"+qualifierName);
+			Mutation m1 = new Mutation(Helpers.toByteArray(key.toString()+"_"+qualifierName));
 			
 			// write minimum/maximum
 			if(reportTimestamp != 0)
 			{
-				m1.put("min", qualifierName,reportTimestamp,new Value(minResID.getBytes()));
-				m1.put("min", "amount",reportTimestamp,new Value(Helpers.toByteArray(min)));
-				m1.put("max", qualifierName,reportTimestamp,new Value(maxResID.getBytes()));
-				m1.put("max", "amount",reportTimestamp,new Value(Helpers.toByteArray(max)));
+				m1.put(Helpers.toByteArray("min"), Helpers.toByteArray(qualifierName),reportTimestamp,Helpers.toByteArray(minResID));
+				m1.put(Helpers.toByteArray("min"), Helpers.toByteArray("amount"),reportTimestamp,Helpers.toByteArray(min));
+				m1.put(Helpers.toByteArray("max"), Helpers.toByteArray(qualifierName),reportTimestamp,Helpers.toByteArray(maxResID));
+				m1.put(Helpers.toByteArray("max"), Helpers.toByteArray("amount"),reportTimestamp,Helpers.toByteArray(max));
 			}
 			else
 			{
-				m1.put("min", qualifierName,new Value(minResID.getBytes()));
-				m1.put("min", "amount",new Value(Helpers.toByteArray(min)));
-				m1.put("max", qualifierName,new Value(maxResID.getBytes()));
-				m1.put("max", "amount",new Value(Helpers.toByteArray(max)));
+				m1.put(Helpers.toByteArray("min"), Helpers.toByteArray(qualifierName),Helpers.toByteArray(minResID.getBytes()));
+				m1.put(Helpers.toByteArray("min"), Helpers.toByteArray("amount"),Helpers.toByteArray(min));
+				m1.put(Helpers.toByteArray("max"), Helpers.toByteArray(qualifierName),Helpers.toByteArray(maxResID.getBytes()));
+				m1.put(Helpers.toByteArray("max"), Helpers.toByteArray("amount"),Helpers.toByteArray(max));
 			}
 				
 				

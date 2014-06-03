@@ -57,7 +57,8 @@ public class App {
 			Config.load();
 		else
 			Config.load(confFile);
-
+		
+		
 		Accumulo accumulo;
 		switch ( report ) {
 			case "1":

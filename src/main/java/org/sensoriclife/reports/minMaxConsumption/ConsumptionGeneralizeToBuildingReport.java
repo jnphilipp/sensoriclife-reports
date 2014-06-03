@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.sensoriclife.Config;
 
 public class ConsumptionGeneralizeToBuildingReport extends Configured implements Tool{
 	
@@ -24,17 +25,13 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 	public int run(String[] args) throws Exception {
 		
 		/*
-		 * args[0] = InstanceName
-		 * args[1] = zooServers
-		 * args[2] = TableName
-		 * args[3] = UserName
-		 * args[4] = Password
-		 * args[5] = reportTimestamp	  
+		 * args[0] = TableName
+		 * args[1] = reportTimestamp	  
 		 */
 		
 		Configuration conf = new Configuration();
-		conf.setStrings("outputTableName", args[2]);
-		conf.setLong("reportTimestamp", new Long(args[5]));
+		conf.setStrings("outputTableName", args[0]);
+		conf.setLong("reportTimestamp", new Long(args[1]));
 		
 		Job job = Job.getInstance(conf);
 		job.setJobName(ConsumptionGeneralizeToBuildingReport.class.getName());
@@ -46,21 +43,21 @@ public class ConsumptionGeneralizeToBuildingReport extends Configured implements
 
 		if(test)
 		{
-			AccumuloInputFormat.setMockInstance(job, args[0]); // Instanzname
-			AccumuloOutputFormat.setMockInstance(job, args[0]);
+			AccumuloInputFormat.setMockInstance(job, Config.getProperty("accumulo.name")); // Instanzname
+			AccumuloOutputFormat.setMockInstance(job, Config.getProperty("accumulo.name"));
 		}
 		else
 		{
-			AccumuloInputFormat.setZooKeeperInstance(job, args[0], args[1]);
-			AccumuloOutputFormat.setZooKeeperInstance(job, args[0], args[1]);
+			AccumuloInputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
+			AccumuloOutputFormat.setZooKeeperInstance(job, Config.getProperty("accumulo.name"), Config.getProperty("accumulo.zooServers"));
 		}
 		
-		AccumuloInputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4])); //username,password
-		AccumuloInputFormat.setInputTableName(job, args[2]);//tablename
+		AccumuloInputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password"))); //username,password
+		AccumuloInputFormat.setInputTableName(job, args[0]);//tablename
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 		
-		AccumuloOutputFormat.setConnectorInfo(job, args[3], new PasswordToken(args[4]));
-		AccumuloOutputFormat.setDefaultTableName(job, args[2]);
+		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
+		AccumuloOutputFormat.setDefaultTableName(job, args[0]);
 		AccumuloOutputFormat.setCreateTables(job, false);
 		
 		job.setMapOutputKeyClass(Text.class);
