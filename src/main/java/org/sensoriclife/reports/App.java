@@ -31,7 +31,8 @@ public class App {
 		if(test){
 			args = new String[2];
 			args[0] = "-report";
-			args[1] = "7";
+			args[1] = "4";
+
 		}
 		
 		Logger.getInstance();

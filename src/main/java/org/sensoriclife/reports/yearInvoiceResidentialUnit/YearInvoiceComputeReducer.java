@@ -36,11 +36,11 @@ public class YearInvoiceComputeReducer extends Reducer<Text, FloatWritable, Text
 			
 			String outputTableName = conf.getStrings("outputTableName","yearConsumption")[0];
 			
-			Mutation m1 = new Mutation(key);
+			Mutation m1 = new Mutation(Helpers.toByteArray(key.toString()));
 			if(reportTimestamp != 0)
-				m1.put("residentialUnit", "invoice",reportTimestamp,new Value( Helpers.toByteArray(price)));
+				m1.put(Helpers.toByteArray("residentialUnit"), Helpers.toByteArray("invoice"),reportTimestamp,Helpers.toByteArray(price));
 			else
-				m1.put("residentialUnit", "invoice",new Value( Helpers.toByteArray(price)));
+				m1.put(Helpers.toByteArray("residentialUnit"), Helpers.toByteArray("invoice"),Helpers.toByteArray(price));
 			
 			c.write(new Text(outputTableName), m1);
 		}
