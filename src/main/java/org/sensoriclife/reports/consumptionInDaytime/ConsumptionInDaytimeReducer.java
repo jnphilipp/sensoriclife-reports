@@ -19,8 +19,8 @@ public class ConsumptionInDaytimeReducer extends Reducer<Text, FloatWritable, Te
 			result += value.get();
 		}		
 		
-		Mutation mutation = new Mutation(String.valueOf(key));			
-		mutation.put("result", "value", reportTimeStamp, String.valueOf(result));		
+		Mutation mutation = new Mutation(String.valueOf(key).getBytes());			
+		mutation.put("result".getBytes(), "value".getBytes(), reportTimeStamp, String.valueOf(result).getBytes());		
 		c.write(new Text(outputTable), mutation);		
 	}
 }

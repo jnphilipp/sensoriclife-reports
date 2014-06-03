@@ -33,13 +33,14 @@ public class ConsumptionInDaytimeMapper extends Mapper<Key, Value, Text, FloatWr
 	public void map(Key key, Value value, Context context) throws IOException, InterruptedException {
 
 		long timestamp = key.getTimestamp();
-		String consumptionId = key.getRow().toString();
-		String family = key.getColumnFamily().toString();
-		String qualifier = key.getColumnQualifier().toString();
+		String consumptionId = (String) Helpers.toObject(key.getRow().getBytes());
+		String family = (String) Helpers.toObject(key.getColumnFamily().getBytes());
+		String qualifier = (String) Helpers.toObject(key.getColumnQualifier().getBytes());
 
 		// last row of each consumptionId
 		if (family.equals("residential") && qualifier.equals("id")) {
-			if (value.toString().startsWith(district))
+			String val = ((String) Helpers.toObject(value.get());
+			if (val.startsWith(district))
 				writeConsumption(context, consumptionId.split("_")[1]);
 			currentConsumptionTotal = new float[4];
 			return;

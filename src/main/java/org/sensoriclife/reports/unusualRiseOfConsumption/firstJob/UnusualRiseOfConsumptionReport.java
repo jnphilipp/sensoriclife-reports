@@ -19,6 +19,8 @@ import org.sensoriclife.db.Accumulo;
 import org.sensoriclife.world.ResidentialUnit;
 
 public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
+	
+	public static boolean test = false;
 
 	/**
 	 * runs the whole process of the first map reduce job, including
@@ -40,24 +42,26 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 				String.valueOf(System.currentTimeMillis()));
 
 		Accumulo accumulo = Accumulo.getInstance();
-		accumulo.connect();
-
-		accumulo.createTable(Config
-				.getProperty("report.unusualRiseOfConsumption.inputTableName"),
-				false);
-		accumulo.createTable(
-				Config.getProperty("report.unusualRiseOfConsumption.outputTableName"),
-				false);
-		// another output table ~ helpertable
-		// --> needed for second map reduce job
-		accumulo.createTable(
-				Config.getProperty("report.unusualRiseOfConsumption.helperOutputTableName"),
-				false);
-
-		insertData(
-				accumulo,
-				Config.getProperty("report.unusualRiseOfConsumption.inputTableName"));
 		
+		if (test) {
+			accumulo.connect("mockInstance");
+			accumulo.createTable(Config
+					.getProperty("report.unusualRiseOfConsumption.inputTableName"),
+					false);
+			accumulo.createTable(
+					Config.getProperty("report.unusualRiseOfConsumption.outputTableName"),
+					false);
+			// another output table ~ helpertable
+			// --> needed for second map reduce job
+			accumulo.createTable(
+					Config.getProperty("report.unusualRiseOfConsumption.helperOutputTableName"),
+					false);
+
+			insertData(
+					accumulo,
+					Config.getProperty("report.unusualRiseOfConsumption.inputTableName"));		
+		}
+
 		/*
 		Iterator<Entry<Key, Value>> scanner = accumulo.scanAll(Config
 				.getProperty("report.unusualRiseOfConsumption.inputTableName"),
@@ -103,26 +107,38 @@ public class UnusualRiseOfConsumptionReport extends Configured implements Tool {
 
 		job.setMapperClass(UnusualRiseOfConsumptionMapper.class);
 		job.setReducerClass(UnusualRiseOfConsumptionReducer.class);
-
-		AccumuloInputFormat.setMockInstance(job,
-				Config.getProperty("mockInstanceName"));
-		AccumuloInputFormat.setConnectorInfo(job, Config
-				.getProperty("accumulo.username"),
-				new PasswordToken(Config.getProperty("accumulo.password")));
+		
+		if (test) {
+			AccumuloInputFormat.setMockInstance(job, "mockInstance");
+			AccumuloOutputFormat.setMockInstance(job, "mockInstance");
+			AccumuloInputFormat
+					.setConnectorInfo(job, "", new PasswordToken(""));
+			AccumuloOutputFormat.setConnectorInfo(job, "",
+					new PasswordToken(""));
+		} else {
+			AccumuloInputFormat.setZooKeeperInstance(job,
+					Config.getProperty("accumulo.name"),
+					Config.getProperty("accumulo.zooServers"));
+			AccumuloOutputFormat.setZooKeeperInstance(job,
+					Config.getProperty("accumulo.name"),
+					Config.getProperty("accumulo.zooServers"));
+			AccumuloInputFormat.setConnectorInfo(job, Config
+					.getProperty("accumulo.name"),
+					new PasswordToken(Config.getProperty("accumulo.password")));
+			AccumuloOutputFormat.setConnectorInfo(job, Config
+					.getProperty("accumulo.name"),
+					new PasswordToken(Config.getProperty("accumulo.password")));
+		}
+		
 		AccumuloInputFormat.setInputTableName(job, Config
 				.getProperty("report.unusualRiseOfConsumption.inputTableName"));
 		AccumuloInputFormat.setScanAuthorizations(job, new Authorizations());
 
-		AccumuloOutputFormat.setConnectorInfo(job, Config
-				.getProperty("accumulo.username"),
-				new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloOutputFormat
 				.setDefaultTableName(
 						job,
 						Config.getProperty("report.unusualRiseOfConsumption.outputTableName"));
 		AccumuloOutputFormat.setCreateTables(job, true);
-		AccumuloOutputFormat.setMockInstance(job,
-				Config.getProperty("mockInstanceName"));
 
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(ResidentialUnit.class);

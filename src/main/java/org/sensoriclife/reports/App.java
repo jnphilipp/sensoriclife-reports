@@ -32,6 +32,7 @@ public class App {
 			args = new String[2];
 			args[0] = "-report";
 			args[1] = "4";
+
 		}
 		
 		Logger.getInstance();
@@ -88,12 +89,16 @@ public class App {
 				break;
 			case "6":
 			case "dayWithMaxConsumption":
+				DaysWithConsumptionReport.test=test;
 				accumulo = DaysWithConsumptionReport.runFirstJob();
+				DaysWithMaxConsumptionReport.test=test;
 				DaysWithMaxConsumptionReport.runSecondJob(accumulo);
 				break;
 			case "7":
 			case "unusualRiseOfConsumption":
+				UnusualRiseOfConsumptionReport.test=test;
 				accumulo = UnusualRiseOfConsumptionReport.runFirstJob();
+				UnusualRiseOfHeatingConsumptionReport.test=test;
 				UnusualRiseOfHeatingConsumptionReport.runSecondJob(accumulo);
 				break;
 			default:
