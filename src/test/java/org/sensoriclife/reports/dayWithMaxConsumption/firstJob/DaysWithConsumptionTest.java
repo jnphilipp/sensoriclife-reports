@@ -69,7 +69,7 @@ public class DaysWithConsumptionTest {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	/*@Test
 	public void testMapper() throws Exception {
 
 		int consumptionId = 1;
@@ -286,7 +286,7 @@ public class DaysWithConsumptionTest {
 	 * 
 	 * @throws IOException
 	 */
-	@Test
+	/*@Test
 	public void testReducer() throws IOException {
 
 		List<Pair<IntWritable, List<ResidentialUnit>>> reducerInput = new ArrayList<Pair<IntWritable, List<ResidentialUnit>>>();
@@ -459,5 +459,5 @@ public class DaysWithConsumptionTest {
 		} else {
 			System.out.println("Reducer wrong");
 		}
-	}
+	}*/
 }
