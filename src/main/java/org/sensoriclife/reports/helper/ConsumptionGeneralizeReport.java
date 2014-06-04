@@ -92,7 +92,7 @@ public class ConsumptionGeneralizeReport extends Configured implements Tool{
 		
 		AccumuloOutputFormat.setConnectorInfo(job, Config.getProperty("accumulo.user"), new PasswordToken(Config.getProperty("accumulo.password")));
 		AccumuloOutputFormat.setDefaultTableName(job, args[0]);
-		AccumuloOutputFormat.setCreateTables(job, false);
+		AccumuloOutputFormat.setCreateTables(job, true);
 		
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(FloatWritable.class);

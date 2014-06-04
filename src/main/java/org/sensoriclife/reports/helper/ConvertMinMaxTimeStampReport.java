@@ -43,6 +43,7 @@ public class ConvertMinMaxTimeStampReport extends Configured implements Tool{
 		 * args[4] = (boolean) onlyInTimeRange -> is true, when the compute inside the TimeRange
 		 * args[5] = (long) reportTimestamp
 		 * 
+		 * 
 		 * Times: dd.MM.yyyy or
 		 * 		  dd.MM.yyyy kk:mm:ss
 		 */
