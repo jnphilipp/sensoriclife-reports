@@ -21,16 +21,13 @@ public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, R
 		String consumptionID = null;
 		String family = null;
 		String qualifier = null;
-	//try {
-			consumptionID = k.getRow().toString();
-			family = k.getColumnFamily().toString();
-			qualifier = k.getColumnQualifier().toString();
-//			consumptionID = (String) Helpers.toObject(k.getRow().toString().getBytes());
-//			family = (String) Helpers.toObject(k.getColumnFamily().toString().getBytes());
-//			qualifier = (String) Helpers.toObject(k.getColumnQualifier().toString().getBytes());
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
+	try {
+			consumptionID = (String) Helpers.toObject(k.getRow().getBytes());
+			family = (String) Helpers.toObject(k.getColumnFamily().getBytes());
+			qualifier = (String) Helpers.toObject(k.getColumnQualifier().getBytes());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		Long timestamp = k.getTimestamp();
 			
 		if(family.equals("device") && qualifier.equals("amount"))
@@ -43,12 +40,14 @@ public class DaysWithConsumptionMapper extends Mapper<Key, Value, IntWritable, R
 				ResidentialUnit flat = new ResidentialUnit();
 				flat.setConsumptionID(consumptionID);
 				flat.setTimeStamp(k.getTimestamp());
-				flat.setDeviceAmount(Float.parseFloat(v.toString()));
-//				try {
-//					flat.setDeviceAmount((float) Helpers.toObject(v.toString().getBytes()));
-//				} catch (ClassNotFoundException e) {
-//					e.printStackTrace();
-//				}
+				float amount = 0;
+				try {
+					amount = (float) Helpers.toObject(v.get());
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
+				flat.setDeviceAmount(amount);
+				flat.setDeviceAmount(amount);
 				flat.setCounterType(counterType);
 				
 				Timestamp ts = new Timestamp(timestamp);

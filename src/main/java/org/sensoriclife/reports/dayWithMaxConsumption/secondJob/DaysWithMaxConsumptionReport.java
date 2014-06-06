@@ -20,6 +20,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.sensoriclife.Config;
 import org.sensoriclife.db.Accumulo;
+import org.sensoriclife.util.Helpers;
 import org.sensoriclife.world.Consumption;
 
 public class DaysWithMaxConsumptionReport extends Configured implements Tool {
@@ -60,8 +61,8 @@ public class DaysWithMaxConsumptionReport extends Configured implements Tool {
 				new Authorizations());
 		while (scanner2.hasNext()) {
 			Entry<Key, Value> entry = scanner2.next();
-			System.out.println("Key: " + entry.getKey().toString() + " Value: "
-					+ entry.getValue().toString());
+			System.out.println("Key: " + (String) Helpers.toObject(entry.getKey().getRow().getBytes()) + " Value: "
+					+ (String) Helpers.toObject(entry.getValue().get()));
 		}
 
 		// this is for production mode - save storage

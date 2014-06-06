@@ -15,8 +15,12 @@ public class DaysWithMaxConsumptionMapper extends
 	public void map(Key k, Value v, Context c) throws IOException,
 			InterruptedException {
 
-		String family = k.getColumnFamily().toString();
-		//String family = (String) Helpers.toObject(k.getColumnFamily().toString().getBytes());
+		String family = null;
+		try {
+			family = (String) Helpers.toObject(k.getColumnFamily().getBytes());
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
 
 		Consumption cons = new Consumption();
 		if (family.equals("el")) {
@@ -29,8 +33,12 @@ public class DaysWithMaxConsumptionMapper extends
 			cons.setCounterType("he");
 		}
 
-		double amount = Double.parseDouble(v.toString());
-		//double amount = (double) Helpers.toObject(v.toString().getBytes());
+		float amount = 0;
+		try {
+			amount = (float) Helpers.toObject(v.get());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		long timestamp = k.getTimestamp();
 
