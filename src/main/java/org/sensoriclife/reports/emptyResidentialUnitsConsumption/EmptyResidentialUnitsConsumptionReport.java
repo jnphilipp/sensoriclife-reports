@@ -107,6 +107,19 @@ public class EmptyResidentialUnitsConsumptionReport {
 			insertData(inputConnector, inputTableName);
 
 		}
+		if (test) {
+			Accumulo.getInstance().connect(instanceName);
+		} else {
+			Accumulo.getInstance().connect(instanceName, zooServer, userName,
+					password);
+			Accumulo.getInstance().createTable(outputTableName);
+		}
+		Accumulo.getInstance().addMutation(outputTableName,
+				Helpers.toByteArray("YearInvoice"),
+				Helpers.toByteArray("report"), Helpers.toByteArray("version"),
+				Helpers.toByteArray(reportTimestamp));
+		Accumulo.getInstance().flushBashWriter(outputTableName);
+		Accumulo.getInstance().disconnect();
 
 		String[] jobArgs = new String[5];
 		jobArgs[0] = outputTableName;
@@ -135,18 +148,6 @@ public class EmptyResidentialUnitsConsumptionReport {
 		ConsumptionGeneralizeReport.test = test;
 		ConsumptionGeneralizeReport.runConsumptionGeneralize(jobArgs);
 
-		if (test) {
-			Accumulo.getInstance().connect(instanceName);
-		} else {
-			Accumulo.getInstance().connect(instanceName, zooServer, userName,
-					password);
-		}
-		Accumulo.getInstance().addMutation(outputTableName,
-				Helpers.toByteArray("YearInvoice"),
-				Helpers.toByteArray("report"), Helpers.toByteArray("version"),
-				Helpers.toByteArray(reportTimestamp));
-		Accumulo.getInstance().flushBashWriter(outputTableName);
-		Accumulo.getInstance().disconnect();
 		/*
 		 * Test
 		 */

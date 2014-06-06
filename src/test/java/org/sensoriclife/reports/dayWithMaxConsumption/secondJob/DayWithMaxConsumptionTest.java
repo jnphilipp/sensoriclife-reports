@@ -28,12 +28,12 @@ public class DayWithMaxConsumptionTest {
 	/**
 	 * with this class, map and reduce will be tested together.
 	 */
-	private MapReduceDriver<Key, Value, IntWritable, Consumption, Text, Mutation> mapReduceDriver;
+	//private MapReduceDriver<Key, Value, IntWritable, Consumption, Text, Mutation> mapReduceDriver;
 
 	/**
 	 * this method is called before the execution of the test.
 	 */
-	@Before
+	/*@Before
 	public void setUp() {
 		DaysWithMaxConsumptionMapper mapper = new DaysWithMaxConsumptionMapper();
 		DaysWithMaxConsumptionReducer reducer = new DaysWithMaxConsumptionReducer();
@@ -55,7 +55,7 @@ public class DayWithMaxConsumptionTest {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	/*@Test
 	public void testMapReduce() throws Exception {
 
 		String colQual = "amount";
@@ -160,5 +160,5 @@ public class DayWithMaxConsumptionTest {
 			System.out.println("MapReduce wrong");
 		}
 
-	}
+	}*/
 }
